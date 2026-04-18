@@ -562,8 +562,9 @@ namespace TheOtherRoles.Modules
                 renderer.transform.localPosition = (Vector3)(pos.Item2 / TORGameManager.Instance.RuntimeAsset.MapScale) + new Vector3(0, 0, -1f - p);
                 var button = renderer.gameObject.SetUpButton();
                 button.gameObject.AddComponent<BoxCollider2D>().size = new(0.3f, 0.3f);
+                var hover = button.gameObject.AddComponent<TouchHover>();
 
-                button.OnMouseOver.AddListener((Action)(() => {
+                hover.OnHoverOver.AddListener((Action)(() => {
                     MetaContextOld context = new();
 
                     foreach (var near in statisticsEvent.Position)
@@ -581,7 +582,7 @@ namespace TheOtherRoles.Modules
 
                     TORGUIManager.Instance.SetHelpContext(button, context);
                 }));
-                button.OnMouseOut.AddListener((Action)(() => TORGUIManager.Instance.HideHelpContextIf(button)));
+                hover.OnHoverOut.AddListener((Action)(() => TORGUIManager.Instance.HideHelpContextIf(button)));
 
                 p += 0.001f;
             }
@@ -599,13 +600,14 @@ namespace TheOtherRoles.Modules
                 var collider = detail.AddComponent<BoxCollider2D>();
                 collider.size = new Vector2(3.4f, 0.7f);
                 var button = detail.gameObject.SetUpButton(true, null);
+                var hover = button.gameObject.AddComponent<TouchHover>();
                 button.OnClick.RemoveAllListeners();
-                button.OnMouseOver.AddListener((Action)(() =>
+                hover.OnHoverOver.AddListener((Action)(() =>
                 {
                     OnMouseOver(eventIndex);
                     backGround.color = Color.Lerp(MainColor, Color.white, 0.5f);
                 }));
-                button.OnMouseOut.AddListener((Action)(() =>
+                hover.OnHoverOut.AddListener((Action)(() =>
                 {
                     OnMouseOver(eventIndex);
                     backGround.color = MainColor;

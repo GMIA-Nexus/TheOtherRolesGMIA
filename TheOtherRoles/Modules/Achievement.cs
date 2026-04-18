@@ -311,13 +311,14 @@ namespace TheOtherRoles.Modules
                 collider.isTrigger = true;
                 collider.size = new Vector2(2.6f, 0.55f);
                 var button = billboard.SetUpButton();
-                button.OnMouseOver.AddListener((Action)(() => TORGUIManager.Instance.SetHelpContext(button, achievement.GetOverlayContext(true, false, true, false, true))));
-                button.OnMouseOut.AddListener((Action)(() => TORGUIManager.Instance.HideHelpContextIf(button)));
+                var hover = button.gameObject.AddComponent<TouchHover>();
+                hover.OnHoverOver.AddListener((Action)(() => TORGUIManager.Instance.SetHelpContext(button, achievement.GetOverlayContext(true, false, true, false, true))));
+                hover.OnHoverOut.AddListener((Action)(() => TORGUIManager.Instance.HideHelpContextIf(button)));
 #if WINDOWS
                 button.OnClick.AddListener((Action)(() => {
                     SetOrToggleTitle(achievement);
-                    button.OnMouseOut.Invoke();
-                    button.OnMouseOver.Invoke();
+                    hover.OnHoverOut.Invoke();
+                    hover.OnHoverOver.Invoke();
                 }));
 #endif
 
@@ -734,12 +735,13 @@ namespace TheOtherRoles.Modules
             collider.isTrigger = true;
 
             var button = collider.gameObject.SetUpButton();
-            button.OnMouseOver.AddListener((Action)(() =>
+            var hover = button.gameObject.AddComponent<TouchHover>();
+            hover.OnHoverOver.AddListener((Action)(() =>
             {
                 string text = string.Join("\n", records.Select(r => "- " + ModTranslation.getString(r.TranslationKey).Color(r.IsCleared ? Color.green : Color.white)));
                 TORGUIManager.Instance.SetHelpContext(button, new TORGUIText(GUIAlignment.Left, TextAttr, new RawTextComponent(text)));
             }));
-            button.OnMouseOut.AddListener((Action)(() => TORGUIManager.Instance.HideHelpContextIf(button)));
+            hover.OnHoverOut.AddListener((Action)(() => TORGUIManager.Instance.HideHelpContextIf(button)));
         }
     }
 

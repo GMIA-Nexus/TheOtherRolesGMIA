@@ -70,8 +70,9 @@ namespace TheOtherRoles.Modules
             collider.size = new(0.4f, 0.4f);
 
             var button = renderer.gameObject.SetUpButton(false, renderer, icon.color);
-            button.OnMouseOver.AddListener((Action)(() => { VanillaAsset.PlayHoverSE(); TORGUIManager.Instance.SetHelpContext(button, icon.overlay.Invoke()); notification.gameObject.SetActive(false); icon.isNew.Set(false); }));
-            button.OnMouseOut.AddListener((Action)(() => TORGUIManager.Instance.HideHelpContextIf(button)));
+            var hover = button.gameObject.AddComponent<TouchHover>();
+            hover.OnHoverOver.AddListener((Action)(() => { VanillaAsset.PlayHoverSE(); TORGUIManager.Instance.SetHelpContext(button, icon.overlay.Invoke()); notification.gameObject.SetActive(false); icon.isNew.Set(false); }));
+            hover.OnHoverOut.AddListener((Action)(() => TORGUIManager.Instance.HideHelpContextIf(button)));
         }
 
         public static void OnMeetingStart()

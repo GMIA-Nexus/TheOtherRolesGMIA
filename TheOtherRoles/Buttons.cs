@@ -3501,7 +3501,6 @@ namespace TheOtherRoles
                     }
                     else
                     {
-                        foreach (var yoyo in Yoyo.players) yoyo.markedLocation = null;
                         yoyoButton.Timer = yoyoButton.MaxTimer;
                         yoyoButton.Sprite = Yoyo.getMarkButtonSprite();
                         yoyoButton.buttonText = ModTranslation.getString("MarkText");

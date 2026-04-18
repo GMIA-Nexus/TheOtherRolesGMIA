@@ -172,6 +172,8 @@ namespace TheOtherRoles {
         public static CustomRoleOption yoyoSpawnRate;
         public static CustomOption yoyoBlinkDuration;
         public static CustomOption yoyoMarkCooldown;
+        public static CustomOption yoyoBlackoutRange;
+        public static CustomOption yoyoBlackoutDuration;
         public static CustomOption yoyoMarkStaysOverMeeting;
         public static CustomOption yoyoSilhouetteVisibility;
 
@@ -839,6 +841,8 @@ namespace TheOtherRoles {
             yoyoSpawnRate = new CustomRoleOption(470, Types.Impostor, "yoyo", Yoyo.color);
             yoyoBlinkDuration = CustomOption.Create(471, Types.Impostor, "yoyoBlinkDuration", 20f, 2.5f, 120f, 2.5f, yoyoSpawnRate, format: "unitSeconds");
             yoyoMarkCooldown = CustomOption.Create(472, Types.Impostor, "yoyoMarkCooldown", 20f, 2.5f, 120f, 2.5f, yoyoSpawnRate, format: "unitSeconds");
+            yoyoBlackoutRange = CustomOption.Create(474, Types.Impostor, "yoyoBlackoutRange", 0f, 2f, 10f, 0.5f, yoyoSpawnRate, false, "unitMeters");
+            yoyoBlackoutDuration = CustomOption.Create(475, Types.Impostor, "yoyoBlackoutDuration", 1f, 0.5f, 3f, 0.5f, yoyoSpawnRate, false, "unitSeconds");
             yoyoMarkStaysOverMeeting = CustomOption.Create(473, Types.Impostor, "yoyoMarkStaysOverMeeting", true, yoyoSpawnRate);
             yoyoSilhouetteVisibility = CustomOption.Create(476, Types.Impostor, "yoyoSilhouetteVisibility", ["0%", "10%", "20%", "30%", "40%", "50%"], yoyoSpawnRate);
 

@@ -25,13 +25,20 @@ namespace TheOtherRoles.Roles
             yield return new(getBlinkButtonSprite(), "yoyoBlinkHint");
         }
         public static readonly Image Illustration = new TORSpriteLoader("Assets/Sprites/YoYo.png");
-        static public IEnumerable<DocumentReplacement> GetReplacementPart() => [new("%SEC%", blinkDuration.ToString())];
+        static public IEnumerable<DocumentReplacement> GetReplacementPart()
+        {
+            yield return new("%SEC%", blinkDuration.ToString());
+            yield return new("%RAN%", blackoutRange.ToString());
+            yield return new("%DUR%", blackoutDuration.ToString());
+        }
 
         public static float blinkDuration { get { return CustomOptionHolder.yoyoBlinkDuration.getFloat(); } }
         public static float markCooldown = 0;
         public static bool markStaysOverMeeting = false;
         public float SilhouetteVisibility => silhouetteVisibility == 0 && (PlayerControl.LocalPlayer == player || PlayerControl.LocalPlayer.Data.IsDead) ? 0.1f : silhouetteVisibility;
         public static float silhouetteVisibility = 0;
+        public static float blackoutRange { get { return CustomOptionHolder.yoyoBlackoutRange.getFloat(); } }
+        public static float blackoutDuration { get { return CustomOptionHolder.yoyoBlackoutDuration.getFloat(); } }
 
         public Vector3? markedLocation = null;
 
@@ -54,6 +61,12 @@ namespace TheOtherRoles.Roles
             if (player == null || yoyo == null || yoyo.markedLocation == null) return;
             var markedPos = (Vector3)yoyo.markedLocation;
             player.NetTransform.SnapTo(markedPos);
+
+            if (!PlayerControl.LocalPlayer.Data.Role.IsImpostor && !PlayerControl.LocalPlayer.Data.IsDead
+            && Vector3.Distance(markedPos, PlayerControl.LocalPlayer.transform.position) <= blackoutRange)
+            {
+                Helpers.flashScreen(new(0, 0, 0), 0.1f, 0.4f, 1f, blackoutDuration, "You are struck by the Yo-Yo's power!");
+            }
 
             var markedSilhouette = Silhouette.silhouettes.FirstOrDefault(s => s.gameObject.transform.position.x == markedPos.x && s.gameObject.transform.position.y == markedPos.y);
             if (markedSilhouette != null)
@@ -92,6 +105,11 @@ namespace TheOtherRoles.Roles
         public void markLocation(Vector3 position)
         {
             markedLocation = position;
+        }
+
+        public override void OnMeetingEnd(PlayerControl exiled = null)
+        {
+            if (!markStaysOverMeeting) markedLocation = null;
         }
 
         public override void ResetRole(bool isShifted)

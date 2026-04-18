@@ -1513,6 +1513,12 @@ namespace TheOtherRoles
             Chameleon.update();  // so that morphling and camo wont make the chameleons visible
         }
 
+        /// <summary>
+        /// Show a flash on the screen with a fade in and fade out effect
+        /// </summary>
+        /// <param name="color">The color of the flash screen</param>
+        /// <param name="duration">The duration of the flash effect</param>
+        /// <param name="message">The message to display during the flash</param>
         public static void showFlash(Color color, float duration = 1f, string message = "") {
             if (FastDestroyableSingleton<HudManager>.Instance == null || FastDestroyableSingleton<HudManager>.Instance.FullScreen == null) return;
             var renderer = UnityEngine.Object.Instantiate(FastDestroyableSingleton<HudManager>.Instance.FullScreen, HudManager.Instance.transform);
@@ -1533,6 +1539,53 @@ namespace TheOtherRoles
                         renderer.color = new Color(color.r, color.g, color.b, Mathf.Clamp01((1 - p) * 2 * 0.75f));
                 }
                 if (p == 1f && renderer != null) renderer.enabled = false;
+            })));
+        }
+
+        /// <summary>
+        /// Flashes the screen without a fade in or fade out duration
+        /// </summary>
+        /// <param name="color">The color of the flash</param>
+        /// <param name="fadeIn">The duration of the fade-in effect</param>
+        /// <param name="fadeOut">The duration of the fade-out effect</param>
+        /// <param name="maxAlpha">The maximum alpha value of the flash</param>
+        /// <param name="flashDuring">The duration to keep the flash at maximum alpha</param>
+        /// <param name="message">The message to display during the flash</param>
+        public static void flashScreen(Color color, float fadeIn, float fadeOut, float maxAlpha = 0.5f, float flashDuring = 0f, string message = "")
+        {
+            float duration = fadeIn + fadeOut + flashDuring;
+
+            var flash = GameObject.Instantiate(FastDestroyableSingleton<HudManager>.Instance.FullScreen, FastDestroyableSingleton<HudManager>.Instance.transform);
+            flash.color = color;
+            flash.enabled = true;
+            flash.gameObject.active = true;
+
+            var messageText = CreateAndShowNotification(message, HudManager.Instance.Notifier.settingsChangeColor);
+            messageText.transform.localPosition = new Vector3(0f, 0f, -20f);
+            messageText.alphaTimer = duration + 2f;
+
+            FastDestroyableSingleton<HudManager>.Instance.StartCoroutine(Effects.Lerp(duration, new Action<float>((p) =>
+            {
+                if (p < (fadeIn / duration))
+                {
+                    if (flash != null)
+                        flash.color = new Color(color.r, color.g, color.b, Mathf.Clamp01((PlayerControl.LocalPlayer.Data.IsDead ? Mathf.Min(maxAlpha, 0.2f) : maxAlpha) * p / (fadeIn / duration)));
+                }
+                else if (1 - p < (fadeOut / duration))
+                {
+                    if (flash != null)
+                        flash.color = new Color(color.r, color.g, color.b, Mathf.Clamp01((PlayerControl.LocalPlayer.Data.IsDead ? Mathf.Min(maxAlpha, 0.2f) : maxAlpha) * (1 - p) / (fadeOut / duration)));
+                }
+                else
+                {
+                    if (flash != null)
+                        flash.color = new Color(color.r, color.g, color.b, PlayerControl.LocalPlayer.Data.IsDead ? Mathf.Min(maxAlpha, 0.2f) : maxAlpha);
+                }
+                if ((p == 1f || MeetingHud.Instance) && flash != null)
+                {
+                    flash.enabled = false;
+                    GameObject.Destroy(flash.gameObject);
+                }
             })));
         }
 

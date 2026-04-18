@@ -1662,8 +1662,8 @@ namespace TheOtherRoles {
                 toggleSettingsButton.OnClick.RemoveAllListeners();
                 toggleSettingsButton.OnClick.AddListener((Action)(() => HelpMenu.TryOpenHelpScreen(HelpMenu.HelpTab.Options)));
             }
-            toggleSettingsButtonObject.SetActive((GameStates.IsLobby ? __instance.SettingsButton.gameObject.active : __instance.MapButton.gameObject.active) && !(MapBehaviour.Instance && MapBehaviour.Instance.IsOpen) && GameOptionsManager.Instance.currentGameOptions.GameMode != GameModes.HideNSeek);
-            toggleSettingsButtonObject.transform.localPosition = GameStates.IsLobby ? __instance.SettingsButton.transform.localPosition + new Vector3(-1.45f, 0.03f, -200f) : __instance.MapButton.transform.localPosition + new Vector3(0, -0.8f, -500f);
+            toggleSettingsButtonObject.SetActive((GameStates.IsLobby ? __instance.SettingsButton?.gameObject?.active ?? false : __instance.MapButton?.gameObject?.active ?? false) && !(MapBehaviour.Instance && MapBehaviour.Instance.IsOpen) && GameOptionsManager.Instance.currentGameOptions.GameMode != GameModes.HideNSeek);
+            toggleSettingsButtonObject.transform.localPosition = GameStates.IsLobby ? (__instance.SettingsButton?.transform?.localPosition ?? new Vector3()) + new Vector3(-1.45f, 0.03f, -200f) : __instance.MapButton.transform.localPosition + new Vector3(0, -0.8f, -500f);
 
             if (AmongUsClient.Instance.GameState != InnerNet.InnerNetClient.GameStates.Started) return;
             if (!toggleZoomButton || !toggleZoomButtonObject)

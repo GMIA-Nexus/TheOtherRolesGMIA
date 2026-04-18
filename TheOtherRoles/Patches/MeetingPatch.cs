@@ -1444,7 +1444,7 @@ namespace TheOtherRoles.Patches
                     }
                 }
 
-                Mafioso.UpdateTimer(__instance);
+                if (PlayerControl.LocalPlayer.isRole(RoleId.Mafioso)) Mafioso.UpdateTimer(__instance);
             }
         }
 
