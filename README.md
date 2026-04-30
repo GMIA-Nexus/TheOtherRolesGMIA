@@ -53,6 +53,14 @@ We are only a team of teenagers, and we may not be able to make this mod like an
 <details>
   <summary>Click to show the Changelog</summary>
 
+  **Version v1.3.7**
+ - Updated compatibility for Among Us v17.3
+ - Added new ability to the Yo-Yo, Blackout
+ - Fixed a bug where the UIs on Starlight cannot be opened
+ - Fixed a bug where random spawning in Polus would spawn outside of the map
+ - Fixed a bug where the Fox will not be assigned any task on Starlight
+ - Fixed a bug where the Mafioso Timer will still run even if it is not in the game
+
   **Version v1.3.6**
  - Added compatibility to Starlight. You can now download the mod on Android, thanks to the AOU team
  - Added new ability to the Bait, "Emit"
