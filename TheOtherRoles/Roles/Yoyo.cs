@@ -3,6 +3,7 @@ using System.Linq;
 using TheOtherRoles.MetaContext;
 using TheOtherRoles.Modules;
 using TheOtherRoles.Objects;
+using TheOtherRoles.Utilities;
 using UnityEngine;
 using static TheOtherRoles.TheOtherRoles;
 
@@ -17,6 +18,7 @@ namespace TheOtherRoles.Roles
         {
             RoleId = roleId = RoleId.Yoyo;
             markedLocation = null;
+            blackout = [];
         }
 
         static public IEnumerable<HelpSprite> GetHelpSprites()
@@ -62,12 +64,6 @@ namespace TheOtherRoles.Roles
             var markedPos = (Vector3)yoyo.markedLocation;
             player.NetTransform.SnapTo(markedPos);
 
-            if (!PlayerControl.LocalPlayer.Data.Role.IsImpostor && !PlayerControl.LocalPlayer.Data.IsDead
-            && Vector3.Distance(markedPos, PlayerControl.LocalPlayer.transform.position) <= blackoutRange)
-            {
-                Helpers.flashScreen(new(0, 0, 0), 0.1f, 0.4f, 1f, blackoutDuration, "You are struck by the Yo-Yo's power!");
-            }
-
             var markedSilhouette = Silhouette.silhouettes.FirstOrDefault(s => s.gameObject.transform.position.x == markedPos.x && s.gameObject.transform.position.y == markedPos.y);
             if (markedSilhouette != null)
                 markedSilhouette.permanent = false;
@@ -86,6 +82,37 @@ namespace TheOtherRoles.Roles
             if (Chameleon.chameleon.Any(x => x.PlayerId == message.playerId)) // Make the Yoyo visible if chameleon!
                 Chameleon.lastMoved[message.playerId] = Time.time;
         });
+
+        public static RemoteProcess<(byte playerId, byte yoyoId)> Blackout = new("YoyoBlackout", (message, _) =>
+        {
+            PlayerControl player = Helpers.playerById(message.playerId);
+            var yoyoPlayer = Helpers.playerById(message.yoyoId);
+            var yoyo = getRole(yoyoPlayer);
+            if (player == null || yoyo == null) return;
+            if (yoyo.blackout.Contains(player)) return;
+            yoyo.blackout.Add(player);
+            FastDestroyableSingleton<HudManager>.Instance.StartCoroutine(Effects.Lerp(blackoutDuration + 0.5f, new System.Action<float>((p) => { if (p == 1f || MeetingHud.Instance) yoyo.blackout.Remove(player); })));
+            if (PlayerControl.LocalPlayer == player)
+            {
+                Helpers.flashScreen(new(0, 0, 0), 0.1f, 0.4f, 1f, blackoutDuration, ModTranslation.getString("yoyoBlackoutHint"));
+            }
+            else if (PlayerControl.LocalPlayer == yoyoPlayer)
+                new StaticAchievementToken("yoyo.challenge2");
+        });
+
+        public void ActivateBlackout(Vector3 pos)
+        {
+            foreach (var player in PlayerControl.AllPlayerControls)
+            {
+                if (!player.Data.Role.IsImpostor && !player.Data.IsDead
+                && Vector3.Distance(pos, player.transform.position) <= blackoutRange)
+                {
+                    Blackout.Invoke((player.PlayerId, this.player.PlayerId));
+                }
+            }
+        }
+
+        public List<PlayerControl> blackout = [];
 
         public static Sprite getMarkButtonSprite()
         {
@@ -110,11 +137,13 @@ namespace TheOtherRoles.Roles
         public override void OnMeetingEnd(PlayerControl exiled = null)
         {
             if (!markStaysOverMeeting) markedLocation = null;
+            blackout = [];
         }
 
         public override void ResetRole(bool isShifted)
         {
             markedLocation = null;
+            blackout = [];
             Silhouette.clearSilhouettes(player);
         }
 

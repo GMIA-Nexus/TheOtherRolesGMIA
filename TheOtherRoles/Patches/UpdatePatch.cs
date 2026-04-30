@@ -1,13 +1,13 @@
-using HarmonyLib;
-using UnityEngine;
-using TheOtherRoles.Objects;
 using System.Collections.Generic;
 using System.Linq;
-using TheOtherRoles.Utilities;
-using TheOtherRoles.CustomGameModes;
 using AmongUs.GameOptions;
+using HarmonyLib;
+using TheOtherRoles.CustomGameModes;
 using TheOtherRoles.Modules;
+using TheOtherRoles.Objects;
 using TheOtherRoles.Roles;
+using TheOtherRoles.Utilities;
+using UnityEngine;
 
 namespace TheOtherRoles.Patches {
     [HarmonyPatch(typeof(HudManager), nameof(HudManager.Update))]
@@ -239,6 +239,14 @@ namespace TheOtherRoles.Patches {
                 if (localPlayer.isRole(RoleId.Moriarty) && SchrodingersCat.team == SchrodingersCat.Team.Moriarty)
                     foreach (var p in SchrodingersCat.allPlayers)
                         setPlayerNameColor(p, Moriarty.color);
+            }
+
+            if (PlayerControl.LocalPlayer.isRole(RoleId.Yoyo))
+            {
+                foreach (var black in Yoyo.local.blackout) {
+                    if (black != null && !black.Data.IsDead)
+                        setPlayerNameColor(black, Color.black);
+                }
             }
 
             // No else if here, as the Impostors need the Spy name to be colored
@@ -546,12 +554,6 @@ namespace TheOtherRoles.Patches {
             }
         }
 
-        static void updateMapButton(HudManager __instance) {
-            //Trapper.trapper == null || !(PlayerControl.LocalPlayer.PlayerId == Trapper.trapper.PlayerId) ||
-            if ( __instance == null || __instance.MapButton.HeldButtonSprite == null) return;
-            //__instance.MapButton.HeldButtonSprite.color = Trapper.playersOnMap.Any() ? Trapper.color : Color.white;
-        }
-
         static void updateVisibility()
         {
             if (PlayerControl.LocalPlayer.isRole(RoleId.Medium) && !PlayerControl.LocalPlayer.Data.IsDead)
@@ -596,7 +598,6 @@ namespace TheOtherRoles.Patches {
             // Meeting hide buttons if needed (used for the map usage, because closing the map would show buttons)
             updateSabotageButton(__instance);
             updateUseButton(__instance);
-            updateMapButton(__instance);
             updateVisibility();
             if (!MeetingHud.Instance) __instance.AbilityButton?.Update();
             TORGameManager.Instance?.OnUpdate();

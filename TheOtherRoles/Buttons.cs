@@ -3465,9 +3465,6 @@ namespace TheOtherRoles
             yoyoButton = new CustomButton(
                 () => {
                     var pos = PlayerControl.LocalPlayer.transform.position;
-                    byte[] buff = new byte[sizeof(float) * 2];
-                    Buffer.BlockCopy(BitConverter.GetBytes(pos.x), 0, buff, 0 * sizeof(float), sizeof(float));
-                    Buffer.BlockCopy(BitConverter.GetBytes(pos.y), 0, buff, 1 * sizeof(float), sizeof(float));
 
                     if (Yoyo.local.markedLocation == null)
                     {
@@ -3485,6 +3482,7 @@ namespace TheOtherRoles
                         // Jump to location
                         TheOtherRolesPlugin.Logger.LogMessage($"trying to blink!");
 
+                        Yoyo.local.ActivateBlackout((Vector3)Yoyo.local.markedLocation);
                         Yoyo.Blink.Invoke((true, pos, PlayerControl.LocalPlayer.PlayerId));
                         yoyoButton.EffectDuration = Yoyo.blinkDuration;
                         yoyoButton.Timer = 10f;
@@ -3531,6 +3529,8 @@ namespace TheOtherRoles
                     if (SubmergedCompatibility.IsSubmerged) {
                         SubmergedCompatibility.ChangeFloor(exit.y > -7);
                     }
+                    // Activate blackout here, else the exit will be null
+                    Yoyo.local.ActivateBlackout(exit);
                     Yoyo.Blink.Invoke((false, pos, PlayerControl.LocalPlayer.PlayerId));
 
                     yoyoButton.Timer = yoyoButton.MaxTimer;
