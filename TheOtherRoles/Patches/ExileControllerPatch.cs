@@ -158,10 +158,10 @@ namespace TheOtherRoles.Patches {
             }
         }
 
-        [HarmonyPatch(typeof(AirshipExileController), nameof(AirshipExileController.WrapUpAndSpawn))]
+        [HarmonyPatch(typeof(AirshipExileController._WrapUpAndSpawn_d__11), "MoveNext")]
         class AirshipExileControllerPatch {
-            public static void Postfix(AirshipExileController __instance) {
-                NetworkedPlayerInfo networkedPlayer = __instance.initData.networkedPlayer;
+            public static void Postfix(AirshipExileController._WrapUpAndSpawn_d__11 __instance) {
+                NetworkedPlayerInfo networkedPlayer = __instance.__4__this.initData.networkedPlayer;
                 WrapUpPostfix((networkedPlayer != null) ? networkedPlayer.Object : null);
             }
         }
