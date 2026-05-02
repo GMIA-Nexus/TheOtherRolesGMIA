@@ -144,8 +144,8 @@ namespace TheOtherRoles {
                 return false;
             }
             GameOptionsManager.Instance.GameHostOptions = gameOptions;
-            GameOptionsManager.Instance.CurrentGameOptions = GameOptionsManager.Instance.GameHostOptions;
-            GameManager.Instance.LogicOptions.SetGameOptions(GameOptionsManager.Instance.CurrentGameOptions);
+            GameManager.Instance.LogicOptions.SetGameOptions(gameOptions);
+            GameOptionsManager.Instance.CurrentGameOptions = gameOptions;
             GameManager.Instance.LogicOptions.SyncOptions();
             return true;
         }

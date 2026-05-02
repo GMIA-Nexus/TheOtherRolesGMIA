@@ -279,6 +279,7 @@ namespace TheOtherRoles
             schrodingersCatKillButton.MaxTimer = SchrodingersCat.killCooldown;
             schrodingersCatSwitchButton.MaxTimer = 0f;
             schrodingersCatSwitchButton.Timer = 0f;
+            zephyrButton.MaxTimer = Zephyr.cooldown;
             //roleSummaryButton.Timer = 0f;
             //roleSummaryButton.MaxTimer = 0f;
             cupidArrowButton.MaxTimer = 0f;
