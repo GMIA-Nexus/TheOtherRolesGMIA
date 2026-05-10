@@ -807,6 +807,16 @@ namespace TheOtherRoles.MetaContext
 
         public GUIContext Text(GUIAlignment alignment, TextAttributes attribute, TextComponent text) => new TORGUIText(alignment, attribute, text);
 
+        public GUIContext RealtimeText(GUIAlignment alignment, TextAttributes attribute, Func<string> textSupplier, int length) => new TORGUIText(alignment, attribute, new RawTextComponent(new string('O', length)))
+        {
+            PostBuilder = text =>
+            {
+                text.gameObject.AddComponent<ScriptBehaviour>().UpdateHandler += () => text.text = textSupplier.Invoke();
+                text.text = textSupplier.Invoke();
+                text.ForceMeshUpdate();
+            }
+        };
+
         public GUIContext Margin(FuzzySize margin) => new TORGUIMargin(GUIAlignment.Center, new(margin.Width ?? 0f, margin.Height ?? 0f));
 
         public TextComponent TextComponent(Color color, string transrationKey) => new ColorTextComponent(color, new TranslateTextComponent(transrationKey));

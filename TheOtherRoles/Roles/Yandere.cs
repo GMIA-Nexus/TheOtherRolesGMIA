@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TheOtherRoles.MetaContext;
 using TheOtherRoles.Modules;
 using TheOtherRoles.Objects;
 using TheOtherRoles.Utilities;
@@ -56,6 +57,8 @@ public class Yandere : RoleBase<Yandere>
     {
         meetingFlag = true;
     }
+
+    public override GUIContext ProgressWidget { get => ProgressGUI.Holder(target != null ? ProgressGUI.OneLineText(ModTranslation.getString("roleInfoYandereTargetFull") + ": " + target?.Data.PlayerName ?? "") : null); }
 
     public override void OnMeetingEnd(PlayerControl exiled = null)
     {

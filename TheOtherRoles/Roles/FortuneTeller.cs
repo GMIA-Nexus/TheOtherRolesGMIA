@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
 using Hazel;
+using TheOtherRoles.MetaContext;
 using TheOtherRoles.Modules;
 using TheOtherRoles.Objects;
 using TheOtherRoles.Utilities;
@@ -70,6 +71,8 @@ namespace TheOtherRoles.Roles
             TORMapOptions.resetPoolables();
             resetArrow();
         }
+
+        public override GUIContext ProgressWidget { get => ProgressGUI.Holder(divineTarget != null ? ProgressGUI.OneLineText(ModTranslation.getString("roleInfoFortuneTellerTargetFull") + ": " + divineTarget?.Data.PlayerName ?? "") : null); }
 
         public override void HandleDisconnect(PlayerControl player, DisconnectReasons reason)
         {

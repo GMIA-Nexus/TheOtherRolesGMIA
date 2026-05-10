@@ -2337,7 +2337,7 @@ namespace TheOtherRoles
                 true,
                 Arsonist.duration,
                 () => {
-                    if (Arsonist.local.douseTarget != null) Arsonist.local.dousedPlayers.Add(Arsonist.local.douseTarget);
+                    if (Arsonist.local.douseTarget != null) Arsonist.Douse.Invoke((PlayerControl.LocalPlayer.PlayerId, Arsonist.local.douseTarget.PlayerId));
                     _ = new StaticAchievementToken("arsonist.common1");
                     arsonistButton.Timer = Arsonist.local.dousedEveryoneAlive() ? 0 : arsonistButton.MaxTimer;
 

@@ -282,6 +282,7 @@ namespace TheOtherRoles
             public static List<Role> allRoles = [];
             public PlayerControl player;
             public RoleId roleId;
+            public virtual MetaContext.GUIContext ProgressWidget { get; set; } = null;
 
             /// <summary>
             /// On meeting starts

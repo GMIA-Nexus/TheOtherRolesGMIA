@@ -1,9 +1,10 @@
-using System.Linq;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
-using TheOtherRoles.Utilities;
+using System.Linq;
 using TheOtherRoles.Roles;
+using TheOtherRoles.Utilities;
+using UnityEngine;
+using static Il2CppSystem.Globalization.TimeSpanFormat;
 
 namespace TheOtherRoles
 {
@@ -593,96 +594,107 @@ namespace TheOtherRoles
 
                     // Death Reason on Ghosts
                     if (p.Data.IsDead) {
-                        string deathReasonString = "";
-                        var deadPlayer = GameHistory.deadPlayers.FirstOrDefault(x => x.player.PlayerId == p.PlayerId);
-
-                        Color killerColor = new();
-                        if (deadPlayer != null && deadPlayer.killerIfExisting != null) {
-                            killerColor = getRoleInfoForPlayer(deadPlayer.killerIfExisting, false, true).FirstOrDefault().color;
-                            if (Madmate.madmate.Any(x => x.PlayerId == deadPlayer.killerIfExisting.PlayerId) || CreatedMadmate.createdMadmate.Any(x => x.PlayerId == deadPlayer.killerIfExisting.PlayerId)) killerColor = Palette.ImpostorRed;
-                        }
-
-                        if (deadPlayer != null) {
-                            switch (deadPlayer.deathReason) {
-                                case DeadPlayer.CustomDeathReason.Disconnect:
-                                    deathReasonString = ModTranslation.getString("roleSummaryDisconnected");
-                                    break;
-                                case DeadPlayer.CustomDeathReason.Exile:
-                                    deathReasonString = ModTranslation.getString("roleSummaryExiled");
-                                    break;
-                                case DeadPlayer.CustomDeathReason.Kill:
-                                    deathReasonString = string.Format(ModTranslation.getString("roleSummaryKilled"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
-                                    break;
-                                case DeadPlayer.CustomDeathReason.Guess:
-                                    if (deadPlayer.killerIfExisting.Data.PlayerName == p.Data.PlayerName)
-                                        deathReasonString = ModTranslation.getString("roleSummaryFailedGuess");
-                                    else
-                                        deathReasonString = string.Format(ModTranslation.getString("roleSummaryGuess"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
-                                    break;
-                                case DeadPlayer.CustomDeathReason.Shift:
-                                    deathReasonString = $" - {Helpers.cs(Color.yellow, ModTranslation.getString("roleSummaryShift"))} {Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName)}";
-                                    break;
-                                case DeadPlayer.CustomDeathReason.WitchExile:
-                                    deathReasonString = string.Format(ModTranslation.getString("roleSummarySpelled"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
-                                    break;
-                                case DeadPlayer.CustomDeathReason.LoverSuicide:
-                                    deathReasonString = $" - {Helpers.cs(Lovers.color, ModTranslation.getString("roleSummaryLoverDied"))}";
-                                    break;
-                                case DeadPlayer.CustomDeathReason.Revenge:
-                                    deathReasonString = string.Format(ModTranslation.getString("roleSummaryRevenge"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
-                                    break;
-                                case DeadPlayer.CustomDeathReason.Suicide:
-                                    deathReasonString = ModTranslation.getString("roleSummarySuicide");
-                                    break;
-                                case DeadPlayer.CustomDeathReason.KataomoiStare:
-                                    deathReasonString = $" - {Helpers.cs(Kataomoi.color, ModTranslation.getString("roleSummaryKataomoiStare"))}";
-                                    break;
-                                case DeadPlayer.CustomDeathReason.BrainwashedKilled:
-                                    deathReasonString = string.Format(ModTranslation.getString("roleSummaryBrainwashedKilled"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
-                                    break;
-                                case DeadPlayer.CustomDeathReason.Blown:
-                                    deathReasonString = string.Format(ModTranslation.getString("roleSummaryBlown"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
-                                    break;
-                                case DeadPlayer.CustomDeathReason.LoveStolen:
-                                    deathReasonString = $" - {Helpers.cs(Lovers.color, ModTranslation.getString("roleSummaryLoveStolen"))}";
-                                    break;
-                                case DeadPlayer.CustomDeathReason.Loneliness:
-                                    deathReasonString = $" - {Helpers.cs(Akujo.color, ModTranslation.getString("roleSummaryLoneliness"))}";
-                                    break;
-                                case DeadPlayer.CustomDeathReason.Disease:
-                                    deathReasonString = string.Format(ModTranslation.getString("roleSummaryDisease"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
-                                    break;
-                                case DeadPlayer.CustomDeathReason.Jailed:
-                                    deathReasonString = string.Format(ModTranslation.getString("roleSummaryJailed"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
-                                    break;
-                                case DeadPlayer.CustomDeathReason.Scapegoat:
-                                    deathReasonString = $" - {Helpers.cs(Cupid.color, ModTranslation.getString("roleSummaryScapegoat"))}";
-                                    break;
-                                case DeadPlayer.CustomDeathReason.Swallowed:
-                                    deathReasonString = string.Format(ModTranslation.getString("roleSummarySwallowed"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
-                                    break;
-                                //case DeadPlayer.CustomDeathReason.LawyerSuicide:
-                                //deathReasonString = $" - {Helpers.cs(Lawyer.color, "bad Lawyer")}";
-                                //break;
-                                case DeadPlayer.CustomDeathReason.Bomb:
-                                    deathReasonString = string.Format(ModTranslation.getString("roleSummaryBombed"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
-                                    break;
-                                case DeadPlayer.CustomDeathReason.Divined:
-                                    deathReasonString = string.Format(ModTranslation.getString("roleSummaryDivined"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
-                                    break;
-                                case DeadPlayer.CustomDeathReason.Pseudocide:
-                                    deathReasonString = $" - {Helpers.cs(Busker.color, ModTranslation.getString("roleSummaryPseudocide"))}";
-                                    break;
-                                case DeadPlayer.CustomDeathReason.Arson:
-                                    deathReasonString = string.Format(ModTranslation.getString("roleSummaryTorched"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
-                                    break;
-                            }
-                            roleName += deathReasonString;
-                        }
+                        roleName += getStatesString(p);
                     }
                 }
             }
             return roleName;
+        }
+
+        public static string getStatesString(PlayerControl p, bool useColors = true)
+        {
+            string deathReasonString = "";
+            var deadPlayer = GameHistory.deadPlayers.FirstOrDefault(x => x.player.PlayerId == p.PlayerId);
+
+            Color killerColor = new();
+            if (deadPlayer != null && deadPlayer.killerIfExisting != null)
+            {
+                killerColor = getRoleInfoForPlayer(deadPlayer.killerIfExisting, false, true).FirstOrDefault().color;
+                if (Madmate.madmate.Any(x => x.PlayerId == deadPlayer.killerIfExisting.PlayerId) || CreatedMadmate.createdMadmate.Any(x => x.PlayerId == deadPlayer.killerIfExisting.PlayerId)) killerColor = Palette.ImpostorRed;
+            }
+
+            if (deadPlayer != null)
+            {
+                switch (deadPlayer.deathReason)
+                {
+                    case DeadPlayer.CustomDeathReason.Disconnect:
+                        deathReasonString = ModTranslation.getString("roleSummaryDisconnected");
+                        break;
+                    case DeadPlayer.CustomDeathReason.Exile:
+                        deathReasonString = ModTranslation.getString("roleSummaryExiled");
+                        break;
+                    case DeadPlayer.CustomDeathReason.Kill:
+                        deathReasonString = string.Format(ModTranslation.getString("roleSummaryKilled"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
+                        break;
+                    case DeadPlayer.CustomDeathReason.Guess:
+                        if (deadPlayer.killerIfExisting.Data.PlayerName == p.Data.PlayerName)
+                            deathReasonString = ModTranslation.getString("roleSummaryFailedGuess");
+                        else
+                            deathReasonString = string.Format(ModTranslation.getString("roleSummaryGuess"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
+                        break;
+                    case DeadPlayer.CustomDeathReason.Shift:
+                        deathReasonString = $" - {Helpers.cs(Color.yellow, ModTranslation.getString("roleSummaryShift"))} {Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName)}";
+                        break;
+                    case DeadPlayer.CustomDeathReason.WitchExile:
+                        deathReasonString = string.Format(ModTranslation.getString("roleSummarySpelled"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
+                        break;
+                    case DeadPlayer.CustomDeathReason.LoverSuicide:
+                        deathReasonString = $" - {Helpers.cs(Lovers.color, ModTranslation.getString("roleSummaryLoverDied"))}";
+                        break;
+                    case DeadPlayer.CustomDeathReason.Revenge:
+                        deathReasonString = string.Format(ModTranslation.getString("roleSummaryRevenge"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
+                        break;
+                    case DeadPlayer.CustomDeathReason.Suicide:
+                        deathReasonString = ModTranslation.getString("roleSummarySuicide");
+                        break;
+                    case DeadPlayer.CustomDeathReason.KataomoiStare:
+                        deathReasonString = $" - {Helpers.cs(Kataomoi.color, ModTranslation.getString("roleSummaryKataomoiStare"))}";
+                        break;
+                    case DeadPlayer.CustomDeathReason.BrainwashedKilled:
+                        deathReasonString = string.Format(ModTranslation.getString("roleSummaryBrainwashedKilled"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
+                        break;
+                    case DeadPlayer.CustomDeathReason.Blown:
+                        deathReasonString = string.Format(ModTranslation.getString("roleSummaryBlown"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
+                        break;
+                    case DeadPlayer.CustomDeathReason.LoveStolen:
+                        deathReasonString = $" - {Helpers.cs(Lovers.color, ModTranslation.getString("roleSummaryLoveStolen"))}";
+                        break;
+                    case DeadPlayer.CustomDeathReason.Loneliness:
+                        deathReasonString = $" - {Helpers.cs(Akujo.color, ModTranslation.getString("roleSummaryLoneliness"))}";
+                        break;
+                    case DeadPlayer.CustomDeathReason.Disease:
+                        deathReasonString = string.Format(ModTranslation.getString("roleSummaryDisease"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
+                        break;
+                    case DeadPlayer.CustomDeathReason.Jailed:
+                        deathReasonString = string.Format(ModTranslation.getString("roleSummaryJailed"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
+                        break;
+                    case DeadPlayer.CustomDeathReason.Scapegoat:
+                        deathReasonString = $" - {Helpers.cs(Cupid.color, ModTranslation.getString("roleSummaryScapegoat"))}";
+                        break;
+                    case DeadPlayer.CustomDeathReason.Swallowed:
+                        deathReasonString = string.Format(ModTranslation.getString("roleSummarySwallowed"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
+                        break;
+                    //case DeadPlayer.CustomDeathReason.LawyerSuicide:
+                    //deathReasonString = $" - {Helpers.cs(Lawyer.color, "bad Lawyer")}";
+                    //break;
+                    case DeadPlayer.CustomDeathReason.Bomb:
+                        deathReasonString = string.Format(ModTranslation.getString("roleSummaryBombed"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
+                        break;
+                    case DeadPlayer.CustomDeathReason.Divined:
+                        deathReasonString = string.Format(ModTranslation.getString("roleSummaryDivined"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
+                        break;
+                    case DeadPlayer.CustomDeathReason.Pseudocide:
+                        deathReasonString = $" - {Helpers.cs(Busker.color, ModTranslation.getString("roleSummaryPseudocide"))}";
+                        break;
+                    case DeadPlayer.CustomDeathReason.Arson:
+                        deathReasonString = string.Format(ModTranslation.getString("roleSummaryTorched"), Helpers.cs(killerColor, deadPlayer.killerIfExisting.Data.PlayerName));
+                        break;
+                }
+            }
+            if (!useColors)
+                deathReasonString = System.Text.RegularExpressions.Regex.Replace(deathReasonString, @"<color=#([0-9a-fA-F]+)>|</color>", string.Empty);
+
+            return deathReasonString;
         }
     }
 }

@@ -331,14 +331,12 @@ namespace TheOtherRoles.Patches {
                     string playerInfoText = "";
                     string meetingInfoText = "";                    
                     if (p == PlayerControl.LocalPlayer) {
-                        if (p.Data.IsDead) roleNames = roleText;
                         playerInfoText = $"{roleNames}";
                         if (p.isRole(RoleId.Swapper)) playerInfoText = $"{roleNames}" + Helpers.cs((p.Data.Role.IsImpostor || Madmate.madmate.Any(x => x.PlayerId == p.PlayerId)) ? Palette.ImpostorRed : Swapper.color, $" ({Swapper.charges})");
                         if (HudManager.Instance.TaskPanel != null) {
                             TMPro.TextMeshPro tabText = HudManager.Instance.TaskPanel.tab.transform.FindChild("TabText_TMP").GetComponent<TMPro.TextMeshPro>();
                             tabText.SetText(String.Format("{0} {1}", isTaskMasterExTask ? ModTranslation.getString("taskMasterExTasks") : TranslationController.Instance.GetString(StringNames.Tasks), isTaskMasterExTask ? exTaskInfo : taskInfo));
                         }
-                        //meetingInfoText = $"{roleNames} {taskInfo}".Trim();
                         if (!isTaskMasterExTask)
                             meetingInfoText = $"{roleNames} {taskInfo}".Trim();
                         else
@@ -346,19 +344,24 @@ namespace TheOtherRoles.Patches {
                     }
                     else if (!PlayerControl.LocalPlayer.Data.IsDead && Akujo.isPartner(PlayerControl.LocalPlayer, p) && Akujo.knowsRoles) {
                         playerInfoText = roleText;
-                        meetingInfoText = roleText;
+                        meetingInfoText = roleNames;
                     }
                     else if (ClientOption.GetValue(ClientOption.ClientOptionType.SpoilerAfterDeath) == 1) {
                         if (!isTaskMasterExTask)
+                        {
                             playerInfoText = $"{roleText} {taskInfo}".Trim();
+                            meetingInfoText = $"{roleNames} {taskInfo}".Trim();
+                        }
                         else
+                        {
                             playerInfoText = $"{roleText} {exTaskInfo}".Trim();
-                        meetingInfoText = playerInfoText;
+                            meetingInfoText = $"{roleNames} {exTaskInfo}".Trim();
+                        }
                     }
                     else if ((Lawyer.lawyerKnowsRole && PlayerControl.LocalPlayer.isRole(RoleId.Lawyer) && p == Lawyer.target)
                         || (Godfather.shouldShowInfo(PlayerControl.LocalPlayer) && Godfather.killed.Contains(p))) {
                         playerInfoText = $"{roleText}";
-                        meetingInfoText = playerInfoText;
+                        meetingInfoText = $"{roleNames}";
                     }
 
                     playerInfo.text = playerInfoText;

@@ -208,6 +208,8 @@ namespace TheOtherRoles.MetaContext
         /// <returns>生成されたコンテキスト定義</returns>
         GUIContext Text(GUIAlignment alignment, TextAttributes attribute, TextComponent text);
 
+        GUIContext RealtimeText(GUIAlignment alignment, TextAttributes attribute, Func<string> textSupplier, int length);
+
         /// <summary>
         /// 翻訳テキストを表示するボタンです。
         /// Buttonメソッドの呼び出しを簡素化した冗長なメソッドです。

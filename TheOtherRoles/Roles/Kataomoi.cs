@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using TheOtherRoles.MetaContext;
 using TheOtherRoles.Modules;
 using TheOtherRoles.Objects;
 using TheOtherRoles.Patches;
@@ -62,6 +63,8 @@ namespace TheOtherRoles.Roles
                 GameHistory.overrideDeathReasonAndKiller(target, DeadPlayer.CustomDeathReason.KataomoiStare, allPlayers.FirstOrDefault());
             }
         });
+
+        public override GUIContext ProgressWidget { get => ProgressGUI.Holder(target != null ? ProgressGUI.OneLineText(ModTranslation.getString("roleInfoKataomoiTargetFull") + ": " + target?.Data.PlayerName?? "") : null); }
 
         public static RemoteProcess<byte> SetStalking = RemotePrimitiveProcess.OfByte("KataomoiSetStalking", (message, _) =>
         {

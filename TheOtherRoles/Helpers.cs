@@ -753,6 +753,49 @@ namespace TheOtherRoles
             button.OnMouseOut.AddListener((Action)(() => TORGUIManager.Instance.HideHelpContextIf(button)));
         }
 
+        public static GUIContext GetProgressWidget(PlayerControl player)
+        {
+            if (player == null) return null;
+            var role = Role.allRoles.FirstOrDefault(r => r.player == player);
+            var roleInfo = RoleInfo.getRoleInfoForPlayer(player, false, true).FirstOrDefault();
+            string stateText = RoleInfo.getStatesString(player, false).Replace(" - ", "");
+            try { stateText = stateText.HeadUpper(); } catch { }
+            GUIContext stateContext = player.Data.IsDead ? TORGUIContextEngine.API.RawText(GUIAlignment.Left, TORGUIContextEngine.API.GetAttribute(AttributeAsset.DocumentBold), stateText) : null;
+            GUIContext[] progContext = (role?.ProgressWidget != null) ? [TORGUIContextEngine.API.VerticalHolder(GUIAlignment.Left, TORGUIContextEngine.API.RawText(GUIAlignment.Left,
+                    TORGUIContextEngine.API.GetAttribute(AttributeAsset.OverlayContent), cs(roleInfo.color, roleInfo.name)), role.ProgressWidget.Move(new(0.14f, 0f)))] : [];
+            var context = stateContext != null ? [.. progContext.Prepend(stateContext)] : progContext;
+            return context.Length == 0 ? null : TORGUIContextEngine.API.VerticalHolder(GUIAlignment.Left, context);
+        }
+
+        public static GUIContext Move(this GUIContext inner, Vector2 diff)
+        {
+            if (inner == null) return null;
+            if (diff.x > 0f)
+                inner = TORGUIContextEngine.API.HorizontalHolder(inner.Alignment, TORGUIContextEngine.API.HorizontalMargin(diff.x), inner);
+            if (diff.x < 0f)
+                inner = TORGUIContextEngine.API.HorizontalHolder(inner.Alignment, inner, TORGUIContextEngine.API.HorizontalMargin(-diff.x));
+
+            if (diff.y > 0f)
+                inner = TORGUIContextEngine.API.VerticalHolder(inner.Alignment, TORGUIContextEngine.API.VerticalMargin(diff.y), inner);
+            if (diff.y < 0f)
+                inner = TORGUIContextEngine.API.VerticalHolder(inner.Alignment, inner, TORGUIContextEngine.API.HorizontalMargin(-diff.y));
+
+            return inner;
+        }
+
+        public static void SetOverlay(this PassiveButton button, Func<GUIContext> widget)
+        {
+            button.OnMouseOver.AddListener((Action)(() =>
+            {
+                var val = widget.Invoke();
+                if (val != null)
+                {
+                    TORGUIManager.Instance.SetHelpContext(button, val);
+                }
+            }));
+            button.OnMouseOut.AddListener((Action)(() => TORGUIManager.Instance.HideHelpContextIf(button)));
+        }
+
         public static void generateNormalTasks(this PlayerControl player)
         {
             if (player == null) return;

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
+using TheOtherRoles.MetaContext;
 using TheOtherRoles.Modules;
 using TheOtherRoles.Patches;
 using UnityEngine;
@@ -32,6 +33,10 @@ namespace TheOtherRoles.Roles
             yield return new("%SEC%", duration.ToString());
         }
 
+        public override GUIContext ProgressWidget { get => ProgressGUI.Holder(ProgressGUI.OneLineText(ModTranslation.getString("roleInfoDousedLeft")),
+            ProgressGUI.Holder(PlayerControl.AllPlayerControls.ToArray().Where(x => x != player && !x.Data.IsDead && !dousedPlayers.Contains(x)).Select(p =>
+            ProgressGUI.OneLineText("-" + p.Data.PlayerName))).Move(new(0.04f, 0f))); }
+
         public static float cooldown = 30f;
         public static float duration { get { return CustomOptionHolder.arsonistDuration.getFloat(); } }
         public bool triggerArsonistWin = false;
@@ -62,6 +67,15 @@ namespace TheOtherRoles.Roles
                     GameHistory.overrideDeathReasonAndKiller(p, DeadPlayer.CustomDeathReason.Arson, player);
                 }
             }
+        });
+
+        public static RemoteProcess<(byte arsonistId, byte playerId)> Douse = new("ArsonistDouse", (message, _) =>
+        {
+            PlayerControl player = Helpers.playerById(message.arsonistId);
+            PlayerControl target = Helpers.playerById(message.playerId);
+            var arsonist = getRole(player);
+            if (player == null || arsonist == null || target == null) return;
+            arsonist.dousedPlayers.Add(target);
         });
 
         private static Sprite igniteSprite;

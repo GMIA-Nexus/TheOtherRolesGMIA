@@ -1287,6 +1287,20 @@ namespace TheOtherRoles.Patches
                         SpriteRenderer renderer = Helpers.CreateObject<SpriteRenderer>("Color", player.transform, new Vector3(1.2f, -0.18f, -1f));
                         renderer.sprite = isLighter ? LightColorSprite.GetSprite() : DarkColorSprite.GetSprite();
                     }
+
+                    var button = player.PlayerButton.Cast<PassiveButton>();
+                    button.OnMouseOver = new();
+                    button.OnMouseOut = new();
+                    var playerControl = Helpers.playerById(player.TargetPlayerId);
+                    button.OnMouseOver.AddListener((Action)(() =>
+                    {
+                        if (player.canBeHighlighted()) player.SetHighlighted(true);
+                    }));
+                    button.OnMouseOut.AddListener((Action)(() =>
+                    {
+                        player.SetHighlighted(false);
+                    }));
+                    button.SetOverlay(() => PlayerControl.LocalPlayer.Data.IsDead || CustomGameModes.FreePlayGM.isFreePlayGM ? Helpers.GetProgressWidget(playerControl) : null);
                 }
                 __instance.StartCoroutine(Effects.Sequence(Effects.Wait(2f), Helpers.Action(() => SortVotingArea(__instance, p => p.IsDead || p.Disconnected ? 2 : 1)).WrapToIl2Cpp()));
 
