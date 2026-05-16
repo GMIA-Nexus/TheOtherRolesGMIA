@@ -72,7 +72,7 @@ namespace TheOtherRoles.Roles
             resetArrow();
         }
 
-        public override GUIContext ProgressWidget { get => ProgressGUI.Holder(divineTarget != null ? ProgressGUI.OneLineText(ModTranslation.getString("roleInfoFortuneTellerTargetFull") + ": " + divineTarget?.Data.PlayerName ?? "") : null); }
+        public override GUIContext ProgressWidget { get => ProgressGUI.Holder(divineTarget != null ? ProgressGUI.OneLineText(ModTranslation.getString("roleInfoFortuneTellerTargetFull") + ": " + (divineTarget?.Data.PlayerName ?? "")) : null); }
 
         public override void HandleDisconnect(PlayerControl player, DisconnectReasons reason)
         {

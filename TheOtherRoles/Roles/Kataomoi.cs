@@ -64,7 +64,7 @@ namespace TheOtherRoles.Roles
             }
         });
 
-        public override GUIContext ProgressWidget { get => ProgressGUI.Holder(target != null ? ProgressGUI.OneLineText(ModTranslation.getString("roleInfoKataomoiTargetFull") + ": " + target?.Data.PlayerName?? "") : null); }
+        public override GUIContext ProgressWidget { get => ProgressGUI.Holder(target != null ? ProgressGUI.OneLineText(ModTranslation.getString("roleInfoKataomoiTargetFull") + ": " + (target?.Data.PlayerName ?? "")) : null); }
 
         public static RemoteProcess<byte> SetStalking = RemotePrimitiveProcess.OfByte("KataomoiSetStalking", (message, _) =>
         {

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using TheOtherRoles.MetaContext;
 using TheOtherRoles.Modules;
 using UnityEngine;
 using static TheOtherRoles.Patches.PlayerControlFixedUpdatePatch;
@@ -31,6 +32,12 @@ namespace TheOtherRoles.Roles
             if (CustomOptionHolder.jackalCanCreateSidekick.getBool())
                 yield return new(getSidekickButtonSprite(), "jackalSidekickHint");
         }
+
+        public override GUIContext ProgressWidget { get {
+                var sidekick = getSidekick(player);
+                if (sidekick == null || sidekick?.player == null) return null;
+                return ProgressGUI.Holder(ProgressGUI.OneLineText(ModTranslation.getString("sidekick") + ": " + sidekick.player.Data.PlayerName));
+            } }
 
         public override void FixedUpdate()
         {

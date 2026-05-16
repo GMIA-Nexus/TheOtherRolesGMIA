@@ -4865,6 +4865,14 @@
         "0": "Secret Lover",
         "13": "\u6697\u604b\u5bf9\u8c61"
     },
+    "roleInfoCollatorResults": {
+        "0": "Match Results",
+        "13": "\u5bf9\u7167\u7ed3\u679c"
+    },
+    "roleInfoCollatorResultsZero": {
+        "0": "No Results",
+        "13": "\u65e0"
+    },
     "roleSummaryText": {
         "0": "Players and roles at the end of the game:",
         "11": "\u6700\u7d42\u7d50\u679c:",

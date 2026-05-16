@@ -11,6 +11,7 @@ using static TheOtherRoles.TheOtherRoles;
 
 namespace TheOtherRoles.Roles;
 
+[TORRPCHolder]
 public class Collator : RoleBase<Collator>
 {
     public static Color32 color = new(37, 159, 148, 255);
@@ -21,6 +22,7 @@ public class Collator : RoleBase<Collator>
 
     public List<(PlayerControl player, TeamCategory role)> sampledPlayers = [];
     public (SpriteRenderer tube, SpriteRenderer sample)[] allSamples = [];
+    public List<(PlayerControl player1, PlayerControl player2, bool matched)> sharedResults = [];
 
     public PlayerControl currentTarget;
 
@@ -72,7 +74,30 @@ public class Collator : RoleBase<Collator>
         }
         sampledPlayers = [];
         allSamples = [];
+        sharedResults = [];
     }
+
+    public static RemoteProcess<(byte collatorId, byte player1Id, byte player2Id, bool matched)> ShareResults = new("CollatorShareResults", (message, _) =>
+    {
+        var collatorPlayer = Helpers.playerById(message.collatorId);
+        var player1 = Helpers.playerById(message.player1Id);
+        var player2 = Helpers.playerById(message.player2Id);
+        var collator = getRole(collatorPlayer);
+        if (collator != null && collatorPlayer && player1 && player2)
+            collator.sharedResults.Add((player1, player2, message.matched));
+    });
+
+    public override GUIContext ProgressWidget { get {
+            var res = sharedResults.Where(x => x.player1 != null && x.player2 != null).ToList();
+            return ProgressGUI.Holder(
+            ProgressGUI.OneLineText(ModTranslation.getString("roleInfoCollatorResults")),
+                (res.Count == 0 ?
+                    ProgressGUI.OneLineText(ModTranslation.getString("roleInfoCollatorResultsZero")) :
+                    ProgressGUI.Holder(
+                    res.Select(result => ProgressGUI.OneLineText((result.player1?.Data.PlayerName ?? "") + ", " + (result.player2?.Data.PlayerName ?? "") + " ⇒ " + (result.matched ? ModTranslation.getString("collatorMatched").Color(Color.green) : ModTranslation.getString("collatorUnmatched").Color(Color.red))))
+                )).Move(new(0.1f, 0f))
+            );
+        } }
 
     public override void FixedUpdate()
     {
@@ -159,6 +184,7 @@ public class Collator : RoleBase<Collator>
                     new TORGUIText(GUIAlignment.Left, TORGUIContextEngine.API.GetAttribute(AttributeAsset.OverlayTitle), new TranslateTextComponent("collatorInfo")),
                     new TORGUIText(GUIAlignment.Left, TORGUIContextEngine.API.GetAttribute(AttributeAsset.OverlayContent), new RawTextComponent(msg)))
                     , MeetingOverlayHolder.IconsSprite[4], color);
+        ShareResults.Invoke((player.PlayerId, player1.player.PlayerId, player2.player.PlayerId, matched));
     }
 
     public static TeamCategory CheckTeam(RoleInfo role)
@@ -233,6 +259,7 @@ public class Collator : RoleBase<Collator>
         trialsLeft = Mathf.RoundToInt(CustomOptionHolder.collatorNumberOfTrials.getFloat());
         sampledPlayers = [];
         allSamples = [];
+        sharedResults = [];
         currentTarget = null;
         acTokenChallenge = null;
     }

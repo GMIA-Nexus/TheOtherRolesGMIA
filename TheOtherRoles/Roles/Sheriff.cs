@@ -1,4 +1,5 @@
 using System.Linq;
+using TheOtherRoles.MetaContext;
 using TheOtherRoles.Modules;
 using UnityEngine;
 using static TheOtherRoles.Patches.PlayerControlFixedUpdatePatch;
@@ -71,6 +72,16 @@ public class Sheriff : RoleBase<Sheriff>
                     }
                 }
             }
+        }
+    }
+
+    public override GUIContext ProgressWidget
+    {
+        get
+        {
+            var deputy = getDeputy(player);
+            if (deputy == null || deputy?.player == null) return null;
+            return ProgressGUI.Holder(ProgressGUI.OneLineText(ModTranslation.getString("deputy") + ": " + deputy.player.Data.PlayerName));
         }
     }
 

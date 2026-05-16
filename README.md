@@ -17,6 +17,7 @@ We are only a team of teenagers, and we may not be able to make this mod like an
 
 | Among Us - Version | Mod Version | Link                                                         |
 | ------------------ | ----------- | ------------------------------------------------------------ |
+| 17.3s            | v1.3.7     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.3.7) |
 | 17.1.2s            | v1.3.6     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.3.6) |
 | 17.1s            | v1.3.5     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.3.5) |
 | 17.1s            | v1.3.4     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.3.4) |

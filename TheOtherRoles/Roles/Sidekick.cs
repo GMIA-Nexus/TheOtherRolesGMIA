@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using Hazel;
 using TheOtherRoles.CustomGameModes;
+using TheOtherRoles.MetaContext;
 using TheOtherRoles.Modules;
 using UnityEngine;
 using static TheOtherRoles.Patches.PlayerControlFixedUpdatePatch;
@@ -33,6 +34,8 @@ namespace TheOtherRoles.Roles
                 if (player.isLovers()) counter += 1;
             return counter;
         }
+
+        public override GUIContext ProgressWidget { get => ProgressGUI.Holder(jackal != null && jackal.player ? ProgressGUI.OneLineText(ModTranslation.getString("jackal") + ": " + jackal.player.Data.PlayerName) : null); }
 
         public static RemoteProcess<byte> PromoteToJackal = RemotePrimitiveProcess.OfByte("SidekickPromotes", (message, _) =>
         {

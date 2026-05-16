@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Hazel;
+using TheOtherRoles.MetaContext;
 using TheOtherRoles.Modules;
 using UnityEngine;
 using static TheOtherRoles.Patches.PlayerControlFixedUpdatePatch;
@@ -39,6 +40,8 @@ namespace TheOtherRoles.Roles
 
         private static Sprite buttonSprite;
         private static Sprite handcuffedSprite;
+
+        public override GUIContext ProgressWidget { get => ProgressGUI.Holder(sheriff != null && sheriff.player ? ProgressGUI.OneLineText(ModTranslation.getString("sheriff") + ": " + sheriff.player.Data.PlayerName) : null); }
 
         public override void FixedUpdate()
         {
