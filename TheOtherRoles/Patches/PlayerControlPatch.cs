@@ -331,6 +331,7 @@ namespace TheOtherRoles.Patches {
                     string playerInfoText = "";
                     string meetingInfoText = "";                    
                     if (p == PlayerControl.LocalPlayer) {
+                        if (p.Data.IsDead) roleNames = roleText;
                         playerInfoText = $"{roleNames}";
                         if (p.isRole(RoleId.Swapper)) playerInfoText = $"{roleNames}" + Helpers.cs((p.Data.Role.IsImpostor || Madmate.madmate.Any(x => x.PlayerId == p.PlayerId)) ? Palette.ImpostorRed : Swapper.color, $" ({Swapper.charges})");
                         if (HudManager.Instance.TaskPanel != null) {
@@ -344,24 +345,21 @@ namespace TheOtherRoles.Patches {
                     }
                     else if (!PlayerControl.LocalPlayer.Data.IsDead && Akujo.isPartner(PlayerControl.LocalPlayer, p) && Akujo.knowsRoles) {
                         playerInfoText = roleText;
-                        meetingInfoText = roleNames;
+                        meetingInfoText = roleText;
                     }
                     else if (ClientOption.GetValue(ClientOption.ClientOptionType.SpoilerAfterDeath) == 1) {
-                        if (!isTaskMasterExTask)
-                        {
+                        if (!isTaskMasterExTask) {
                             playerInfoText = $"{roleText} {taskInfo}".Trim();
-                            meetingInfoText = $"{roleNames} {taskInfo}".Trim();
                         }
-                        else
-                        {
+                        else {
                             playerInfoText = $"{roleText} {exTaskInfo}".Trim();
-                            meetingInfoText = $"{roleNames} {exTaskInfo}".Trim();
                         }
+                        meetingInfoText = playerInfoText;
                     }
                     else if ((Lawyer.lawyerKnowsRole && PlayerControl.LocalPlayer.isRole(RoleId.Lawyer) && p == Lawyer.target)
                         || (Godfather.shouldShowInfo(PlayerControl.LocalPlayer) && Godfather.killed.Contains(p))) {
                         playerInfoText = $"{roleText}";
-                        meetingInfoText = $"{roleNames}";
+                        meetingInfoText = playerInfoText;
                     }
 
                     playerInfo.text = playerInfoText;
@@ -896,7 +894,7 @@ namespace TheOtherRoles.Patches {
                 Camouflager.acTokenChallenge.Value.cleared |= Camouflager.acTokenChallenge.Value.kills >= 3;
             }
 
-            if (PlayerControl.LocalPlayer.isRole(RoleId.Tracker) && Tracker.local.tracked == target)
+            if (PlayerControl.LocalPlayer.isRole(RoleId.Tracker) && Tracker.canKill && Tracker.local.tracked == target)
                 Tracker.local.numShots++;
 
             if (PlayerControl.LocalPlayer.isRole(RoleId.Teleporter))
@@ -946,7 +944,7 @@ namespace TheOtherRoles.Patches {
                     _ = new StaticAchievementToken("sprinter.challenge");
             }
 
-            if (Helpers.isVisible(PlayerControl.LocalPlayer, target))
+            if (Helpers.isVisible(PlayerControl.LocalPlayer, target) && Watcher.canKillVillain)
             {
                 if (PlayerControl.LocalPlayer.isRole(RoleId.NiceWatcher))
                 {

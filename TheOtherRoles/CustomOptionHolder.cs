@@ -77,6 +77,7 @@ namespace TheOtherRoles {
         public static CustomOption watcherIsImpWatcherRate;
         public static CustomOption watcherSeeGuesses;
         public static CustomOption watcherSeeYasunaVotes;
+        public static CustomOption watcherCanKill;
 
         public static CustomRoleOption jesterSpawnRate;
         public static CustomOption jesterCanCallEmergency;
@@ -317,6 +318,7 @@ namespace TheOtherRoles {
         public static CustomOption trackerCorpsesTrackingCooldown;
         public static CustomOption trackerCorpsesTrackingDuration;
         public static CustomOption trackerTrackingMethod;
+        public static CustomOption trackerCanKill;
         public static CustomOption trackerKillCooldown;
 
         public static CustomRoleOption archaeologistSpawnRate;
@@ -921,6 +923,7 @@ namespace TheOtherRoles {
             watcherIsImpWatcherRate = CustomOption.Create(1036, Types.Neutral, "watcherisImpWatcherRate", rates, watcherAssignEqually);
             watcherSeeGuesses = CustomOption.Create(5080, Types.Neutral, "watcherSeeGuesses", true, watcherSpawnRate);
             watcherSeeYasunaVotes = CustomOption.Create(5081, Types.Neutral, "watcherSeeYasunaVotes", true, watcherSpawnRate);
+            watcherCanKill = CustomOption.Create(5082, Types.Neutral, "watcherCanKill", true, watcherSpawnRate);
 
             yasunaSpawnRate = new CustomRoleOption(6040, Types.Neutral, "yasuna", Yasuna.color, 1);
             yasunaIsImpYasunaRate = CustomOption.Create(6041, Types.Neutral, "yasunaIsImpYasunaRate", rates, yasunaSpawnRate);
@@ -1182,7 +1185,8 @@ namespace TheOtherRoles {
             trackerCorpsesTrackingCooldown = CustomOption.Create(204, Types.Crewmate, "trackerCorpsesTrackingCooldown", 30f, 5f, 120f, 5f, trackerCanTrackCorpses, false, "unitSeconds");
             trackerCorpsesTrackingDuration = CustomOption.Create(205, Types.Crewmate, "trackerCorpsesTrackingDuration", 5f, 2.5f, 30f, 2.5f, trackerCanTrackCorpses, false, "unitSeconds");
             trackerTrackingMethod = CustomOption.Create(206, Types.Crewmate, "trackerTrackingMethod", ["trackerArrow", "trackerProximity", "trackerBoth"], trackerSpawnRate);
-            trackerKillCooldown = CustomOption.Create(207, Types.Crewmate, "trackerKillCooldown", 30f, 5f, 60f, 2.5f, trackerSpawnRate, false, "unitSeconds");
+            trackerCanKill = CustomOption.Create(208, Types.Crewmate, "trackerCanKill", true, trackerSpawnRate);
+            trackerKillCooldown = CustomOption.Create(207, Types.Crewmate, "trackerKillCooldown", 30f, 5f, 60f, 2.5f, trackerCanKill, false, "unitSeconds");
 
             sherlockSpawnRate = new CustomRoleOption(5070, Types.Crewmate, "sherlock", Sherlock.color);
             sherlockCooldown = CustomOption.Create(5071, Types.Crewmate, "sherlockCooldown", 10f, 0f, 40f, 2.5f, sherlockSpawnRate, false, "unitSeconds");

@@ -81,7 +81,7 @@ namespace TheOtherRoles.Roles
             medium.questioned.TryAdd(player);
 
             if (PlayerControl.LocalPlayer == player) {
-                Helpers.showFlash(Palette.CrewmateBlue, message: ModTranslation.getString("mediumQuestionText"));
+                Helpers.showFlash(Palette.CrewmateBlue, message: ModTranslation.getString("mediumQuestionText"), textColor: color, textSprite: Helpers.RoleIcons.GetSprite(2));
             }
         });
 

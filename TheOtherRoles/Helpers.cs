@@ -598,6 +598,7 @@ namespace TheOtherRoles
         }
 
         private static readonly Image LightMask = SpriteLoader.FromResource("TheOtherRoles.Resources.LighterLightMask.png", 100f);
+        public static readonly IDividedSpriteLoader RoleIcons = XOnlyDividedSpriteLoader.FromResource("TheOtherRoles.Resources.RoleIcons.png", 150f, 9);
         public static SpriteRenderer CreateCustomLight(Vector2 pos, float range, bool enabled = true, Sprite maskSprite = null)
         {
             var trueRange = range;
@@ -846,7 +847,7 @@ namespace TheOtherRoles
             // Seer show flash and add dead player position
             if (Seer.exists && ((PlayerControl.LocalPlayer.isRole(RoleId.Seer) && PlayerControl.LocalPlayer != target) || shouldShowGhostInfo()) && Seer.livingPlayers.Count > 0 && Seer.mode <= 1)
             {
-                showFlash(new Color(42f / 255f, 187f / 255f, 245f / 255f), message: ModTranslation.getString("seerInfo"));
+                showFlash(new Color(42f / 255f, 187f / 255f, 245f / 255f), message: ModTranslation.getString("seerInfo"), textColor: Color.white, textSprite: RoleIcons.GetSprite(5));
                 if (PlayerControl.LocalPlayer.isRole(RoleId.Seer))
                 {
                     _ = new StaticAchievementToken("seer.common1");
@@ -1562,14 +1563,15 @@ namespace TheOtherRoles
         /// <param name="color">The color of the flash screen</param>
         /// <param name="duration">The duration of the flash effect</param>
         /// <param name="message">The message to display during the flash</param>
-        public static void showFlash(Color color, float duration = 1f, string message = "") {
+        /// <param name="textColor">The color of the text during the flash</param>
+        /// <param name="textSprite">The sprite of the text to display during the flash</param>
+        public static void showFlash(Color color, float duration = 1f, string message = "", Color textColor = default, Sprite textSprite = null) {
             if (FastDestroyableSingleton<HudManager>.Instance == null || FastDestroyableSingleton<HudManager>.Instance.FullScreen == null) return;
             var renderer = UnityEngine.Object.Instantiate(FastDestroyableSingleton<HudManager>.Instance.FullScreen, HudManager.Instance.transform);
             renderer.gameObject.SetActive(true);
             renderer.enabled = true;
 
-            var messageText = CreateAndShowNotification(message, HudManager.Instance.Notifier.settingsChangeColor);
-            messageText.transform.localPosition = new Vector3(0f, 0f, -20f);
+            var messageText = CreateAndShowNotification(message, textColor == default ? HudManager.Instance.Notifier.settingsChangeColor : textColor, new Vector3(0f, 1f, -20f), spr : textSprite);
             messageText.alphaTimer = duration + 2f;
 
             FastDestroyableSingleton<HudManager>.Instance.StartCoroutine(Effects.Lerp(duration, new Action<float>((p) => {
@@ -1594,7 +1596,9 @@ namespace TheOtherRoles
         /// <param name="maxAlpha">The maximum alpha value of the flash</param>
         /// <param name="flashDuring">The duration to keep the flash at maximum alpha</param>
         /// <param name="message">The message to display during the flash</param>
-        public static void flashScreen(Color color, float fadeIn, float fadeOut, float maxAlpha = 0.5f, float flashDuring = 0f, string message = "")
+        /// <param name="textColor">The color of the text during the flash</param>
+        /// <param name="textSprite">The sprite of the text to display during the flash</param>
+        public static void flashScreen(Color color, float fadeIn, float fadeOut, float maxAlpha = 0.5f, float flashDuring = 0f, string message = "", Color textColor = default, Sprite textSprite = null)
         {
             float duration = fadeIn + fadeOut + flashDuring;
 
@@ -1603,8 +1607,7 @@ namespace TheOtherRoles
             flash.enabled = true;
             flash.gameObject.active = true;
 
-            var messageText = CreateAndShowNotification(message, HudManager.Instance.Notifier.settingsChangeColor);
-            messageText.transform.localPosition = new Vector3(0f, 0f, -20f);
+            var messageText = CreateAndShowNotification(message, textColor == default ? HudManager.Instance.Notifier.settingsChangeColor : textColor, new Vector3(0f, 1f, -20f), spr : textSprite);
             messageText.alphaTimer = duration + 2f;
 
             FastDestroyableSingleton<HudManager>.Instance.StartCoroutine(Effects.Lerp(duration, new Action<float>((p) =>

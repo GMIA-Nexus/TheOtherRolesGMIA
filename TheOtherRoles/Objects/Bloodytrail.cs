@@ -66,10 +66,9 @@ namespace TheOtherRoles.Objects {
 
         private static IEnumerator CreateBlood(PlayerControl killer, PlayerControl blood)
         {
-            float endTime = Bloody.duration;
-            while (endTime > 0)
+            float endTime = Modules.TORGameManager.Instance.CurrentTime + Bloody.duration;
+            while (endTime > Modules.TORGameManager.Instance.CurrentTime)
             {
-                endTime -= Time.deltaTime;
                 if (killer.Data.IsDead || MeetingHud.Instance) yield break;
                 _ = new Bloodytrail(killer, blood);
                 yield return new WaitForSeconds(0.1f);

@@ -22,6 +22,7 @@ namespace TheOtherRoles.Roles
         {
             RoleId = roleId = RoleId.FortuneTeller;
             numUsed = 0;
+            isRevealed = false;
             pageIndex = 1;
             divinedFlag = false;
             divineTarget = null;
@@ -48,6 +49,7 @@ namespace TheOtherRoles.Roles
         public Dictionary<byte, float> progress = [];
         public Dictionary<byte, bool> playerStatus = [];
         public bool divinedFlag = false;
+        public bool isRevealed = false;
         public int numUsed = 0;
 
         private static Sprite leftButtonSprite;
@@ -153,7 +155,7 @@ namespace TheOtherRoles.Roles
                     {
                         if (p == null || p.player == null) continue;
                         if (p.player.Data.IsDead) continue;
-                        if (!p.divinedFlag) continue;
+                        if (!p.isRevealed) continue;
 
                         Arrow arrow = new(color);
                         arrow.arrow.SetActive(true);
@@ -209,8 +211,7 @@ namespace TheOtherRoles.Roles
 
         public static void fortuneTellerMessage(string message, float duration, Color color)
         {
-            var messageText = Helpers.CreateAndShowNotification(message, color);
-            messageText.transform.localPosition = new Vector3(0f, 0f, -20f);
+            var messageText = Helpers.CreateAndShowNotification(message, color, new Vector3(0f, 1f, -20f), spr: Helpers.RoleIcons.GetSprite(1));
             messageText.alphaTimer = duration;
         }
 
@@ -255,6 +256,9 @@ namespace TheOtherRoles.Roles
 
             else if (divineResult == DivineResults.Role)
                 msg = $"{p.Data.PlayerName} was The {string.Join(" ", RoleInfo.getRoleInfoForPlayer(p, false, true).Select(x => Helpers.cs(x.color, x.name)))}";
+
+            if (p.Data.Role.IsImpostor && revealOnImp)
+                msg += "<br>" + ModTranslation.getString("fortuneTellerRevealNotification");
 
             if (!string.IsNullOrWhiteSpace(msg))
                 fortuneTellerMessage(msg, 7f, color);

@@ -51,6 +51,9 @@ namespace TheOtherRoles.Roles
             }
             if (PlayerControl.LocalPlayer.Data.Role.IsImpostor)
                 PlayerControl.LocalPlayer.SetKillTimerUnchecked(Mathf.Max(PlayerControl.LocalPlayer.GetKillCooldown(), PlayerControl.LocalPlayer.killTimer));
+
+            var text = Helpers.CreateAndShowNotification(ModTranslation.getString("baitEmitNotificatoin"), Color.white, new Vector3(0f, 1f, -20f), spr: Helpers.RoleIcons.GetSprite(0));
+            text.alphaTimer = 3f;
         });
 
         private static Sprite buttonSprite;

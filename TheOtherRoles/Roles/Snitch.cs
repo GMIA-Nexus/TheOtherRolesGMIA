@@ -65,8 +65,8 @@ namespace TheOtherRoles.Roles
             int numberOfTasks = playerTotal - playerCompleted;
 
             if (!local.Data.IsDead && numberOfTasks <= taskCountForReveal && (local.Data.Role.IsImpostor || (includeTeamEvil && (local.isRole(RoleId.Jackal) || local.isRole(RoleId.Sidekick)
-                || local.isRole(RoleId.Moriarty) || local.isRole(RoleId.JekyllAndHyde) || local.isRole(RoleId.Fox)) || local.isRole(RoleId.Immoralist)
-                || (local.isRole(RoleId.SchrodingersCat) && SchrodingersCat.hasTeam() && SchrodingersCat.team != SchrodingersCat.Team.Crewmate))))
+                || local.isRole(RoleId.Moriarty) || local.isRole(RoleId.JekyllAndHyde) || local.isRole(RoleId.Fox)) || local.isRole(RoleId.Immoralist) || local.isRole(RoleId.Pelican)
+                || local.isRole(RoleId.Yandere) || (local.isRole(RoleId.SchrodingersCat) && SchrodingersCat.hasTeam() && SchrodingersCat.team != SchrodingersCat.Team.Crewmate))))
             {
                 if (localArrows.Count == 0) localArrows.Add(new Arrow(Color.blue));
                 if (localArrows.Count != 0 && localArrows[0] != null)

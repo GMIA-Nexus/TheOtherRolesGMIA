@@ -1131,14 +1131,14 @@ namespace TheOtherRoles
                 },
                 () =>
                 {
-                    return PlayerControl.LocalPlayer.isRole(RoleId.Tracker) && !PlayerControl.LocalPlayer.Data.IsDead;
+                    return PlayerControl.LocalPlayer.isRole(RoleId.Tracker) && Tracker.canKill && !PlayerControl.LocalPlayer.Data.IsDead;
                 },
                 () =>
                 {
                     if (trackerText != null) {
                         trackerText.text = $"{Tracker.local.numShots}";
                     }
-                    return PlayerControl.LocalPlayer.CanMove && Tracker.local.numShots > 0;
+                    return PlayerControl.LocalPlayer.CanMove && Tracker.local.numShots > 0 && Tracker.local.currentTarget;
                 },
                 () => { trackerKillButton.Timer = trackerKillButton.MaxTimer; },
                 Tracker.getKillButtonSprite(),
@@ -1153,7 +1153,7 @@ namespace TheOtherRoles
             watcherKillButton = new(
                 () =>
                 {
-                    if (Helpers.checkMurderAttemptAndKill(PlayerControl.LocalPlayer, Tracker.local.currentTarget) == MurderAttemptResult.SuppressKill) return;
+                    if (Helpers.checkMurderAttemptAndKill(PlayerControl.LocalPlayer, NiceWatcher.local.currentTarget) == MurderAttemptResult.SuppressKill) return;
                     NiceWatcher.local.canKill = false;
                     NiceWatcher.local.currentTarget = null;
                 },
@@ -1161,7 +1161,7 @@ namespace TheOtherRoles
                 {
                     return PlayerControl.LocalPlayer.isRole(RoleId.NiceWatcher) && NiceWatcher.local.canKill && !PlayerControl.LocalPlayer.Data.IsDead;
                 },
-                () => { return PlayerControl.LocalPlayer.CanMove; },
+                () => { return PlayerControl.LocalPlayer.CanMove && NiceWatcher.local.currentTarget; },
                 () => { },
                 __instance.KillButton.graphic.sprite,
                 CustomButton.ButtonPositions.upperRowRight,
@@ -2947,7 +2947,8 @@ namespace TheOtherRoles
 
                     return PlayerControl.LocalPlayer.CanMove && Sherlock.local.numUsed < Sherlock.local.getNumInvestigate();
                 },
-                () => {
+                () =>
+                {
                     sherlockWatchButton.Timer = sherlockWatchButton.MaxTimer;
                     Sherlock.killTimerCounter = 0;
                 },
@@ -2956,7 +2957,8 @@ namespace TheOtherRoles
                 __instance,
                 KeyCode.H,
                 actionName: ModTranslation.getString("sherlockWatchButton")
-            );
+            )
+            { buttonText = "" };
             sherlockNumKillTimerText = GameObject.Instantiate(sherlockWatchButton.actionButton.cooldownTimerText, sherlockWatchButton.actionButton.cooldownTimerText.transform.parent);
             sherlockNumKillTimerText.text = "";
             sherlockNumKillTimerText.enableWordWrapping = false;

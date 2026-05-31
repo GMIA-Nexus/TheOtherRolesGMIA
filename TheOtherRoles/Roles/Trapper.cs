@@ -103,8 +103,7 @@ namespace TheOtherRoles.Roles
                             var distance = Vector3.Distance(p1, p2);
                             if (distance < trapRange)
                             {
-                                var text = Helpers.CreateAndShowNotification(string.Format(ModTranslation.getString("trapperGotTrapText"), p.Data.PlayerName), Color.white);
-                                text.transform.localPosition = new Vector3(0f, 0f, -20f);
+                                var text = Helpers.CreateAndShowNotification(string.Format(ModTranslation.getString("trapperGotTrapText"), p.Data.PlayerName), Color.white, localPos: new(0f, 1f, -20f), spr: Helpers.RoleIcons.GetSprite(3));
                                 text.alphaTimer = 3f;
 
                                 ActivateTrap.Invoke((trap.Key, PlayerControl.LocalPlayer.PlayerId, p.PlayerId));

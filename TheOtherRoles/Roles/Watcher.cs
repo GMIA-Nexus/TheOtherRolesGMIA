@@ -68,6 +68,7 @@ namespace TheOtherRoles.Roles
         public static Color color = Palette.Purple;
         public static bool canSeeGuesses { get { return CustomOptionHolder.watcherSeeGuesses.getBool(); } }
         public static bool canSeeYasunaVotes = false;
+        public static bool canKillVillain { get { return CustomOptionHolder.watcherCanKill.getBool(); }  }
 
         public static void clearAndReload()
         {

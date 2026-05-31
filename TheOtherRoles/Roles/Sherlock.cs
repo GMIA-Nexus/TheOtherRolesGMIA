@@ -91,8 +91,7 @@ namespace TheOtherRoles.Roles
 
         public static void investigateMessage(string message, float duration, Color color)
         {
-            var messageText = Helpers.CreateAndShowNotification(message, color);
-            messageText.transform.localPosition = new Vector3(0f, 0f, -20f);
+            var messageText = Helpers.CreateAndShowNotification(message, color, new Vector3(0f, 1f, -20f), spr: Helpers.RoleIcons.GetSprite(7));
             messageText.alphaTimer = duration;
         }
 

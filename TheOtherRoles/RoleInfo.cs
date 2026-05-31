@@ -573,28 +573,32 @@ namespace TheOtherRoles
                         roleName = Helpers.cs(Assassin.color, ModTranslation.getString("roleInfoMarked")) + roleName;
                     if (Pursuer.blankedList.Contains(p) && !p.Data.IsDead)
                         roleName = Helpers.cs(Pursuer.color, ModTranslation.getString("roleInfoBlanked")) + roleName;
-                    if (FortuneTeller.players.Any(x => x.divineTarget == p))
-                        roleName = Helpers.cs(FortuneTeller.color, ModTranslation.getString("roleInfoDivined")) + roleName;
-                    if (Witch.players.Any(x => x.futureSpelled.Contains(p)) && !MeetingHud.Instance) // This is already displayed in meetings!
-                        roleName = Helpers.cs(Witch.color, "☆ ") + roleName;
-                    foreach (var arsonist in Arsonist.players) {
-                        if (arsonist.player == p)
-                            roleName += Helpers.cs(Arsonist.color, $" ({PlayerControl.AllPlayerControls.ToArray().Count(x => { return x != p && !x.Data.IsDead && !x.Data.Disconnected && !arsonist.dousedPlayers.Any(y => y.PlayerId == x.PlayerId); })} {ModTranslation.getString("roleInfoRemaining")})");
-                    }
-                    if (Akujo.isKeep(p))
-                        roleName = Helpers.cs(Color.gray, ModTranslation.getString("roleInfoBackup")) + roleName;
-                    if (Akujo.isHonmei(p))
-                        roleName = Helpers.cs(Akujo.players.FirstOrDefault(x => x.honmei == p).iconColor, ModTranslation.getString("roleInfoHonmei")) + roleName;
-                    if (p == Kataomoi.target)
-                        roleName = Helpers.cs(Kataomoi.color, ModTranslation.getString("roleInfoKataomoiTarget")) + roleName;
-                    if (p == Yandere.target)
-                        roleName = Helpers.cs(Yandere.color, ModTranslation.getString("roleInfoYandereTarget")) + roleName;
-                    if (Pelican.players.Any(x => x.eatenPlayers.Contains(p)))
-                        roleName = Helpers.cs(Pelican.color, ModTranslation.getString("roleInfoSwallowIndicator")) + roleName;
 
-                    // Death Reason on Ghosts
-                    if (p.Data.IsDead) {
-                        roleName += getStatesString(p);
+                    if (!MeetingHud.Instance)
+                    {
+                        if (FortuneTeller.players.Any(x => x.divineTarget == p))
+                            roleName = Helpers.cs(FortuneTeller.color, ModTranslation.getString("roleInfoDivined")) + roleName;
+                        if (Witch.players.Any(x => x.futureSpelled.Contains(p)))
+                            roleName = Helpers.cs(Witch.color, "☆ ") + roleName;
+                        foreach (var arsonist in Arsonist.players) {
+                            if (arsonist.player == p)
+                                roleName += Helpers.cs(Arsonist.color, $" ({PlayerControl.AllPlayerControls.ToArray().Count(x => { return x != p && !x.Data.IsDead && !x.Data.Disconnected && !arsonist.dousedPlayers.Any(y => y.PlayerId == x.PlayerId); })} {ModTranslation.getString("roleInfoRemaining")})");
+                        }
+                        if (Akujo.isKeep(p))
+                            roleName = Helpers.cs(Color.gray, ModTranslation.getString("roleInfoBackup")) + roleName;
+                        if (Akujo.isHonmei(p))
+                            roleName = Helpers.cs(Akujo.players.FirstOrDefault(x => x.honmei == p).iconColor, ModTranslation.getString("roleInfoHonmei")) + roleName;
+                        if (p == Kataomoi.target)
+                            roleName = Helpers.cs(Kataomoi.color, ModTranslation.getString("roleInfoKataomoiTarget")) + roleName;
+                        if (p == Yandere.target)
+                            roleName = Helpers.cs(Yandere.color, ModTranslation.getString("roleInfoYandereTarget")) + roleName;
+                        if (Pelican.players.Any(x => x.eatenPlayers.Contains(p)))
+                            roleName = Helpers.cs(Pelican.color, ModTranslation.getString("roleInfoSwallowIndicator")) + roleName;
+
+                        // Death Reason on Ghosts
+                        if (p.Data.IsDead) {
+                            roleName += getStatesString(p);
+                        }
                     }
                 }
             }

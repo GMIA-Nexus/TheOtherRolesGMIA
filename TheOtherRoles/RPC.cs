@@ -1270,7 +1270,8 @@ namespace TheOtherRoles
             {
                 FortuneTeller.fortuneTellerMessage(ModTranslation.getString("fortuneTellerDivinedSomeone"), 7f, Color.white);
             }
-            if (target.Data.Role.IsImpostor && FortuneTeller.revealOnImp) ftRole.setDivinedFlag(true);
+            ftRole.setDivinedFlag(true);
+            ftRole.isRevealed = target.Data.Role.IsImpostor && FortuneTeller.revealOnImp;
             if (target.isRole(RoleId.Immoralist) && PlayerControl.LocalPlayer == target)
             {
                 FortuneTeller.fortuneTellerMessage(ModTranslation.getString("fortuneTellerDivinedYou"), 7f, Color.white);

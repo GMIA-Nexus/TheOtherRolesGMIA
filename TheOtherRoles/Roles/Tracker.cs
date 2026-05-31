@@ -15,6 +15,7 @@ namespace TheOtherRoles.Roles
         public static Color color = new Color32(100, 58, 220, byte.MaxValue);
         public List<Arrow> localArrows = [];
         public int numShots = 0;
+        public static bool canKill { get { return CustomOptionHolder.trackerCanKill.getBool(); } }
 
         public Tracker()
         {
@@ -60,6 +61,7 @@ namespace TheOtherRoles.Roles
         {
             yield return new("%OPT%", ModTranslation.getString($"trackerOPT{(resetTargetAfterMeeting ? "1" : "2")}Hint"));
             yield return new("%SEC%", updateIntervall.ToString());
+            yield return new("%KILL%", canKill ? ModTranslation.getString("trackerCanKillHint") : "");
         }
 
         public override void FixedUpdate()
