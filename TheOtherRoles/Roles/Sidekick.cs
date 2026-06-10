@@ -35,7 +35,7 @@ namespace TheOtherRoles.Roles
             return counter;
         }
 
-        public override GUIContext ProgressWidget { get => ProgressGUI.Holder(jackal != null && jackal.player ? ProgressGUI.OneLineText(ModTranslation.getString("jackal") + ": " + jackal.player.Data.PlayerName) : null); }
+        public override GUIContext ProgressContext { get => ProgressGUI.Holder(jackal != null && jackal.player ? ProgressGUI.OneLineText(ModTranslation.getString("jackal") + ": " + jackal.player.Data.PlayerName) : null); }
 
         public static RemoteProcess<byte> PromoteToJackal = RemotePrimitiveProcess.OfByte("SidekickPromotes", (message, _) =>
         {

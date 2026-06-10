@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
+using AmongUs.Data;
 using AmongUs.GameOptions;
 using BepInEx.Unity.IL2CPP.Utils;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
@@ -754,16 +755,36 @@ namespace TheOtherRoles
             button.OnMouseOut.AddListener((Action)(() => TORGUIManager.Instance.HideHelpContextIf(button)));
         }
 
-        public static GUIContext GetProgressWidget(PlayerControl player)
+        private static List<SupportedLangs> _languagesToBold =
+        [
+            SupportedLangs.Russian,
+            SupportedLangs.Japanese,
+            SupportedLangs.SChinese,
+            SupportedLangs.TChinese,
+            SupportedLangs.Korean
+        ];
+
+        public static void AdjustNotification(this LobbyNotificationMessage notification)
+        {
+            if (!_languagesToBold.Contains(DataManager.Settings.Language.CurrentLanguage))
+            {
+                notification.Text.fontStyle = FontStyles.Bold;
+                notification.Text.SetOutlineThickness(0.35f);
+            }
+        }
+
+        public static GUIContext GetProgressContext(PlayerControl player)
         {
             if (player == null) return null;
             var role = Role.allRoles.FirstOrDefault(r => r.player == player);
             var roleInfo = RoleInfo.getRoleInfoForPlayer(player, false, true).FirstOrDefault();
             string stateText = RoleInfo.getStatesString(player, false).Replace(" - ", "");
             try { stateText = stateText.HeadUpper(); } catch { }
-            GUIContext stateContext = player.Data.IsDead ? TORGUIContextEngine.API.RawText(GUIAlignment.Left, TORGUIContextEngine.API.GetAttribute(AttributeAsset.DocumentBold), stateText) : null;
-            GUIContext[] progContext = (role?.ProgressWidget != null) ? [TORGUIContextEngine.API.VerticalHolder(GUIAlignment.Left, TORGUIContextEngine.API.RawText(GUIAlignment.Left,
-                    TORGUIContextEngine.API.GetAttribute(AttributeAsset.OverlayContent), cs(roleInfo.color, roleInfo.name)), role.ProgressWidget.Move(new(0.14f, 0f)))] : [];
+            if (!player.Data.IsDead) stateText = ModTranslation.getString("roleSummaryAlive");
+            GUIContext stateContext = stateText != null ? TORGUIContextEngine.API.RawText(GUIAlignment.Left,
+                TORGUIContextEngine.API.GetAttribute(AttributeAsset.DocumentBold), player.Data.PlayerName + ": " + stateText) : null;
+            GUIContext[] progContext = (role?.ProgressContext != null) ? [TORGUIContextEngine.API.VerticalHolder(GUIAlignment.Left, TORGUIContextEngine.API.RawText(GUIAlignment.Left,
+                    TORGUIContextEngine.API.GetAttribute(AttributeAsset.OverlayTitle), cs(roleInfo.color, roleInfo.name)), role.ProgressContext.Move(new(0.14f, 0f)))] : [];
             var context = stateContext != null ? [.. progContext.Prepend(stateContext)] : progContext;
             return context.Length == 0 ? null : TORGUIContextEngine.API.VerticalHolder(GUIAlignment.Left, context);
         }
@@ -786,7 +807,9 @@ namespace TheOtherRoles
 
         public static void SetOverlay(this PassiveButton button, Func<GUIContext> widget)
         {
-            button.OnMouseOver.AddListener((Action)(() =>
+            var hover = button.GetComponent<TouchHover>();
+            if (hover == null) return;
+            hover.OnHoverOver.AddListener((Action)(() =>
             {
                 var val = widget.Invoke();
                 if (val != null)
@@ -794,7 +817,7 @@ namespace TheOtherRoles
                     TORGUIManager.Instance.SetHelpContext(button, val);
                 }
             }));
-            button.OnMouseOut.AddListener((Action)(() => TORGUIManager.Instance.HideHelpContextIf(button)));
+            hover.OnHoverOut.AddListener((Action)(() => TORGUIManager.Instance.HideHelpContextIf(button)));
         }
 
         public static void generateNormalTasks(this PlayerControl player)
@@ -1573,6 +1596,7 @@ namespace TheOtherRoles
 
             var messageText = CreateAndShowNotification(message, textColor == default ? HudManager.Instance.Notifier.settingsChangeColor : textColor, new Vector3(0f, 1f, -20f), spr : textSprite);
             messageText.alphaTimer = duration + 2f;
+            messageText.AdjustNotification();
 
             FastDestroyableSingleton<HudManager>.Instance.StartCoroutine(Effects.Lerp(duration, new Action<float>((p) => {
 
@@ -1609,6 +1633,7 @@ namespace TheOtherRoles
 
             var messageText = CreateAndShowNotification(message, textColor == default ? HudManager.Instance.Notifier.settingsChangeColor : textColor, new Vector3(0f, 1f, -20f), spr : textSprite);
             messageText.alphaTimer = duration + 2f;
+            messageText.AdjustNotification();
 
             FastDestroyableSingleton<HudManager>.Instance.StartCoroutine(Effects.Lerp(duration, new Action<float>((p) =>
             {

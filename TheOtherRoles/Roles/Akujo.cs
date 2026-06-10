@@ -32,7 +32,7 @@ namespace TheOtherRoles.Roles
             iconColor = getAvailableColor();
         }
 
-        public override GUIContext ProgressWidget { get => ProgressGUI.Holder(honmei != null ? ProgressGUI.OneLineText(ModTranslation.getString("roleInfoHonmei") + ": " + (honmei?.Data.PlayerName ?? "")) : null,
+        public override GUIContext ProgressContext { get => ProgressGUI.Holder(honmei != null ? ProgressGUI.OneLineText(ModTranslation.getString("roleInfoHonmei") + ": " + (honmei?.Data.PlayerName ?? "")) : null,
             keeps.Count > 0 ? ProgressGUI.OneLineText(ModTranslation.getString("roleInfoBackup") + ": " + string.Join(", ", keeps.Where(x => x != null).Select(k => k.Data.PlayerName))) : null); }
 
         public static RemoteProcess<(byte akujoId, byte targetId)> SetHonmei = new("AkujoSetHonmei", (message, _) =>

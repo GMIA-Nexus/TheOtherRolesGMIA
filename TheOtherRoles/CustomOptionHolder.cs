@@ -332,6 +332,7 @@ namespace TheOtherRoles {
         public static CustomOption snitchLeftTasksForReveal;
         public static CustomOption snitchIncludeTeamEvil;
         public static CustomOption snitchTeamEvilUseDifferentArrowColor;
+        public static CustomOption snitchSeesRoles;
 
         public static CustomRoleOption shifterSpawnRate;
         public static CustomOption shifterIsNeutralRate;
@@ -1197,6 +1198,7 @@ namespace TheOtherRoles {
             snitchLeftTasksForReveal = CustomOption.Create(219, Types.Crewmate, "snitchLeftTasksForReveal", 5f, 0f, 25f, 1f, snitchSpawnRate, false, "unitScrews");
             snitchIncludeTeamEvil = CustomOption.Create(211, Types.Crewmate, "snitchIncludeTeamEvil", true, snitchSpawnRate);
             snitchTeamEvilUseDifferentArrowColor = CustomOption.Create(212, Types.Crewmate, "snitchTeamEvilUseDifferentArrowColor", true, snitchIncludeTeamEvil);
+            snitchSeesRoles = CustomOption.Create(213, Types.Crewmate, "snitchSeesRoles", true, snitchSpawnRate);
 
             archaeologistSpawnRate = new CustomRoleOption(7030, Types.Crewmate, "archaeologist", Archaeologist.color, 1);
             archaeologistCooldown = CustomOption.Create(7031, Types.Crewmate, "archaeologistCooldown", 20f, 5f, 60f, 1f, archaeologistSpawnRate, format: "unitSeconds");

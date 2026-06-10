@@ -1,20 +1,21 @@
-using System.Collections.Generic;
-using UnityEngine;
-using BepInEx.Configuration;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using AmongUs.Data;
+using AmongUs.GameOptions;
+using BepInEx.Configuration;
 using HarmonyLib;
 using Hazel;
-using System.Text;
-using TheOtherRoles.Utilities;
-using static TheOtherRoles.CustomOption;
+using Il2CppSystem.Linq;
 using Reactor.Utilities.Extensions;
-using AmongUs.GameOptions;
-using TMPro;
 using TheOtherRoles.Modules;
-using AmongUs.Data;
 using TheOtherRoles.Roles;
+using TheOtherRoles.Utilities;
+using TMPro;
+using UnityEngine;
+using static TheOtherRoles.CustomOption;
 
 namespace TheOtherRoles {
     public class CustomOption {
@@ -1623,19 +1624,61 @@ namespace TheOtherRoles {
             return sb.ToString();
         }
 
-        public static string buildAllOptions(string vanillaSettings = "") {
-            if (vanillaSettings == "")
-                vanillaSettings = GameOptionsManager.Instance.CurrentGameOptions.ToHudString(PlayerControl.AllPlayerControls.Count);
+        private static string[] mapName = new string[] { "Skeld", "Mira", "Polus", "Dlesk", "Airship", "Fungle" };
+        public static string buildAllOptions() {
+            StringBuilder builder = new();
+
+            //バニラオプション
+            var vanillaOptions = GameOptionsManager.Instance.currentNormalGameOptions;
+            var translator = TranslationController.Instance;
+
+            void AddHeader(string header)
+            {
+                builder.Append("\n\n");
+                builder.Append(ModTranslation.getString(header));
+            }
+            void AddOption(StringNames option, string value, string format = "")
+            {
+                builder.Append("\n- ");
+                builder.Append(translator.GetString(option));
+                builder.Append(": ");
+                builder.Append(string.IsNullOrEmpty(format) ? value : string.Format(ModTranslation.getString(format), value));
+            }
+            string SimpleTrigger(bool trigger) => trigger ? "<color=#FFFF00FF>" + ModTranslation.getString("optionOn") + "</color>" : "<color=#CCCCCCFF>" + ModTranslation.getString("optionOff") + "</color>";
+            builder.Append(ModTranslation.getString("vanillaOptionsHeader"));
+            AddOption(StringNames.GameMapName, ModTranslation.getString("map" + mapName[vanillaOptions.MapId]));
+            AddHeader("vanillaOptionsImpostorHeader");
+            AddOption(StringNames.GameNumImpostors, vanillaOptions.NumImpostors.ToString());
+            AddOption(StringNames.GameKillCooldown, vanillaOptions.KillCooldown.ToString(), "unitSeconds");
+            AddOption(StringNames.GameImpostorLight, vanillaOptions.ImpostorLightMod.ToString(), "unitTimes");
+            AddOption(StringNames.GameKillDistance, translator.GetString(vanillaOptions.KillDistance switch { 0 => StringNames.SettingShort, 1 => StringNames.SettingMedium, _ => StringNames.SettingLong }));
+            AddHeader("vanillaOptionsCrewmateHeader");
+            AddOption(StringNames.GamePlayerSpeed, vanillaOptions.PlayerSpeedMod.ToString(), "unitTimes");
+            AddOption(StringNames.GameCrewLight, vanillaOptions.CrewLightMod.ToString(), "unitTimes");
+            AddHeader("vanillaOptionsMeetingHeader");
+            AddOption(StringNames.GameNumMeetings, vanillaOptions.NumEmergencyMeetings.ToString());
+            AddOption(StringNames.GameEmergencyCooldown, vanillaOptions.EmergencyCooldown.ToString(), "unitSeconds");
+            AddOption(StringNames.GameDiscussTime, vanillaOptions.DiscussionTime.ToString(), "unitSeconds");
+            AddOption(StringNames.GameVotingTime, vanillaOptions.VotingTime.ToString(), "unitSeconds");
+            AddOption(StringNames.GameAnonymousVotes, SimpleTrigger(vanillaOptions.AnonymousVotes));
+            AddOption(StringNames.GameConfirmImpostor, SimpleTrigger(vanillaOptions.ConfirmImpostor));
+            AddHeader("vanillaOptionsTaskHeader");
+            AddOption(StringNames.GameTaskBarMode, translator.GetString(vanillaOptions.TaskBarMode switch { AmongUs.GameOptions.TaskBarMode.Normal => StringNames.SettingNormalTaskMode, AmongUs.GameOptions.TaskBarMode.MeetingOnly => StringNames.SettingMeetingTaskMode, _ => StringNames.SettingInvisibleTaskMode }));
+            AddOption(StringNames.GameCommonTasks, vanillaOptions.NumCommonTasks.ToString());
+            AddOption(StringNames.GameLongTasks, vanillaOptions.NumLongTasks.ToString());
+            AddOption(StringNames.GameShortTasks, vanillaOptions.NumShortTasks.ToString());
+            AddOption(StringNames.GameVisualTasks, SimpleTrigger(vanillaOptions.VisualTasks));
+
             string hudString = "";
             if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek) {
                 hudString += buildOptionsOfType(CustomOptionType.HideNSeekMain, false) + buildOptionsOfType(CustomOptionType.HideNSeekRoles, false);
             } else {
-                hudString += vanillaSettings + buildOptionsOfType(CustomOptionType.General, false) + buildRoleOptions() + buildOptionsOfType(CustomOptionType.Impostor, false) +
+                hudString += buildOptionsOfType(CustomOptionType.General, false) + buildRoleOptions() + buildOptionsOfType(CustomOptionType.Impostor, false) +
                     buildOptionsOfType(CustomOptionType.Neutral, false) + buildOptionsOfType(CustomOptionType.Crewmate, false) +
                     buildOptionsOfType(CustomOptionType.Modifier, false);
             }
 
-            return hudString;
+            return builder.ToString() + "\n\n" + hudString;
         }
     }
 

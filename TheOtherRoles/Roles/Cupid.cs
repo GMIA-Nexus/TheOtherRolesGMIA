@@ -77,7 +77,7 @@ namespace TheOtherRoles.Roles
             }
         }
 
-        public override GUIContext ProgressWidget { get => ProgressGUI.Holder(lovers1 != null && lovers2 != null ? ProgressGUI.OneLineText(ModTranslation.getString("lover") + ": " +
+        public override GUIContext ProgressContext { get => ProgressGUI.Holder(lovers1 != null && lovers2 != null ? ProgressGUI.OneLineText(ModTranslation.getString("lover") + ": " +
             (lovers1?.Data.PlayerName ?? "") + ", " + (lovers2?.Data.PlayerName ?? "")) : null); }
 
         public static RemoteProcess<(byte cupidId, bool isScapegoat, bool isExile)> Suicide = new("CupidSuicide", (message, isCalledByMe) =>

@@ -293,8 +293,9 @@ namespace TheOtherRoles.Patches {
 
                 p.cosmetics.nameText.transform.parent.SetLocalZ(-0.0001f);  // This moves both the name AND the colorblindtext behind objects (if the player is behind the object), like the rock on polus
 
-                if ((Lawyer.lawyerKnowsRole && PlayerControl.LocalPlayer.isRole(RoleId.Lawyer) && p == Lawyer.target) || (Akujo.knowsRoles && Akujo.isPartner(PlayerControl.LocalPlayer, p)) || p == PlayerControl.LocalPlayer || (PlayerControl.LocalPlayer.Data.IsDead
-                    && RoleManager.IsGhostRole(PlayerControl.LocalPlayer.Data.RoleType)) || (Godfather.shouldShowInfo(PlayerControl.LocalPlayer) && Godfather.killed.Contains(p)) || FreePlayGM.isFreePlayGM) {
+                if ((Lawyer.lawyerKnowsRole && PlayerControl.LocalPlayer.isRole(RoleId.Lawyer) && p == Lawyer.target) || (Akujo.knowsRoles && Akujo.isPartner(PlayerControl.LocalPlayer, p))
+                    || p == PlayerControl.LocalPlayer || (PlayerControl.LocalPlayer.Data.IsDead && RoleManager.IsGhostRole(PlayerControl.LocalPlayer.Data.RoleType))
+                    || (Godfather.shouldShowInfo(PlayerControl.LocalPlayer) && Godfather.killed.Contains(p)) || (PlayerControl.LocalPlayer.isRole(RoleId.Snitch) && Snitch.shouldShowRole(PlayerControl.LocalPlayer, p)) || FreePlayGM.isFreePlayGM) {
                     Transform playerInfoTransform = p.cosmetics.nameText.transform.parent.FindChild("Info");
                     TMPro.TextMeshPro playerInfo = playerInfoTransform != null ? playerInfoTransform.GetComponent<TMPro.TextMeshPro>() : null;
                     if (playerInfo == null) {
@@ -357,7 +358,7 @@ namespace TheOtherRoles.Patches {
                         meetingInfoText = playerInfoText;
                     }
                     else if ((Lawyer.lawyerKnowsRole && PlayerControl.LocalPlayer.isRole(RoleId.Lawyer) && p == Lawyer.target)
-                        || (Godfather.shouldShowInfo(PlayerControl.LocalPlayer) && Godfather.killed.Contains(p))) {
+                        || (Godfather.shouldShowInfo(PlayerControl.LocalPlayer) && Godfather.killed.Contains(p)) || (PlayerControl.LocalPlayer.isRole(RoleId.Snitch) && Snitch.shouldShowRole(PlayerControl.LocalPlayer, p))) {
                         playerInfoText = $"{roleText}";
                         meetingInfoText = playerInfoText;
                     }
@@ -570,6 +571,8 @@ namespace TheOtherRoles.Patches {
                 HudManagerStartPatch.thiefKillButton.MaxTimer = Thief.cooldown * multiplier;
                 HudManagerStartPatch.serialKillerButton.EffectDuration = SerialKiller.suicideTimer * (Mini.isGrownUp() ? 1f : 2f);
                 HudManagerStartPatch.schrodingersCatKillButton.MaxTimer = SchrodingersCat.killCooldown * multiplier;
+                HudManagerStartPatch.pelicanKillButton.MaxTimer = Pelican.cooldown * multiplier;
+                HudManagerStartPatch.trackerKillButton.MaxTimer = Tracker.killCooldown * multiplier;
             }
         }
 
@@ -977,13 +980,22 @@ namespace TheOtherRoles.Patches {
 
             if (PlayerControl.LocalPlayer == __instance && Diseased.diseased.Any(x => x.PlayerId == target.PlayerId))
             {
-                HudManagerStartPatch.jackalKillButton.Timer = Jackal.cooldown * Diseased.multiplier;
-                HudManagerStartPatch.sheriffKillButton.Timer = Sheriff.cooldown * Diseased.multiplier;
-                HudManagerStartPatch.vampireKillButton.Timer = Vampire.cooldown * Diseased.multiplier;
-                HudManagerStartPatch.sidekickKillButton.Timer = Sidekick.cooldown * Diseased.multiplier;
-                HudManagerStartPatch.schrodingersCatKillButton.Timer = SchrodingersCat.killCooldown * Diseased.multiplier;
-                PlayerControl.LocalPlayer.SetKillTimerUnchecked(__instance.killTimer * Diseased.multiplier);
+                if (Diseased.active.TryGetValue(__instance.PlayerId, out var num)) num++;
+                else num = 1;
+                Diseased.active[__instance.PlayerId] = num;
+
+                HudManagerStartPatch.jackalKillButton.MaxTimer *= Diseased.multiplier;
+                HudManagerStartPatch.sheriffKillButton.MaxTimer *= Diseased.multiplier;
+                HudManagerStartPatch.vampireKillButton.MaxTimer *= Diseased.multiplier;
+                HudManagerStartPatch.sidekickKillButton.MaxTimer *= Diseased.multiplier;
+                HudManagerStartPatch.schrodingersCatKillButton.MaxTimer *= Diseased.multiplier;
+                HudManagerStartPatch.pelicanKillButton.MaxTimer *= Diseased.multiplier;
+                HudManagerStartPatch.yandereButton.MaxTimer *= Diseased.multiplier;
+                HudManagerStartPatch.trackerKillButton.MaxTimer *= Diseased.multiplier;
             }
+
+            if (PlayerControl.LocalPlayer == __instance && Diseased.active.ContainsKey(__instance.PlayerId))
+                PlayerControl.LocalPlayer.SetKillTimerUnchecked((float)(__instance.killTimer * Math.Pow(Diseased.multiplier, Diseased.active[__instance.PlayerId])));
 
             // Add Bloody Modifier
             if (Bloody.bloody.Any(x => x.PlayerId == target.PlayerId)) {

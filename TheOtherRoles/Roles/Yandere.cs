@@ -58,7 +58,7 @@ public class Yandere : RoleBase<Yandere>
         meetingFlag = true;
     }
 
-    public override GUIContext ProgressWidget { get => ProgressGUI.Holder(target != null ? ProgressGUI.OneLineText(ModTranslation.getString("roleInfoYandereTargetFull") + ": " + (target?.Data.PlayerName ?? "")) : null); }
+    public override GUIContext ProgressContext { get => ProgressGUI.Holder(target != null ? ProgressGUI.OneLineText(ModTranslation.getString("roleInfoYandereTargetFull") + ": " + (target?.Data.PlayerName ?? "")) : null); }
 
     public override void OnMeetingEnd(PlayerControl exiled = null)
     {

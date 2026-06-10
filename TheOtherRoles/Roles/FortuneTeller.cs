@@ -74,7 +74,7 @@ namespace TheOtherRoles.Roles
             resetArrow();
         }
 
-        public override GUIContext ProgressWidget { get => ProgressGUI.Holder(divineTarget != null ? ProgressGUI.OneLineText(ModTranslation.getString("roleInfoFortuneTellerTargetFull") + ": " + (divineTarget?.Data.PlayerName ?? "")) : null); }
+        public override GUIContext ProgressContext { get => ProgressGUI.Holder(divineTarget != null ? ProgressGUI.OneLineText(ModTranslation.getString("roleInfoFortuneTellerTargetFull") + ": " + (divineTarget?.Data.PlayerName ?? "")) : null); }
 
         public override void HandleDisconnect(PlayerControl player, DisconnectReasons reason)
         {
@@ -206,13 +206,14 @@ namespace TheOtherRoles.Roles
             bool status = true;
             if (playerStatus.ContainsKey(index))
                 status = playerStatus[index];
-            return progress.ContainsKey(index) && progress[index] >= duration || !status;
+            return (progress.ContainsKey(index) && progress[index] >= duration) || !status;
         }
 
         public static void fortuneTellerMessage(string message, float duration, Color color)
         {
             var messageText = Helpers.CreateAndShowNotification(message, color, new Vector3(0f, 1f, -20f), spr: Helpers.RoleIcons.GetSprite(1));
             messageText.alphaTimer = duration;
+            messageText.AdjustNotification();
         }
 
         public void divine(PlayerControl p)

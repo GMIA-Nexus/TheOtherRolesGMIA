@@ -7,6 +7,7 @@ using BepInEx.Unity.IL2CPP.Utils;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using HarmonyLib;
 using Hazel;
+using Il2CppSystem.Runtime.Remoting.Messaging;
 using Reactor.Utilities;
 using TheOtherRoles.CustomGameModes;
 using TheOtherRoles.MetaContext;
@@ -41,7 +42,7 @@ namespace TheOtherRoles
         public static CustomButton hackerAdminTableButton;
         private static CustomButton trackerTrackPlayerButton;
         private static CustomButton trackerTrackCorpsesButton;
-        private static CustomButton trackerKillButton;
+        public static CustomButton trackerKillButton;
         public static CustomButton vampireKillButton;
         public static CustomButton garlicButton;
         public static CustomButton jackalKillButton;
@@ -2892,7 +2893,8 @@ namespace TheOtherRoles
                     }
                     if (count == 0)
                     {
-                        Sherlock.investigateMessage(ModTranslation.getString("sherlockMessage1"), 7f, Color.white);
+                        var messageText = Helpers.CreateAndShowNotification(ModTranslation.getString("sherlockMessage1"), Color.white, new Vector3(0f, 1f, -20f), spr: Helpers.RoleIcons.GetSprite(7));
+                        messageText.AdjustNotification();
                     }
                     if (count >= 3)
                         _ = new StaticAchievementToken("sherlock.common1");

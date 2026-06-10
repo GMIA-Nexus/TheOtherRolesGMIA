@@ -89,12 +89,6 @@ namespace TheOtherRoles.Roles
             return detectIcon;
         }
 
-        public static void investigateMessage(string message, float duration, Color color)
-        {
-            var messageText = Helpers.CreateAndShowNotification(message, color, new Vector3(0f, 1f, -20f), spr: Helpers.RoleIcons.GetSprite(7));
-            messageText.alphaTimer = duration;
-        }
-
         public int getNumInvestigate()
         {
             int counter = player.Data.Tasks.ToArray().Where(t => t.Complete).Count();

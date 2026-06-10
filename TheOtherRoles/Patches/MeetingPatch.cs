@@ -30,9 +30,6 @@ namespace TheOtherRoles.Patches
         private static TMPro.TextMeshPro meetingExtraButtonLabel;
         private static PlayerVoteArea swapped1 = null;
         private static PlayerVoteArea swapped2 = null;
-        static TMPro.TextMeshPro[] meetingInfoText = new TMPro.TextMeshPro[4];
-        static PassiveButton meetingInfoButton;
-        static int meetingTextIndex = 0;
 
         static private float[] VotingAreaScale = [1f, 0.95f, 0.76f];
         static private (int x, int y)[] VotingAreaSize = [(3, 5), (3, 6), (4, 6)];
@@ -341,14 +338,6 @@ namespace TheOtherRoles.Patches
                 // Reset swapper values
                 Swapper.playerId1 = Byte.MaxValue;
                 Swapper.playerId2 = Byte.MaxValue;
-
-                // Disable meeting info text
-                if (meetingInfoText != null)
-                    foreach (var text in meetingInfoText)
-                        text.gameObject.SetActive(false);
-
-                if (meetingInfoButton)
-                    UnityEngine.Object.Destroy(meetingInfoButton);
 
                 // Lovers, Lawyer & Pursuer save next to be exiled, because RPC of ending game comes before RPC of exiled
                 foreach (var couple in Lovers.couples)
@@ -1100,104 +1089,39 @@ namespace TheOtherRoles.Patches
 
         static bool IsBlockedBlackmail() => Blackmailer.players.Any(x => x.player && x.blackmailed == PlayerControl.LocalPlayer) && Blackmailer.blockTargetAbility;
 
-        public static void updateMeetingText(MeetingHud __instance)
+        [HarmonyPatch(typeof(MeetingHud), nameof(MeetingHud.UpdateTimerText))]
+        public static class MeetingTimerUpdatePatch
         {
-            // Uses remaining text for guesser/yasuna etc.
-            if (meetingInfoText[0] == null)
+            public static void Postfix(MeetingHud __instance)
             {
-                for (int i = 0; i < meetingInfoText.Length; i++)
-                {
-                    meetingInfoText[i] = UnityEngine.Object.Instantiate(FastDestroyableSingleton<HudManager>.Instance.TaskPanel.taskText, __instance.transform);
-                    meetingInfoText[i].alignment = TMPro.TextAlignmentOptions.BottomLeft;
-                    meetingInfoText[i].transform.position = Vector3.zero;
-                    meetingInfoText[i].transform.localPosition = new Vector3(-3.07f, 3.33f, -20f);
-                    meetingInfoText[i].transform.localScale *= 1.1f;
-                    meetingInfoText[i].color = Palette.White;
-                    meetingInfoText[i].gameObject.SetActive(false);
+                var newText = string.Empty;
+                if (!PlayerControl.LocalPlayer || PlayerControl.LocalPlayer.Data.IsDead) return;
+                int numGuesses = HandleGuesser.isGuesser(PlayerControl.LocalPlayer.PlayerId) ? HandleGuesser.remainingShots(PlayerControl.LocalPlayer.PlayerId) : 0;
+                if (numGuesses > 0 && !PlayerControl.LocalPlayer.Data.IsDead) {
+                    newText += "\n" +  string.Format(ModTranslation.getString("guesserGuessesLeft"), numGuesses);
                 }
-            }
 
-            if (meetingInfoButton == null)
-            {
-                var renderer = Helpers.CreateObject<SpriteRenderer>("MeetingInfoButtonRenderer", __instance.transform, new(-4.5f, 2.1f, -20f));
-                renderer.sprite = Helpers.NextButtonSprite.GetSprite(0);
-                meetingInfoButton = renderer.gameObject.SetUpButton();
-                var collider = renderer.gameObject.AddComponent<BoxCollider2D>();
-                collider.isTrigger = true;
-                collider.size = new(0.4f, 0.4f);
-                meetingInfoButton.OnMouseOver.AddListener((Action)(() => { renderer.sprite = Helpers.NextButtonSprite.GetSprite(1); VanillaAsset.PlayHoverSE(); }));
-                meetingInfoButton.OnMouseOut.AddListener((Action)(() => { renderer.sprite = Helpers.NextButtonSprite.GetSprite(0); }));
-                meetingInfoButton.OnClick.AddListener((Action)(() => {
-                    meetingTextIndex = (meetingTextIndex + 1) % meetingInfoText.totalCounts();
-                    VanillaAsset.PlaySelectSE();
-                }));
-                meetingInfoButton.gameObject.SetActive(false);
-            }
-
-            for (int i = 0; i < meetingInfoText.Length; i++)
-            {
-                meetingInfoText[i].text = "";
-                meetingInfoText[i].gameObject.SetActive(false);
-            }
-
-            if (MeetingHud.Instance.state is not MeetingHud.VoteStates.Voted and
-                not MeetingHud.VoteStates.NotVoted and
-                not MeetingHud.VoteStates.Discussion)
-                return;
-
-            int numGuesses = HandleGuesser.isGuesser(PlayerControl.LocalPlayer.PlayerId) ? HandleGuesser.remainingShots(PlayerControl.LocalPlayer.PlayerId) : 0;
-            if (numGuesses > 0 && !PlayerControl.LocalPlayer.Data.IsDead) {
-                meetingInfoText.getFirst().text = string.Format(ModTranslation.getString("guesserGuessesLeft"), numGuesses);
-            }
-
-            int numSpecialVotes = Yasuna.isYasuna(PlayerControl.LocalPlayer.PlayerId) ? Yasuna.remainingSpecialVotes() : 0;
-            if (numSpecialVotes > 0 && !PlayerControl.LocalPlayer.Data.IsDead)
-            {
-                meetingInfoText.getFirst().text = string.Format(ModTranslation.getString("yasunaSpecialVotes"), numSpecialVotes);
-            } if (!PlayerControl.LocalPlayer.Data.IsDead && Akujo.players.Any(x => x.player == PlayerControl.LocalPlayer && x.honmei == null && x.cupidHonmei == null)) {
-                meetingInfoText.getFirst().text = string.Format(ModTranslation.getString("akujoTimeRemaining"), $"{TimeSpan.FromSeconds(Akujo.local.timeLeft):mm\\:ss}");
-            } if (!PlayerControl.LocalPlayer.Data.IsDead && Cupid.players.Any(x => x.player == PlayerControl.LocalPlayer && x.lovers1 == null && x.lovers2 == null)) {
-                meetingInfoText.getFirst().text = string.Format(ModTranslation.getString("akujoTimeRemaining"), $"{TimeSpan.FromSeconds(Cupid.local.timeLeft):mm\\:ss}");
-            } if (EvilTracker.players.Any(x => x.player == PlayerControl.LocalPlayer && x.target)) {
-                meetingInfoText.getFirst().text = string.Format(ModTranslation.getString("evilTrackerCurrentTarget"), EvilTracker.local.target?.Data?.PlayerName ?? "");
-            } if (!PlayerControl.LocalPlayer.Data.IsDead && PlayerControl.LocalPlayer.isRole(RoleId.Lawyer) && Lawyer.winsAfterMeetings) {
-                meetingInfoText.getFirst().text = Lawyer.neededMeetings - Lawyer.meetings > 1 ? string.Format(ModTranslation.getString("lawyerMeetingInfo"), Lawyer.neededMeetings - Lawyer.meetings - 1) : ModTranslation.getString("lawyerAboutToWin");
-            } if (!PlayerControl.LocalPlayer.Data.IsDead && PlayerControl.LocalPlayer.isRole(RoleId.Doomsayer)) {
-                meetingInfoText.getFirst().text = string.Format(ModTranslation.getString("doomsayerGuessesLeft"), Math.Max(0, Doomsayer.guessesToWin - Doomsayer.local.counter));
-                meetingInfoText.getFirst().text = string.Format(ModTranslation.getString("doomsayerMissesLeft"), Mathf.Max(0, Doomsayer.maxMisses - Doomsayer.local.failedGuesses));
-            } if (!PlayerControl.LocalPlayer.Data.IsDead && PlayerControl.LocalPlayer.isRole(RoleId.Mafioso)) {
-                meetingInfoText.getFirst().text = string.Format(ModTranslation.getString("mafiosoNumSkipsLeft"), Mafioso.numUses);
-            }
-
-            meetingInfoButton.gameObject.SetActive(meetingInfoText.totalCounts() > 1);
-
-            meetingInfoText[meetingTextIndex].gameObject.SetActive(true);
-            if (meetingInfoText.totalCounts() == 0) return;
-            if (meetingTextIndex + 1 > meetingInfoText.totalCounts())
-                meetingTextIndex = meetingInfoText.totalCounts() - 1;
-        }
-
-        [HarmonyPatch(typeof(KeyboardJoystick), nameof(KeyboardJoystick.Update))]
-        public static class MeetingTextUpdatePatch
-        {
-            public static void Postfix(KeyboardJoystick __instance)
-            {
-                if (meetingInfoText[0] == null || meetingInfoText.totalCounts() == 0) return;
-                if (Input.GetKeyDown(KeyCode.Tab))
-                {
-                    meetingTextIndex = (meetingTextIndex + 1) % meetingInfoText.totalCounts();
+                int numSpecialVotes = Yasuna.isYasuna(PlayerControl.LocalPlayer.PlayerId) ? Yasuna.remainingSpecialVotes() : 0;
+                if (numSpecialVotes > 0 && !PlayerControl.LocalPlayer.Data.IsDead) {
+                    newText += "\n" + string.Format(ModTranslation.getString("yasunaSpecialVotes"), numSpecialVotes);
+                } if (!PlayerControl.LocalPlayer.Data.IsDead && Akujo.players.Any(x => x.player == PlayerControl.LocalPlayer && x.honmei == null && x.cupidHonmei == null)) {
+                    newText += "\n" + string.Format(ModTranslation.getString("akujoTimeRemaining"), $"{TimeSpan.FromSeconds(Akujo.local.timeLeft):mm\\:ss}");
+                } if (!PlayerControl.LocalPlayer.Data.IsDead && Cupid.players.Any(x => x.player == PlayerControl.LocalPlayer && x.lovers1 == null && x.lovers2 == null)) {
+                    newText += "\n" + string.Format(ModTranslation.getString("akujoTimeRemaining"), $"{TimeSpan.FromSeconds(Cupid.local.timeLeft):mm\\:ss}");
+                } if (EvilTracker.players.Any(x => x.player == PlayerControl.LocalPlayer && x.target)) {
+                    newText += "\n" + string.Format(ModTranslation.getString("evilTrackerCurrentTarget"), EvilTracker.local.target?.Data?.PlayerName ?? "");
+                } if (!PlayerControl.LocalPlayer.Data.IsDead && PlayerControl.LocalPlayer.isRole(RoleId.Lawyer) && Lawyer.winsAfterMeetings) {
+                    newText += "\n" + (Lawyer.neededMeetings - Lawyer.meetings > 1 ? string.Format(ModTranslation.getString("lawyerMeetingInfo"), Lawyer.neededMeetings - Lawyer.meetings - 1) : ModTranslation.getString("lawyerAboutToWin"));
+                } if (!PlayerControl.LocalPlayer.Data.IsDead && PlayerControl.LocalPlayer.isRole(RoleId.Doomsayer)) {
+                    newText += "\n" + string.Format(ModTranslation.getString("doomsayerGuessesLeft"), Math.Max(0, Doomsayer.guessesToWin - Doomsayer.local.counter)) + " | " +
+                        string.Format(ModTranslation.getString("doomsayerMissesLeft"), Mathf.Max(0, Doomsayer.maxMisses - Doomsayer.local.failedGuesses));
+                } if (!PlayerControl.LocalPlayer.Data.IsDead && PlayerControl.LocalPlayer.isRole(RoleId.Mafioso)) {
+                    newText += "\n" + string.Format(ModTranslation.getString("mafiosoNumSkipsLeft"), Mafioso.numUses);
                 }
-                if (Input.GetKeyDown(KeyCode.Alpha1) || Input.GetKeyDown(KeyCode.Keypad1))
+
+                if (newText != string.Empty)
                 {
-                    meetingTextIndex = 0;
-                }
-                if (Input.GetKeyDown(KeyCode.Alpha2) || Input.GetKeyDown(KeyCode.Keypad2))
-                {
-                    meetingTextIndex = 1 % meetingInfoText.totalCounts();
-                }
-                if (Input.GetKeyDown(KeyCode.Alpha3) || Input.GetKeyDown(KeyCode.Keypad3))
-                {
-                    meetingTextIndex = meetingInfoText.totalCounts() <= 3 ? meetingInfoText.totalCounts() - 1 : 2;
+                    __instance.TimerText.text += $"<color=#FFFFFF>{newText}</color>";
                 }
             }
         }
@@ -1289,18 +1213,9 @@ namespace TheOtherRoles.Patches
                     }
 
                     var button = player.PlayerButton.Cast<PassiveButton>();
-                    button.OnMouseOver = new();
-                    button.OnMouseOut = new();
+                    var hover = button.gameObject.AddComponent<TouchHover>();
                     var playerControl = Helpers.playerById(player.TargetPlayerId);
-                    button.OnMouseOver.AddListener((Action)(() =>
-                    {
-                        if (player.canBeHighlighted()) player.SetHighlighted(true);
-                    }));
-                    button.OnMouseOut.AddListener((Action)(() =>
-                    {
-                        player.SetHighlighted(false);
-                    }));
-                    button.SetOverlay(() => PlayerControl.LocalPlayer.Data.IsDead || CustomGameModes.FreePlayGM.isFreePlayGM ? Helpers.GetProgressWidget(playerControl) : null);
+                    button.SetOverlay(() => PlayerControl.LocalPlayer.Data.IsDead || CustomGameModes.FreePlayGM.isFreePlayGM ? Helpers.GetProgressContext(playerControl) : null);
                 }
                 __instance.StartCoroutine(Effects.Sequence(Effects.Wait(2f), Helpers.Action(() => SortVotingArea(__instance, p => p.IsDead || p.Disconnected ? 2 : 1)).WrapToIl2Cpp()));
 
@@ -1379,7 +1294,6 @@ namespace TheOtherRoles.Patches
                 if (meetingTarget == null) meetingsCount++;
                 // Save the meeting target
                 target = meetingTarget;
-                meetingTextIndex = 0;
 
                 Fox.stealthed = false;
 
@@ -1442,8 +1356,6 @@ namespace TheOtherRoles.Patches
                     // Remove first kill shield
                     TORMapOptions.firstKillPlayer = null;
                 }
-
-                updateMeetingText(__instance);
 
                 if (Blackmailer.players.Any(x => x.player && x.blackmailed))
                 {

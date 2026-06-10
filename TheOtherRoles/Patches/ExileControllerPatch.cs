@@ -216,6 +216,8 @@ namespace TheOtherRoles.Patches {
                 Mini.mini.SetKillTimer(PlayerControl.LocalPlayer.GetKillCooldown() * multiplier);
             }
 
+            Diseased.active = [];
+
             if (Antique.antiques != null && Antique.antiques.Count > 0) {
                 if (Archaeologist.revealAntique == Archaeologist.RevealAntique.AfterMeeting) {
                     var revealed = Antique.antiques.Where(x => x.isBroken).ToList();

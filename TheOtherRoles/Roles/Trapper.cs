@@ -104,7 +104,7 @@ namespace TheOtherRoles.Roles
                             if (distance < trapRange)
                             {
                                 var text = Helpers.CreateAndShowNotification(string.Format(ModTranslation.getString("trapperGotTrapText"), p.Data.PlayerName), Color.white, localPos: new(0f, 1f, -20f), spr: Helpers.RoleIcons.GetSprite(3));
-                                text.alphaTimer = 3f;
+                                text.AdjustNotification();
 
                                 ActivateTrap.Invoke((trap.Key, PlayerControl.LocalPlayer.PlayerId, p.PlayerId));
                                 break;

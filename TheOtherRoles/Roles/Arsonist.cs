@@ -33,7 +33,7 @@ namespace TheOtherRoles.Roles
             yield return new("%SEC%", duration.ToString());
         }
 
-        public override GUIContext ProgressWidget { get => ProgressGUI.Holder(ProgressGUI.OneLineText(ModTranslation.getString("roleInfoDousedLeft")),
+        public override GUIContext ProgressContext { get => ProgressGUI.Holder(ProgressGUI.OneLineText(ModTranslation.getString("roleInfoDousedLeft")),
             ProgressGUI.Holder(PlayerControl.AllPlayerControls.ToArray().Where(x => x != player && !x.Data.IsDead && !dousedPlayers.Contains(x)).Select(p =>
             ProgressGUI.OneLineText("-" + p.Data.PlayerName))).Move(new(0.04f, 0f))); }
 

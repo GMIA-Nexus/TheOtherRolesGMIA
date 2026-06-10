@@ -128,13 +128,22 @@ namespace TheOtherRoles {
                     }
                 }
 
-                if (PlayerControl.LocalPlayer == pc && !PlayerControl.LocalPlayer.Data.IsDead && pc.isRole(RoleId.Snitch))
+                if (!PlayerControl.LocalPlayer.Data.IsDead && pc.isRole(RoleId.Snitch))
                 {
                     var (taskComplete, taskTotal) = taskInfo(pc.Data);
                     if (taskTotal - taskComplete == Snitch.taskCountForReveal)
-                        Helpers.CreateAndShowNotification(ModTranslation.getString("snitchTaskLeftNotification"), UnityEngine.Color.white, new UnityEngine.Vector3(0f, 1f, -20f), spr: Helpers.RoleIcons.GetSprite(4));
-                    if (taskTotal == taskComplete)
-                        Helpers.CreateAndShowNotification(ModTranslation.getString("snitchAllTasksCompleteNotification"), UnityEngine.Color.white, new UnityEngine.Vector3(0f, 1f, -20f), spr: Helpers.RoleIcons.GetSprite(4));
+                    {
+                        if (PlayerControl.LocalPlayer == pc) {
+                            Snitch.snitchMessage("snitchTaskLeftNotification");
+                        }
+                        else if (PlayerControl.LocalPlayer.Data.Role.IsImpostor || (Snitch.IsEvilRole(PlayerControl.LocalPlayer) && Snitch.includeTeamEvil)) {
+                            Snitch.snitchMessage("snitchAlmostFinishNotification");
+                        }
+                    }
+                    if (PlayerControl.LocalPlayer == pc && taskTotal == taskComplete)
+                    {
+                        Snitch.snitchMessage("snitchAllTasksCompleteNotification");
+                    }
                 }
             }
         }

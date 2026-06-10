@@ -75,7 +75,7 @@ public class Sheriff : RoleBase<Sheriff>
         }
     }
 
-    public override GUIContext ProgressWidget
+    public override GUIContext ProgressContext
     {
         get
         {

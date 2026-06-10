@@ -33,7 +33,7 @@ namespace TheOtherRoles.Roles
                 yield return new(getSidekickButtonSprite(), "jackalSidekickHint");
         }
 
-        public override GUIContext ProgressWidget { get {
+        public override GUIContext ProgressContext { get {
                 var sidekick = getSidekick(player);
                 if (sidekick == null || sidekick?.player == null) return null;
                 return ProgressGUI.Holder(ProgressGUI.OneLineText(ModTranslation.getString("sidekick") + ": " + sidekick.player.Data.PlayerName));

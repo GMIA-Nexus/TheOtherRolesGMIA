@@ -41,7 +41,7 @@ namespace TheOtherRoles.Roles
         private static Sprite buttonSprite;
         private static Sprite handcuffedSprite;
 
-        public override GUIContext ProgressWidget { get => ProgressGUI.Holder(sheriff != null && sheriff.player ? ProgressGUI.OneLineText(ModTranslation.getString("sheriff") + ": " + sheriff.player.Data.PlayerName) : null); }
+        public override GUIContext ProgressContext { get => ProgressGUI.Holder(sheriff != null && sheriff.player ? ProgressGUI.OneLineText(ModTranslation.getString("sheriff") + ": " + sheriff.player.Data.PlayerName) : null); }
 
         public override void FixedUpdate()
         {

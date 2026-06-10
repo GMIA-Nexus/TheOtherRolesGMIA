@@ -14,11 +14,18 @@ namespace TheOtherRoles.Roles
         public static int taskCountForReveal { get { return Mathf.RoundToInt(CustomOptionHolder.snitchLeftTasksForReveal.getFloat()); } }
         public static bool includeTeamEvil = false;
         public static bool teamEvilUseDifferentArrowColor = true;
+        public static bool canSeeRoles { get { return CustomOptionHolder.snitchSeesRoles.getBool(); } }
 
         public Snitch()
         {
             RoleId = roleId = RoleId.Snitch;
             localArrows = [];
+        }
+
+        public static void snitchMessage(string message)
+        {
+            var notify = Helpers.CreateAndShowNotification(ModTranslation.getString(message), UnityEngine.Color.white, new UnityEngine.Vector3(0f, 1f, -20f), spr: Helpers.RoleIcons.GetSprite(4));
+            notify.AdjustNotification();
         }
 
         public override void ResetRole(bool isShifted)
@@ -51,7 +58,25 @@ namespace TheOtherRoles.Roles
             }
         }
 
-        static public IEnumerable<DocumentReplacement> GetReplacementPart() => [new("%NUM%", taskCountForReveal.ToString())];
+        static public IEnumerable<DocumentReplacement> GetReplacementPart() {
+            yield return new("%NUM%", taskCountForReveal.ToString());
+            yield return new("%SRO%", canSeeRoles ? ModTranslation.getString("snitchSeesRolesOPT") : "");
+        }
+
+        public static bool IsEvilRole(PlayerControl player)
+        {
+            return player.isRole(RoleId.Jackal) || player.isRole(RoleId.Sidekick)
+                || player.isRole(RoleId.Moriarty) || player.isRole(RoleId.JekyllAndHyde) || player.isRole(RoleId.Fox) || player.isRole(RoleId.Immoralist) || player.isRole(RoleId.Pelican)
+                || player.isRole(RoleId.Yandere) || (player.isRole(RoleId.SchrodingersCat) && SchrodingersCat.hasTeam() && SchrodingersCat.team != SchrodingersCat.Team.Crewmate);
+        }
+
+        static public bool shouldShowRole(PlayerControl snitch, PlayerControl target)
+        {
+            if (!canSeeRoles) return false;
+            var (taskComplete, taskTotal) = TasksHandler.taskInfo(snitch.Data);
+            if (taskTotal > taskComplete) return false;
+            return target.Data.Role.IsImpostor || (includeTeamEvil && Helpers.isEvil(target));
+        }
 
         public override void FixedUpdate()
         {
@@ -64,9 +89,7 @@ namespace TheOtherRoles.Roles
             var (playerCompleted, playerTotal) = TasksHandler.taskInfo(player.Data);
             int numberOfTasks = playerTotal - playerCompleted;
 
-            if (!local.Data.IsDead && numberOfTasks <= taskCountForReveal && (local.Data.Role.IsImpostor || (includeTeamEvil && (local.isRole(RoleId.Jackal) || local.isRole(RoleId.Sidekick)
-                || local.isRole(RoleId.Moriarty) || local.isRole(RoleId.JekyllAndHyde) || local.isRole(RoleId.Fox)) || local.isRole(RoleId.Immoralist) || local.isRole(RoleId.Pelican)
-                || local.isRole(RoleId.Yandere) || (local.isRole(RoleId.SchrodingersCat) && SchrodingersCat.hasTeam() && SchrodingersCat.team != SchrodingersCat.Team.Crewmate))))
+            if (!local.Data.IsDead && numberOfTasks <= taskCountForReveal && (local.Data.Role.IsImpostor || (includeTeamEvil && IsEvilRole(local))))
             {
                 if (localArrows.Count == 0) localArrows.Add(new Arrow(Color.blue));
                 if (localArrows.Count != 0 && localArrows[0] != null)

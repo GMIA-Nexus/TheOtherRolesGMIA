@@ -282,7 +282,7 @@ namespace TheOtherRoles
             public static List<Role> allRoles = [];
             public PlayerControl player;
             public RoleId roleId;
-            public virtual MetaContext.GUIContext ProgressWidget { get; set; } = null;
+            public virtual MetaContext.GUIContext ProgressContext { get; set; } = null;
 
             /// <summary>
             /// On meeting starts
@@ -867,11 +867,13 @@ namespace TheOtherRoles
     public static class Diseased
     {
         public static List<PlayerControl> diseased = [];
+        public static Dictionary<byte, int> active = [];
         public static float multiplier;
 
         public static void clearAndReload()
         {
             diseased = [];
+            active = [];
             multiplier = CustomOptionHolder.modifierDiseasedMultiplier.getFloat();
         }
     }

@@ -639,6 +639,14 @@ public static class HelpMenu
         }
         if (LobbyBehaviour.Instance && Helpers.previousEndGameSummary != "") validTabs |= HelpTab.LastGameResult;
 
+        if ((tab & validTabs) == (HelpTab)0)
+        {
+            if ((validTabs & HelpTab.MyInfo) != 0)
+                tab = HelpTab.MyInfo;
+            else
+                tab = PlayerControl.AllPlayerControls.Count > 5 ? HelpTab.Overview : HelpTab.Roles;
+        }
+
         ShowScreen(screen, tab, validTabs);
 
         return screen;
@@ -815,7 +823,7 @@ public static class HelpMenu
             {
                 if ((PlayerControl.LocalPlayer && LobbyBehaviour.Instance && !ShipStatus.Instance) ||
                     (AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started && !Minigame.Instance))
-                    TryOpenHelpScreen(HelpTab.Roles);
+                    TryOpenHelpScreen(HelpTab.MyInfo);
             }
         }
     }

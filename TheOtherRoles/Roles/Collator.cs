@@ -87,7 +87,7 @@ public class Collator : RoleBase<Collator>
             collator.sharedResults.Add((player1, player2, message.matched));
     });
 
-    public override GUIContext ProgressWidget { get {
+    public override GUIContext ProgressContext { get {
             var res = sharedResults.Where(x => x.player1 != null && x.player2 != null).ToList();
             return ProgressGUI.Holder(
             ProgressGUI.OneLineText(ModTranslation.getString("roleInfoCollatorResults")),
