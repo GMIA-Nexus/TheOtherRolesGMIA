@@ -431,6 +431,7 @@ namespace TheOtherRoles {
         public static CustomRoleOption warlockSpawnRate;
         public static CustomOption warlockCooldown;
         public static CustomOption warlockRootTime;
+        public static CustomOption warlockCanKillImpostors;
 
         public static CustomRoleOption securityGuardSpawnRate;
         public static CustomOption securityGuardCooldown;
@@ -785,6 +786,7 @@ namespace TheOtherRoles {
             warlockSpawnRate = new CustomRoleOption(270, Types.Impostor, "warlock", Warlock.color);
             warlockCooldown = CustomOption.Create(271, Types.Impostor, "warlockCooldown", 30f, 10f, 60f, 2.5f, warlockSpawnRate, false, "unitSeconds");
             warlockRootTime = CustomOption.Create(272, Types.Impostor, "warlockRootTime", 5f, 0f, 15f, 1f, warlockSpawnRate, false, "unitSeconds");
+            warlockCanKillImpostors = CustomOption.Create(273, Types.Impostor, "warlockCanKillImpostors", false, warlockSpawnRate);
 
             bountyHunterSpawnRate = new CustomRoleOption(320, Types.Impostor, "bountyHunter", BountyHunter.color);
             bountyHunterBountyDuration = CustomOption.Create(321, Types.Impostor, "bountyHunterBountyDuration", 60f, 10f, 180f, 10f, bountyHunterSpawnRate, false, "unitSeconds");

@@ -495,7 +495,7 @@ public static class HelpMenu
             if (option == null || option.getSelection() == 0 || (option == CustomOptionHolder.guesserSpawnRate && TORMapOptions.gameMode == CustomGamemodes.Guesser)) continue;
             if (option is CustomRoleOption roleOption)
             {
-                string text = "x" + roleOption.count.ToString();
+                string text = "x" + ((option == CustomOptionHolder.guesserSpawnRate && CustomOptionHolder.guesserSpawnBothRate.getSelection() > 0) ? 2 : roleOption.count.ToString());
                 if (option.getSelection() < 10) text += $" ({roleOption.getString()})";
                 complex.Add(gui.HorizontalHolder(GUIAlignment.Left, comp.Count > 1 ? new TORGUIText(GUIAlignment.Center, maskedAttr, new RawTextComponent(option.getName())) : GetAssignableText(comp[0]),
                     gui.HorizontalMargin(0.1f), gui.RawText(GUIAlignment.Left, maskedAttr, text)));

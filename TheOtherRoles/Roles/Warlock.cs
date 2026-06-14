@@ -22,10 +22,12 @@ namespace TheOtherRoles.Roles
         static public IEnumerable<DocumentReplacement> GetReplacementPart()
         {
             yield return new("%SEC%", rootTime.ToString());
+            yield return new("%OPT%", canKillImpostors ? ModTranslation.getString("warlockCanKillImpostorsOption") : ModTranslation.getString("warlockCannotKillImpostorsOption"));
         }
 
         public static float cooldown = 30f;
         public static float rootTime { get { return CustomOptionHolder.warlockRootTime.getFloat(); } }
+        static public bool canKillImpostors { get { return CustomOptionHolder.warlockCanKillImpostors.getBool(); } }
 
         private static Sprite curseButtonSprite;
         private static Sprite curseKillButtonSprite;
@@ -78,7 +80,7 @@ namespace TheOtherRoles.Roles
                 setPlayerOutline(currentTarget, color);
             }
             else {
-                curseVictimTarget = setTarget(targetingPlayer: curseVictim);
+                curseVictimTarget = setTarget(!canKillImpostors, targetingPlayer: curseVictim);
                 setPlayerOutline(curseVictimTarget, color);
             }
         }
