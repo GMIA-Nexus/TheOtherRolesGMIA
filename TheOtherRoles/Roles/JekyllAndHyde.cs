@@ -16,7 +16,6 @@ namespace TheOtherRoles.Roles
         public static Color color = Color.grey;
         public PlayerControl currentTarget;
 
-        public static readonly Image Illustration = new TORSpriteLoader("Assets/Sprites/JekyllAndHyde.png");
         static public IEnumerable<HelpSprite> GetHelpSprites()
         {
             yield return new(PlagueDoctor.getSyringeIcon(), "jekyllAndHydeSwitchHint");

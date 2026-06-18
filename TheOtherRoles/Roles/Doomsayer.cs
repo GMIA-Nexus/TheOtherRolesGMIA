@@ -33,7 +33,6 @@ namespace TheOtherRoles.Roles
         });
 
         static public IEnumerable<HelpSprite> GetHelpSprites() => [new(getButtonSprite(), "doomsayerObserveHint")];
-        public static readonly Image Illustration = new TORSpriteLoader("Assets/Sprites/Doomsayer.png");
 
         public static Color color = new(0f, 1f, 0.5f, 1f);
 

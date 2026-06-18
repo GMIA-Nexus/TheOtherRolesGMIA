@@ -29,8 +29,6 @@ namespace TheOtherRoles.Roles
                 bountyUpdateTimer = 0f;
         }
 
-        public static readonly Image Illustration = new TORSpriteLoader("Assets/Sprites/BountyHunter.png");
-
         static public IEnumerable<DocumentReplacement> GetReplacementPart()
         {
             yield return new("%SEC%", arrowUpdateIntervall.ToString());

@@ -191,8 +191,6 @@ namespace TheOtherRoles.Roles
             yield return new("%OPT%", knowsRoles ? ModTranslation.getString("akujoOPTHint") : "");
         }
 
-        public static readonly Image Illustration = new TORSpriteLoader("Assets/Sprites/Akujo.png");
-
         private static Sprite honmeiSprite;
         public static Sprite getHonmeiSprite()
         {

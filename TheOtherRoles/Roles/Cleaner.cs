@@ -17,8 +17,6 @@ namespace TheOtherRoles.Roles
         public static float cooldown = 30f;
         public static bool canSeeBodies { get { return CustomOptionHolder.cleanerCanSeeBodies.getBool(); } }
 
-        public static readonly Image Illustration = new TORSpriteLoader("Assets/Sprites/Cleaner.png");
-
         public override void OnKill(PlayerControl target)
         {
             if (PlayerControl.LocalPlayer == player && HudManagerStartPatch.cleanerCleanButton != null)

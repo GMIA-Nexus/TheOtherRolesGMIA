@@ -233,11 +233,30 @@ namespace TheOtherRoles
             {
                 return allRoleIds.TryGetValue(roleId, out var type) ? type.GetGenericArguments()[0].GetMethod("GetReplacementPart", BindingFlags.Public | BindingFlags.Static)?.Invoke(null, null) as IEnumerable<DocumentReplacement> ?? [] : [];
             }
+        }
 
-            public static MetaContext.Image GetIllustration(RoleId roleId)
+        static internal class Illustrations
+        {
+            static private Dictionary<string, MetaContext.Image> illustrationCache = [];
+            static private Dictionary<string, MetaContext.Image> roleIconCache = [];
+
+            private static MetaContext.Image GetImageInternal(RoleId roleId, string fieldName, string pathPrefix, Dictionary<string, MetaContext.Image> cache)
             {
-                return allRoleIds.TryGetValue(roleId, out var type) ? type.GetGenericArguments()[0].GetField("Illustration", BindingFlags.Public | BindingFlags.Static)?.GetValue(null) as MetaContext.Image ?? null : null;
+                string key = roleId.ToString();
+                if (RoleData.allRoleIds.TryGetValue(roleId, out var type))
+                {
+                    var field = type.GetGenericArguments()[0].GetField(fieldName, BindingFlags.Public | BindingFlags.Static);
+                    if (field?.GetValue(null) is MetaContext.Image img) return img;
+                }
+
+                if (!cache.TryGetValue(key, out var loader))
+                    cache[key] = loader = new MetaContext.TORSpriteLoaderWithDefault($"{pathPrefix}{key}.png", null);
+                return loader;
             }
+
+            static public MetaContext.Image GetIllustration(RoleId roleId)  => GetImageInternal(roleId, "Illustration", "Assets/Sprites/Illustrations/", illustrationCache);
+
+            static public MetaContext.Image GetRoleIcon(RoleId roleId) => GetImageInternal(roleId, "RoleIcon", "Assets/Sprites/RoleIcons/", roleIconCache);
         }
 
         public static void OnDeath(this PlayerControl player, PlayerControl killer)

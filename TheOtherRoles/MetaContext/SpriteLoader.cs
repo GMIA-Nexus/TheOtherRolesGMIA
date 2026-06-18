@@ -203,6 +203,32 @@ namespace TheOtherRoles.MetaContext
         public void MarkAsUnloadAsset() { }
     }
 
+    internal class TORSpriteLoaderWithDefault : AssetBundleResource<Sprite>, Image
+    {
+        protected override AssetBundle AssetBundle => Modules.AssetLoader.AssetBundle;
+        private Image defaultImage;
+        private bool failed = false;
+        Sprite Image.GetSprite()
+        {
+            if (!failed)
+            {
+                var asset = Asset;
+                if (Asset != null) return Asset;
+                failed = true;
+            }
+            return defaultImage?.GetSprite();
+        }
+
+        public TORSpriteLoaderWithDefault(string name, Image defaultImage) : base(name)
+        {
+            this.defaultImage = defaultImage;
+        }
+
+        public void UnloadAsset() { }
+        public System.Collections.IEnumerator LoadAsset() { yield break; }
+        public void MarkAsUnloadAsset() { }
+    }
+
     public class ResourceTextureLoader : ITextureLoader
     {
         string address;

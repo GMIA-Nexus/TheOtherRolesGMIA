@@ -14,7 +14,6 @@ namespace TheOtherRoles.Roles
     public class Vampire : RoleBase<Vampire> {
         public static Color color = Palette.ImpostorRed;
 
-        public static readonly Image Illustration = new TORSpriteLoader("Assets/Sprites/Vampire.png");
         static public IEnumerable<DocumentReplacement> GetReplacementPart()
         {
             yield return new("%TIME%", delay.ToString());

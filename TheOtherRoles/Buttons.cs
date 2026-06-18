@@ -2893,7 +2893,7 @@ namespace TheOtherRoles
                     }
                     if (count == 0)
                     {
-                        var messageText = Helpers.CreateAndShowNotification(ModTranslation.getString("sherlockMessage1"), Color.white, new Vector3(0f, 1f, -20f), spr: Helpers.RoleIcons.GetSprite(7));
+                        var messageText = Helpers.CreateAndShowNotification(ModTranslation.getString("sherlockMessage1"), Color.white, new Vector3(0f, 1f, -20f), spr: Illustrations.GetRoleIcon(RoleId.Sherlock).GetSprite());
                         messageText.AdjustNotification();
                     }
                     if (count >= 3)

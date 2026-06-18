@@ -34,8 +34,6 @@ namespace TheOtherRoles.Roles
             }
         }
 
-        public static readonly Image Illustration = new TORSpriteLoader("Assets/Sprites/Fox.png");
-
         public Fox()
         {
             RoleId = roleId = RoleId.Fox;

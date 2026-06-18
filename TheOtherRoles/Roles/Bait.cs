@@ -162,7 +162,7 @@ namespace TheOtherRoles.Roles
                 if (showKillFlash && killer != player && killer == PlayerControl.LocalPlayer)
                 {
                     Helpers.showFlash(new Color(204f / 255f, 102f / 255f, 0f / 255f));
-                    var text = Helpers.CreateAndShowNotification(ModTranslation.getString("baitReportNotification"), Color.white, new Vector3(0f, 1f, -20f), spr: Helpers.RoleIcons.GetSprite(0));
+                    var text = Helpers.CreateAndShowNotification(ModTranslation.getString("baitReportNotification"), Color.white, new Vector3(0f, 1f, -20f), spr: Illustrations.GetRoleIcon(RoleId.Bait).GetSprite());
                     text.AdjustNotification();
                 }
             }

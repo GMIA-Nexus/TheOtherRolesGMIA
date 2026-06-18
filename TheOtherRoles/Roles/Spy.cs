@@ -7,8 +7,6 @@ namespace TheOtherRoles.Roles
     public class Spy : RoleBase<Spy> {
         public static Color color = Palette.ImpostorRed;
 
-        public static readonly Image Illustration = new TORSpriteLoader("Assets/Sprites/Spy.png");
-
         public Spy()
         {
             RoleId = roleId = RoleId.Spy;

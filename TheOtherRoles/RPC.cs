@@ -914,6 +914,8 @@ namespace TheOtherRoles
                             else if (x.CamName == "East") x.NewName = StringNames.CamEast;
                         }
                     );
+
+                    Mini.timeOfGrowthStart = DateTime.UtcNow;
                 }
             })));
         }

@@ -30,7 +30,6 @@ namespace TheOtherRoles.Roles
             yield return new(getArrowSprite(), "cupidArrowHint");
             yield return new(Medic.getButtonSprite(), "cupidShieldHint");
         }
-        public static readonly Image Illustration = new TORSpriteLoader("Assets/Sprites/Cupid.png");
 
         public static Color color = new Color32(246, 152, 150, byte.MaxValue);
 

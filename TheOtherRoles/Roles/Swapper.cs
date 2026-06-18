@@ -18,7 +18,6 @@ namespace TheOtherRoles.Roles
         public static float rechargedTasks;
         static public IEnumerable<HelpSprite> GetHelpSprites() => [new(getCheckSprite(), "swapperCheckHint")];
         static public IEnumerable<DocumentReplacement> GetReplacementPart() => [new("%SWAP%", ModTranslation.getString(canOnlySwapOthers ? "swapperCheckCantSwapSelfHint" : "swapperCheckSwapSelfHint"))];
-        public static readonly Image Illustration = new TORSpriteLoader("Assets/Sprites/Swapper.png");
 
         public Swapper()
         {

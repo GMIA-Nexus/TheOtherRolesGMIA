@@ -291,7 +291,7 @@ namespace TheOtherRoles.Modules {
             if (GameStates.IsLobby) return;
             UpdateChatChannels();
             KeyboardInput(__instance);
-            bool jailed = Jailor.isJailed(PlayerControl.LocalPlayer.PlayerId);
+            bool jailed = Jailor.isJailed(PlayerControl.LocalPlayer.PlayerId) && MeetingHud.Instance;
             if (TeamChatButton != null) TeamChatButton.SetActive(ActiveChannels.Count > 1 && !jailed);
             if (ChannelShower != null)
             {
@@ -327,7 +327,7 @@ namespace TheOtherRoles.Modules {
 
         public static void KeyboardInput(ChatController __instance)
         {
-            if (Jailor.players.Any(x => x.player != null && !x.player.Data.IsDead && x.jailTarget == PlayerControl.LocalPlayer)) { CurrentChannel = ChannelType.Default; return; }
+            if (Jailor.players.Any(x => x.player != null && !x.player.Data.IsDead && x.jailTarget == PlayerControl.LocalPlayer) && MeetingHud.Instance) { CurrentChannel = ChannelType.Default; return; }
             if (Input.GetKeyDown(KeyCode.Mouse1)) SwitchNextChannel();
         }
 
@@ -337,7 +337,7 @@ namespace TheOtherRoles.Modules {
             {
                 [ChannelType.Default] = (x) => GameStates.IsLobby || MeetingHud.Instance || Helpers.shouldShowGhostInfo(),
                 [ChannelType.Lover] = (x) => x.isLovers() && !x.Data.IsDead,
-                [ChannelType.Jailor] = (x) => !x.Data.IsDead && Jailor.players.Any(jailor => jailor.jailTarget != null && !jailor.jailTarget.Data.IsDead && jailor.player == x),
+                [ChannelType.Jailor] = (x) => MeetingHud.Instance && !x.Data.IsDead && Jailor.players.Any(jailor => jailor.jailTarget != null && !jailor.jailTarget.Data.IsDead && jailor.player == x),
                 [ChannelType.Impostor] = (x) => CustomOptionHolder.enableImpostorChat.getBool() && !x.Data.IsDead && x.Data.Role.IsImpostor && !Spy.exists
             };
 

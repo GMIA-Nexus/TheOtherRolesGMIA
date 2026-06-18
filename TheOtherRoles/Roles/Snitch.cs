@@ -24,7 +24,7 @@ namespace TheOtherRoles.Roles
 
         public static void snitchMessage(string message)
         {
-            var notify = Helpers.CreateAndShowNotification(ModTranslation.getString(message), UnityEngine.Color.white, new UnityEngine.Vector3(0f, 1f, -20f), spr: Helpers.RoleIcons.GetSprite(4));
+            var notify = Helpers.CreateAndShowNotification(ModTranslation.getString(message), UnityEngine.Color.white, new UnityEngine.Vector3(0f, 1f, -20f), spr: Illustrations.GetRoleIcon(RoleId.Snitch).GetSprite());
             notify.AdjustNotification();
         }
 

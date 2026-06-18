@@ -23,8 +23,6 @@ namespace TheOtherRoles.Roles
         public List<PlayerControl> questioned = [];
         public List<Arrow> arrows = [];
 
-        public static readonly Image Illustration = new TORSpriteLoader("Assets/Sprites/Medium.png");
-
         static public IEnumerable<DocumentReplacement> GetReplacementPart()
         {
             yield return new("%OPT%", oneTimeUse ? ModTranslation.getString("mediumOPTHint") : "");
@@ -81,7 +79,7 @@ namespace TheOtherRoles.Roles
             medium.questioned.TryAdd(player);
 
             if (PlayerControl.LocalPlayer == player) {
-                Helpers.showFlash(Palette.CrewmateBlue, message: ModTranslation.getString("mediumQuestionText"), textColor: color, textSprite: Helpers.RoleIcons.GetSprite(2));
+                Helpers.showFlash(Palette.CrewmateBlue, message: ModTranslation.getString("mediumQuestionText"), textColor: color, textSprite: Illustrations.GetRoleIcon(RoleId.Medium).GetSprite());
             }
         });
 

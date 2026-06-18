@@ -243,7 +243,7 @@ public static class HelpMenu
         inner = scrollView.Artifact;
         Reference<MetaContextOld.ScrollView.InnerScreen> innerRef = new();
 
-        screen.SetContext(scrollView, RoleData.GetIllustration(roleInfo.roleId), out _);
+        screen.SetContext(scrollView, Illustrations.GetIllustration(roleInfo.roleId), out _);
         return screen;
     }
 
@@ -330,7 +330,7 @@ public static class HelpMenu
                 {
                     screen.SetContext(GetRoleContext(role), out _);
                     outsideScreen.ClearBackImage();
-                    outsideScreen.SetBackImage(RoleData.GetIllustration(role.roleId), 0.2f);
+                    outsideScreen.SetBackImage(Illustrations.GetIllustration(role.roleId), 0.2f);
                 });
             }, RoleTitleAttrUnmasked)
             {
@@ -347,7 +347,7 @@ public static class HelpMenu
 
         widget.Append(new MetaContextOld.WrappedContext(scrollView));
 
-        backImage = RoleData.GetIllustration(assignable.roleId);
+        backImage = Illustrations.GetIllustration(assignable.roleId);
 
         return widget;
     }
@@ -588,7 +588,7 @@ public static class HelpMenu
         context.Add(new TORGUIText(GUIAlignment.Left, gui.GetAttribute(AttributeAsset.OverlayTitle), new RawTextComponent(Helpers.cs(assignable.orgColor, assignable.name))));
         context.Add(new TORGUIText(GUIAlignment.Left, gui.GetAttribute(AttributeAsset.OverlayContent), new RawTextComponent(assignable.blurb)));
 
-        return new VerticalContextsHolder(GUIAlignment.Left, context) { BackImage = RoleData.GetIllustration(assignable.roleId) };
+        return new VerticalContextsHolder(GUIAlignment.Left, context) { BackImage = Illustrations.GetIllustration(assignable.roleId) };
     }
 
     static public GUIContext GetAchievementContext(RoleInfo assignable)

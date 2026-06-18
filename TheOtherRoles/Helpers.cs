@@ -599,7 +599,6 @@ namespace TheOtherRoles
         }
 
         private static readonly Image LightMask = SpriteLoader.FromResource("TheOtherRoles.Resources.LighterLightMask.png", 100f);
-        public static readonly IDividedSpriteLoader RoleIcons = XOnlyDividedSpriteLoader.FromResource("TheOtherRoles.Resources.RoleIcons.png", 150f, 9);
         public static SpriteRenderer CreateCustomLight(Vector2 pos, float range, bool enabled = true, Sprite maskSprite = null)
         {
             var trueRange = range;
@@ -870,7 +869,7 @@ namespace TheOtherRoles
             // Seer show flash and add dead player position
             if (Seer.exists && ((PlayerControl.LocalPlayer.isRole(RoleId.Seer) && PlayerControl.LocalPlayer != target) || shouldShowGhostInfo()) && Seer.livingPlayers.Count > 0 && Seer.mode <= 1)
             {
-                showFlash(new Color(42f / 255f, 187f / 255f, 245f / 255f), message: ModTranslation.getString("seerInfo"), textColor: Color.white, textSprite: RoleIcons.GetSprite(5));
+                showFlash(new Color(42f / 255f, 187f / 255f, 245f / 255f), message: ModTranslation.getString("seerInfo"), textColor: Color.white, textSprite: Illustrations.GetRoleIcon(RoleId.Seer).GetSprite());
                 if (PlayerControl.LocalPlayer.isRole(RoleId.Seer))
                 {
                     _ = new StaticAchievementToken("seer.common1");

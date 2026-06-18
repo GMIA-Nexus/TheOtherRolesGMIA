@@ -17,8 +17,6 @@ namespace TheOtherRoles.Roles
         public static bool triggerTaskMasterWin = false;
         public static bool canVent = true;
 
-        public static readonly Image Illustration = new TORSpriteLoader("Assets/Sprites/TaskMaster.png");
-
         public TaskMaster()
         {
             RoleId = roleId = RoleId.TaskMaster;

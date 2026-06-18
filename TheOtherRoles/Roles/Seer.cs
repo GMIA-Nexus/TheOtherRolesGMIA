@@ -76,7 +76,8 @@ namespace TheOtherRoles.Roles
                         (kt => kt.crewmate, Color.white, "crewmate"),
                         (kt => kt.jackal, Jackal.color, "jackal"),
                         (kt => kt.jekyllAndHyde, JekyllAndHyde.color, "jekyllAndHyde"),
-                        (kt => kt.moriarty, Moriarty.color, "moriarty")
+                        (kt => kt.moriarty, Moriarty.color, "moriarty"),
+                        (kt => kt.yandere, Yandere.color, "yandere")
                     };
 
                     foreach (var (selector, color, name) in teamInfos)

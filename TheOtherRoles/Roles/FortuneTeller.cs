@@ -211,7 +211,7 @@ namespace TheOtherRoles.Roles
 
         public static void fortuneTellerMessage(string message, float duration, Color color)
         {
-            var messageText = Helpers.CreateAndShowNotification(message, color, new Vector3(0f, 1f, -20f), spr: Helpers.RoleIcons.GetSprite(1));
+            var messageText = Helpers.CreateAndShowNotification(message, color, new Vector3(0f, 1f, -20f), spr: Illustrations.GetRoleIcon(RoleId.FortuneTeller).GetSprite());
             messageText.alphaTimer = duration;
             messageText.AdjustNotification();
         }

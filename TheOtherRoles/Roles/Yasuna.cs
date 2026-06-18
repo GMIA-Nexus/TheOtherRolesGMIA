@@ -25,7 +25,7 @@ namespace TheOtherRoles.Roles
                 yasunaAcTokenChallenge ??= new("niceYasuna.challenge", (byte.MaxValue, false), (val, _) => val.cleared);
         }
 
-        public static readonly Image Illustration = new TORSpriteLoader("Assets/Sprites/Yasuna.png");
+        public static readonly Image Illustration = new TORSpriteLoader("Assets/Sprites/Illustrations/Yasuna.png");
 
         public override void OnMeetingEnd(PlayerControl exiled = null)
         {
@@ -60,7 +60,7 @@ namespace TheOtherRoles.Roles
             }
         }
 
-        public static readonly Image Illustration = new TORSpriteLoader("Assets/Sprites/Yasuna.png");
+        public static readonly Image Illustration = new TORSpriteLoader("Assets/Sprites/Illustrations/Yasuna.png");
         public override void PostInit()
         {
             if (PlayerControl.LocalPlayer != player) return;
