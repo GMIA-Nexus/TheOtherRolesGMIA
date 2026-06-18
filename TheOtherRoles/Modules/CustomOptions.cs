@@ -116,18 +116,9 @@ namespace TheOtherRoles {
                 }
             }
 
-            // make sure to reload all tabs, even the ones in the background, because they might have changed when the preset was switched!
             if (AmongUsClient.Instance?.AmHost == true)
             {
-                foreach (var entry in GameOptionsMenuStartPatch.currentGOMs)
-                {
-                    CustomOptionType optionType = (CustomOptionType)entry.Key;
-                    GameOptionsMenu gom = entry.Value;
-                    if (gom != null)
-                    {
-                        GameOptionsMenuStartPatch.updateGameOptionsMenu(optionType, gom);
-                    }
-                }
+                TORRoleSettingsManager.RebuildCurrent();
             }
         }
 
@@ -297,13 +288,7 @@ namespace TheOtherRoles {
 
             if (AmongUsClient.Instance?.AmHost == true)
             {
-                var currentTab = GameOptionsMenuStartPatch.currentTabs.FirstOrDefault(x => x.active).GetComponent<GameOptionsMenu>();
-                if (currentTab != null)
-                {
-                    var optionType = options.First(x => x.optionBehaviour == currentTab.Children[0]).type;
-                    GameOptionsMenuStartPatch.updateGameOptionsMenu(optionType, currentTab);
-                }
-
+                TORRoleSettingsManager.RebuildCurrent();
             }
         }
 
@@ -381,15 +366,7 @@ namespace TheOtherRoles {
                 {
                     if (AmongUsClient.Instance?.AmHost == true)
                     {
-                        foreach (var entry in GameOptionsMenuStartPatch.currentGOMs)
-                        {
-                            CustomOptionType optionType = (CustomOptionType)entry.Key;
-                            GameOptionsMenu gom = entry.Value;
-                            if (gom != null)
-                            {
-                                GameOptionsMenuStartPatch.updateGameOptionsMenu(optionType, gom);
-                            }
-                        }
+                        TORRoleSettingsManager.RebuildCurrent();
                     }
                 }
                 catch
@@ -473,27 +450,240 @@ namespace TheOtherRoles {
         }
     }
 
-    [HarmonyPatch(typeof(GameSettingMenu), nameof(GameSettingMenu.ChangeTab))]
-    class GameOptionsMenuChangeTabPatch
+    // ===== ATR-style mod settings via RolesSettingsMenu =====
+
+    [HarmonyPatch(typeof(RolesSettingsMenu), nameof(RolesSettingsMenu.InitialSetup))]
+    class RolesSettingsMenuInitialSetupPatch
     {
-        public static void Postfix(GameSettingMenu __instance, int tabNum, bool previewOnly)
+        public static bool Prefix() => GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek;
+    }
+
+    [HarmonyPatch(typeof(RolesSettingsMenu), nameof(RolesSettingsMenu.SetQuotaTab))]
+    class RolesSettingsMenuSetQuotaTabPatch
+    {
+        public static bool Prefix() => GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek;
+    }
+
+    [HarmonyPatch(typeof(RolesSettingsMenu), nameof(RolesSettingsMenu.OpenChancesTab))]
+    class RolesSettingsMenuOpenChancesTabPatch
+    {
+        public static bool Prefix(RolesSettingsMenu __instance)
         {
-            if (previewOnly) return;
-            foreach (var tab in GameOptionsMenuStartPatch.currentTabs)
+            if (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek)
+                return true;
+            TORRoleSettingsManager.OpenChances(__instance);
+            return false;
+        }
+    }
+
+    [HarmonyPatch(typeof(RolesSettingsMenu), nameof(RolesSettingsMenu.Update))]
+    class RolesSettingsMenuUpdatePatch
+    {
+        public static bool Prefix(RolesSettingsMenu __instance)
+        {
+            if (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek)
+                return true;
+            TORRoleSettingsManager.OnUpdate(__instance);
+            return false;
+        }
+    }
+
+    static class TORRoleSettingsManager
+    {
+        static Dictionary<string, PassiveButton> tabButtons = new();
+        static Dictionary<string, List<OptionBehaviour>> createdOptions = new();
+        static Dictionary<string, List<CategoryHeaderMasked>> createdHeaders = new();
+        static string currentCategory = "";
+        static bool tabsBuilt = false;
+
+        static string[] GetCategories()
+        {
+            if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek) return new string[0];
+            var cats = new List<string> { "general" };
+            if (TORMapOptions.gameMode == CustomGamemodes.Guesser) cats.Add("guesser");
+            cats.Add("impostor"); cats.Add("neutral"); cats.Add("crewmate"); cats.Add("modifier");
+            return cats.ToArray();
+        }
+
+        static CustomOptionType CatToType(string cat) => cat switch
+        {
+            "general" => CustomOptionType.General, "guesser" => CustomOptionType.Guesser,
+            "impostor" => CustomOptionType.Impostor, "neutral" => CustomOptionType.Neutral,
+            "crewmate" => CustomOptionType.Crewmate, "modifier" => CustomOptionType.Modifier,
+            _ => CustomOptionType.General,
+        };
+
+        static List<CustomOption> FilterForCategory(string cat)
+        {
+            var t = CatToType(cat);
+            var list = (t == CustomOptionType.General && TORMapOptions.gameMode == CustomGamemodes.Guesser)
+                ? CustomOption.options.Where(x => x.type == CustomOptionType.General || x.type == CustomOptionType.Guesser).ToList()
+                : CustomOption.options.Where(x => x.type == t).ToList();
+            if (TORMapOptions.gameMode == CustomGamemodes.Guesser)
+                list = list.Where(x => !(new List<int> { 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 7006 }).Contains(x.id)).ToList();
+            else if (t == CustomOptionType.General)
+                list = list.Where(x => x.id != 7007).ToList();
+            if (TORMapOptions.gameMode != CustomGamemodes.FreePlay)
+                list = list.Where(x => x.id != 10429).ToList();
+            return list;
+        }
+
+        public static void OpenChances(RolesSettingsMenu menu)
+        {
+            if (!tabsBuilt) BuildTabs(menu);
+
+            menu.RoleChancesSettings.SetActive(false);
+            menu.AdvancedRolesSettings.SetActive(true);
+            var bg = menu.AdvancedRolesSettings.transform.Find("Background");
+            if (bg != null) bg.gameObject.SetActive(false);
+            var ilb = menu.AdvancedRolesSettings.transform.Find("InfoLabelBackground");
+            if (ilb != null) ilb.gameObject.SetActive(false);
+            var db = menu.AdvancedRolesSettings.transform.Find("DescBackground");
+            if (db != null) db.gameObject.SetActive(false);
+            var ib = menu.AdvancedRolesSettings.transform.Find("Imagebackground");
+            if (ib != null) ib.gameObject.SetActive(false);
+
+            SwitchCategory(menu, "general");
+        }
+
+        static void BuildTabs(RolesSettingsMenu menu)
+        {
+            foreach (var kv in tabButtons)
+                if (kv.Value != null && kv.Value.gameObject != null) kv.Value.gameObject.Destroy();
+            tabButtons.Clear();
+            menu.AllButton?.gameObject.SetActive(false);
+            menu.advHeader?.gameObject.SetActive(false);
+
+            float xPos = -1.928f - 0.762f;
+            foreach (string cat in GetCategories())
             {
-                if (tab != null)
-                    tab.SetActive(false);
+                var tab = UnityEngine.Object.Instantiate<RoleSettingsTabButton>(
+                    menu.roleSettingsTabButtonOrigin, Vector3.zero, Quaternion.identity, menu.roleSettingsTabParent);
+                tab.transform.localPosition = new Vector3(xPos, 2.275f, -2f);
+                tab.icon.color = Color.white;
+                if (tab.Button != null)
+                {
+                    tab.Button.OnClick = new UnityEngine.UI.Button.ButtonClickedEvent();
+                    string c = cat;
+                    tab.Button.OnClick.AddListener((Action)(() => SwitchCategory(menu, c)));
+                }
+                tabButtons[cat] = tab.Button;
+                xPos += 0.762f;
             }
-            foreach (var pbutton in GameOptionsMenuStartPatch.currentButtons)
+            tabsBuilt = true;
+        }
+
+        static CategoryHeaderMasked headerPrefab;
+        static CategoryHeaderMasked HeaderPrefab
+        {
+            get
             {
-                pbutton.SelectButton(false);
+                if (headerPrefab == null)
+                {
+                    var gom = UnityEngine.Object.FindObjectOfType<GameOptionsMenu>(true);
+                    if (gom != null) headerPrefab = gom.categoryHeaderOrigin;
+                }
+                return headerPrefab;
             }
-            if (tabNum > 2)
+        }
+
+        static void SwitchCategory(RolesSettingsMenu menu, string category)
+        {
+            if (createdHeaders.ContainsKey(currentCategory))
+                foreach (var h in createdHeaders[currentCategory])
+                    if (h != null && h.gameObject != null) h.gameObject.Destroy();
+            if (createdOptions.ContainsKey(currentCategory))
+                foreach (var o in createdOptions[currentCategory])
+                    if (o != null && o.gameObject != null) o.gameObject.Destroy();
+            if (createdHeaders.ContainsKey(currentCategory)) createdHeaders[currentCategory].Clear();
+            if (createdOptions.ContainsKey(currentCategory)) createdOptions[currentCategory].Clear();
+
+            currentCategory = category;
+
+            foreach (var kv in tabButtons)
+                if (kv.Value != null) kv.Value.SelectButton(kv.Key == category);
+
+            menu.advHeader?.gameObject.SetActive(false);
+            menu.roleTitleText?.gameObject.SetActive(false);
+            menu.roleDescriptionText?.gameObject.SetActive(false);
+            menu.roleHeaderSprite?.gameObject.SetActive(false);
+            menu.roleScreenshot?.gameObject.SetActive(false);
+
+            var opts = FilterForCategory(category);
+            if (HeaderPrefab != null && menu.stringOptionOrigin != null)
+                CreateSettingsInContainer(menu, opts);
+        }
+
+        static void CreateSettingsInContainer(RolesSettingsMenu menu, List<CustomOption> options)
+        {
+            var parent = menu.AdvancedRolesSettings.transform;
+            var clickMask = menu.ButtonClickMask;
+
+            if (!createdHeaders.ContainsKey(currentCategory))
+                createdHeaders[currentCategory] = new List<CategoryHeaderMasked>();
+            if (!createdOptions.ContainsKey(currentCategory))
+                createdOptions[currentCategory] = new List<OptionBehaviour>();
+
+            float num = 0.8f;
+            foreach (CustomOption option in options)
             {
-                tabNum -= 3;
-                GameOptionsMenuStartPatch.currentTabs[tabNum].SetActive(true);
-                GameOptionsMenuStartPatch.currentButtons[tabNum].SelectButton(true);
+                if (option.isHeader)
+                {
+                    var header = UnityEngine.Object.Instantiate<CategoryHeaderMasked>(HeaderPrefab, Vector3.zero, Quaternion.identity, parent);
+                    header.Title.text = option.heading != "" ? option.getHeading() : option.getName();
+                    header.Background.material.SetInt(PlayerMaterial.MaskLayer, 20);
+                    if (header.Divider != null) header.Divider.material.SetInt(PlayerMaterial.MaskLayer, 20);
+                    header.Title.fontMaterial.SetFloat("_StencilComp", 3f);
+                    header.Title.fontMaterial.SetFloat("_Stencil", 20f);
+                    header.transform.localScale = Vector3.one * 0.63f;
+                    header.transform.localPosition = new Vector3(-0.55f, num, -2f);
+                    header.transform.GetChild(0).GetComponent<SpriteRenderer>().color = option.getColor();
+                    if (header.transform.childCount > 1) header.transform.GetChild(1).GetComponent<SpriteRenderer>().color = option.getColor();
+                    createdHeaders[currentCategory].Add(header);
+                    num -= 0.63f;
+                }
+                else if (!ShouldBeEnabled(option)) continue;
+                else if (option.parent != null && option.parent.selection != 0 && option.invertedParent) continue;
+
+                var ob = UnityEngine.Object.Instantiate<StringOption>(menu.stringOptionOrigin, Vector3.zero, Quaternion.identity, parent);
+                ob.transform.localPosition = new Vector3(1.28f, num, -2f);
+                ob.SetClickMask(clickMask);
+
+                SpriteRenderer[] sr = ob.GetComponentsInChildren<SpriteRenderer>(true);
+                for (int i = 0; i < sr.Length; i++) sr[i].material.SetInt(PlayerMaterial.MaskLayer, 20);
+                foreach (TextMeshPro tmp in ob.GetComponentsInChildren<TextMeshPro>(true))
+                { tmp.fontMaterial.SetFloat("_StencilComp", 3f); tmp.fontMaterial.SetFloat("_Stencil", 20f); }
+
+                var so = ob as StringOption;
+                so.OnValueChanged = new Action<OptionBehaviour>((o) => { });
+                so.TitleText.text = option.getName();
+                if (option.heading == "" && (option.type == CustomOptionType.Neutral || option.type == CustomOptionType.Crewmate || option.type == CustomOptionType.Impostor || option.type == CustomOptionType.Modifier))
+                    so.TitleText.text = ModTranslation.getString("optionSpawnChance");
+                if (so.TitleText.text.Length > 25) so.TitleText.fontSize = 2.2f;
+                if (so.TitleText.text.Length > 40) so.TitleText.fontSize = 2f;
+                so.Value = so.oldValue = option.selection;
+                so.ValueText.text = option.getString();
+                option.optionBehaviour = so;
+
+                createdOptions[currentCategory].Add(ob);
+                num -= 0.45f;
+                menu.scrollBar.SetYBoundsMax(-num - 1.65f);
             }
+
+            for (int i = 0; i < createdOptions[currentCategory].Count; i++)
+                if (AmongUsClient.Instance && !AmongUsClient.Instance.AmHost)
+                    createdOptions[currentCategory][i].SetAsPlayer();
+        }
+
+        public static void RebuildCurrent()
+        {
+            if (string.IsNullOrEmpty(currentCategory)) return;
+            var menu = UnityEngine.Object.FindObjectOfType<RolesSettingsMenu>();
+            if (menu != null) SwitchCategory(menu, currentCategory);
+        }
+
+        public static void OnUpdate(RolesSettingsMenu menu)
+        {
         }
     }
 
@@ -1144,258 +1334,49 @@ namespace TheOtherRoles {
     [HarmonyPatch(typeof(GameSettingMenu), nameof(GameSettingMenu.Start))]
     class GameOptionsMenuStartPatch
     {
-        public static List<GameObject> currentTabs = new();
-        public static List<PassiveButton> currentButtons = new();
-        public static Dictionary<byte, GameOptionsMenu> currentGOMs = new();
-
         public static void Postfix(GameSettingMenu __instance)
         {
-            currentTabs.ForEach(x => { if (x != null) x?.Destroy(); });
-            currentButtons.ForEach(x => { if (x != null) x?.Destroy(); });
-            currentTabs = new();
-            currentButtons = new();
-            currentGOMs.Clear();
-
             if (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek) return;
 
-            removeVanillaTabs(__instance);
-
-            createSettingTabs(__instance);
-
-            var GOMGameObject = GameObject.Find("GAME SETTINGS TAB");
-
-
-            // create copy to clipboard and paste from clipboard buttons.
-            var template = GameObject.Find("PlayerOptionsMenu(Clone)").transform.Find("CloseButton").gameObject;
-            var holderGO = new GameObject("copyPasteButtonParent");
-            var bgrenderer = holderGO.AddComponent<SpriteRenderer>();
-            bgrenderer.sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.CopyPasteBG.png", 175f);
-            holderGO.transform.SetParent(template.transform.parent, false);
-            holderGO.transform.localPosition = template.transform.localPosition + new Vector3(-8.3f, 0.73f, -2f);
-            holderGO.layer = template.layer;
-            holderGO.SetActive(true);
-            var copyButton = GameObject.Instantiate(template, holderGO.transform);
-            copyButton.transform.localPosition = new Vector3(-0.3f, 0.02f, -2f);
-            var copyButtonPassive = copyButton.GetComponent<PassiveButton>();
-            var copyButtonRenderer = copyButton.GetComponentInChildren<SpriteRenderer>();
-            var copyButtonActiveRenderer = copyButton.transform.GetChild(1).GetComponent<SpriteRenderer>();
-            copyButtonRenderer.sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Copy.png", 100f);
-            copyButton.transform.GetChild(1).transform.localPosition = Vector3.zero;
-            copyButtonActiveRenderer.sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.CopyActive.png", 100f);
-            copyButtonPassive.OnClick.RemoveAllListeners();
-            copyButtonPassive.OnClick = new UnityEngine.UI.Button.ButtonClickedEvent();
-            copyButtonPassive.OnClick.AddListener((System.Action)(() => {
-                copyToClipboard();
-                copyButtonRenderer.color = Color.green;
-                copyButtonActiveRenderer.color = Color.green;
-                __instance.StartCoroutine(Effects.Lerp(1f, new System.Action<float>((p) => {
-                    if (p > 0.95)
-                    {
-                        copyButtonRenderer.color = Color.white;
-                        copyButtonActiveRenderer.color = Color.white;
-                    }
-                })));
-            }));
-            var pasteButton = GameObject.Instantiate(template, holderGO.transform);
-            pasteButton.transform.localPosition = new Vector3(0.3f, 0.02f, -2f);
-            var pasteButtonPassive = pasteButton.GetComponent<PassiveButton>();
-            var pasteButtonRenderer = pasteButton.GetComponentInChildren<SpriteRenderer>();
-            var pasteButtonActiveRenderer = pasteButton.transform.GetChild(1).GetComponent<SpriteRenderer>();
-            pasteButtonRenderer.sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Paste.png", 100f);
-            pasteButtonActiveRenderer.sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.PasteActive.png", 100f);
-            pasteButtonPassive.OnClick.RemoveAllListeners();
-            pasteButtonPassive.OnClick = new UnityEngine.UI.Button.ButtonClickedEvent();
-            pasteButtonPassive.OnClick.AddListener((System.Action)(() => {
-                pasteButtonRenderer.color = Color.yellow;
-                int success = pasteFromClipboard();
-                pasteButtonRenderer.color = success == 3 ? Color.green : success == 0 ? Color.red : Color.yellow;
-                pasteButtonActiveRenderer.color = success == 3 ? Color.green : success == 0 ? Color.red : Color.yellow;
-                __instance.StartCoroutine(Effects.Lerp(1f, new System.Action<float>((p) => {
-                    if (p > 0.95)
-                    {
-                        pasteButtonRenderer.color = Color.white;
-                        pasteButtonActiveRenderer.color = Color.white;
-                    }
-                })));
-            }));
-        }
-
-        private static void createSettings(GameOptionsMenu menu, List<CustomOption> options)
-        {
-            float num = 1.5f;
-            foreach (CustomOption option in options)
-            {
-                if (option.isHeader)
-                {
-                    CategoryHeaderMasked categoryHeaderMasked = UnityEngine.Object.Instantiate<CategoryHeaderMasked>(menu.categoryHeaderOrigin, Vector3.zero, Quaternion.identity, menu.settingsContainer);
-                    categoryHeaderMasked.SetHeader(StringNames.ImpostorsCategory, 20);
-                    string titleText = option.heading != "" ? option.getHeading() : option.getName();
-                    categoryHeaderMasked.Title.text = titleText;
-                    categoryHeaderMasked.transform.localScale = Vector3.one * 0.63f;
-                    categoryHeaderMasked.transform.localPosition = new Vector3(-0.903f, num, -2f);
-                    categoryHeaderMasked.transform.GetChild(0).GetComponent<SpriteRenderer>().color = option.getColor();
-                    categoryHeaderMasked.transform.GetChild(1).GetComponent<SpriteRenderer>().color = option.getColor();
-                    num -= 0.63f;
-                }
-                else if (!ShouldBeEnabled(option)) continue;  // Hides options, for which the parent is disabled!
-                else if (option.parent != null && option.parent.selection != 0 && option.invertedParent) continue;
-                OptionBehaviour optionBehaviour = UnityEngine.Object.Instantiate<StringOption>(menu.stringOptionOrigin, Vector3.zero, Quaternion.identity, menu.settingsContainer);
-                optionBehaviour.transform.localPosition = new Vector3(0.952f, num, -2f);
-                optionBehaviour.SetClickMask(menu.ButtonClickMask);
-
-                // "SetUpFromData"
-                SpriteRenderer[] componentsInChildren = optionBehaviour.GetComponentsInChildren<SpriteRenderer>(true);
-                for (int i = 0; i < componentsInChildren.Length; i++)
-                {
-                    componentsInChildren[i].material.SetInt(PlayerMaterial.MaskLayer, 20);
-                }
-                foreach (TextMeshPro textMeshPro in optionBehaviour.GetComponentsInChildren<TextMeshPro>(true))
-                {
-                    textMeshPro.fontMaterial.SetFloat("_StencilComp", 3f);
-                    textMeshPro.fontMaterial.SetFloat("_Stencil", 20);
-                }
-
-                var stringOption = optionBehaviour as StringOption;
-                stringOption.OnValueChanged = new Action<OptionBehaviour>((o) => { });
-                stringOption.TitleText.text = option.getName();
-                if (option.isHeader && option.heading == "" && (option.type == CustomOptionType.Neutral || option.type == CustomOptionType.Crewmate || option.type == CustomOptionType.Impostor || option.type == CustomOptionType.Modifier))
-                {
-                    stringOption.TitleText.text = ModTranslation.getString("optionSpawnChance");
-                }
-                if (stringOption.TitleText.text.Length > 25)
-                    stringOption.TitleText.fontSize = 2.2f;
-                if (stringOption.TitleText.text.Length > 40)
-                    stringOption.TitleText.fontSize = 2f;
-                stringOption.Value = stringOption.oldValue = option.selection;
-                stringOption.ValueText.text = option.getString();
-                option.optionBehaviour = stringOption;
-
-                menu.Children.Add(optionBehaviour);
-                num -= 0.45f;
-                menu.scrollBar.SetYBoundsMax(-num - 1.65f);
-            }
-
-            for (int i = 0; i < menu.Children.Count; i++)
-            {
-                OptionBehaviour optionBehaviour = menu.Children[i];
-                if (AmongUsClient.Instance && !AmongUsClient.Instance.AmHost)
-                {
-                    optionBehaviour.SetAsPlayer();
-                }
-            }
-        }
-
-        private static void removeVanillaTabs(GameSettingMenu __instance)
-        {
-            GameObject.Find("What Is This?")?.Destroy();
+            // GameObject.Find("What Is This?")?.Destroy();
             GameObject.Find("GamePresetButton")?.Destroy();
-            GameObject.Find("RoleSettingsButton")?.Destroy();
+
             __instance.ChangeTab(1, false);
-        }
 
-        public static void createCustomButton(GameSettingMenu __instance, int targetMenu, string buttonName, string buttonText)
-        {
-            var leftPanel = GameObject.Find("LeftPanel");
-            var buttonTemplate = GameObject.Find("GameSettingsButton");
-            if (targetMenu == 3)
+            var template = GameObject.Find("PlayerOptionsMenu(Clone)")?.transform.Find("CloseButton")?.gameObject;
+            if (template != null)
             {
-                buttonTemplate.transform.localPosition -= Vector3.up * 0.85f;
-                buttonTemplate.transform.localScale *= Vector2.one * 0.75f;
-            }
-            var torSettingsButton = GameObject.Find(buttonName);
-            if (torSettingsButton == null)
-            {
-                torSettingsButton = GameObject.Instantiate(buttonTemplate, leftPanel.transform);
-                torSettingsButton.transform.localPosition += Vector3.up * 0.5f * (targetMenu - 2);
-                torSettingsButton.name = buttonName;
-                __instance.StartCoroutine(Effects.Lerp(2f, new Action<float>(p => { torSettingsButton.transform.FindChild("FontPlacer").GetComponentInChildren<TextMeshPro>().text = buttonText; })));
-                var torSettingsPassiveButton = torSettingsButton.GetComponent<PassiveButton>();
-                torSettingsPassiveButton.OnClick.RemoveAllListeners();
-                torSettingsPassiveButton.OnClick.AddListener((System.Action)(() => {
-                    __instance.ChangeTab(targetMenu, false);
-                }));
-                torSettingsPassiveButton.OnMouseOut.RemoveAllListeners();
-                torSettingsPassiveButton.OnMouseOver.RemoveAllListeners();
-                torSettingsPassiveButton.SelectButton(false);
-                currentButtons.Add(torSettingsPassiveButton);
-            }
-        }
-
-        public static void createGameOptionsMenu(GameSettingMenu __instance, CustomOptionType optionType, string settingName)
-        {
-            var tabTemplate = GameObject.Find("GAME SETTINGS TAB");
-            currentTabs.RemoveAll(x => x == null);
-
-            var torSettingsTab = GameObject.Instantiate(tabTemplate, tabTemplate.transform.parent);
-            torSettingsTab.name = settingName;
-
-            var torSettingsGOM = torSettingsTab.GetComponent<GameOptionsMenu>();
-
-            updateGameOptionsMenu(optionType, torSettingsGOM);
-            currentTabs.Add(torSettingsTab);
-            torSettingsTab.SetActive(false);
-            currentGOMs.Add((byte)optionType, torSettingsGOM);
-        }
-        public static void updateGameOptionsMenu(CustomOptionType optionType, GameOptionsMenu torSettingsGOM)
-        {
-            foreach (var child in torSettingsGOM.Children)
-            {
-                child.Destroy();
-            }
-            torSettingsGOM.scrollBar.transform.FindChild("SliderInner").DestroyChildren();
-            torSettingsGOM.Children.Clear();
-            var relevantOptions = options.Where(x => x.type == optionType).ToList();
-            if (TORMapOptions.gameMode == CustomGamemodes.Guesser) // Exclude guesser options in neutral mode
-                relevantOptions = relevantOptions.Where(x => !(new List<int> { 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 7006 }).Contains(x.id)).ToList();
-            else
-                relevantOptions = relevantOptions.Where(x => x.id != 7007).ToList();
-
-            if (TORMapOptions.gameMode != CustomGamemodes.FreePlay)
-                relevantOptions = relevantOptions.Where(x => x.id != 10429).ToList();
-            createSettings(torSettingsGOM, relevantOptions);
-        }
-
-        private static void createSettingTabs(GameSettingMenu __instance)
-        {
-            // Handle different gamemodes and tabs needed therein.
-            int next = 3;
-            if (TORMapOptions.gameMode == CustomGamemodes.Guesser || TORMapOptions.gameMode == CustomGamemodes.Classic || TORMapOptions.gameMode == CustomGamemodes.FreePlay)
-            {
-
-                // create TOR settings
-                createCustomButton(__instance, next++, "TORSettings", ModTranslation.getString("torNewSettings"));
-                createGameOptionsMenu(__instance, CustomOptionType.General, "TORSettings");
-                // Guesser if applicable
-                if (TORMapOptions.gameMode == CustomGamemodes.Guesser)
-                {
-                    createCustomButton(__instance, next++, "GuesserSettings", ModTranslation.getString("guesserNewSettings"));
-                    createGameOptionsMenu(__instance, CustomOptionType.Guesser, "GuesserSettings");
-                }
-                // IMp
-                createCustomButton(__instance, next++, "ImpostorSettings", ModTranslation.getString("impostorRoles"));
-                createGameOptionsMenu(__instance, CustomOptionType.Impostor, "ImpostorSettings");
-
-                // Neutral
-                createCustomButton(__instance, next++, "NeutralSettings", ModTranslation.getString("neutralRoles"));
-                createGameOptionsMenu(__instance, CustomOptionType.Neutral, "NeutralSettings");
-                // Crew
-                createCustomButton(__instance, next++, "CrewmateSettings", ModTranslation.getString("crewmateRoles"));
-                createGameOptionsMenu(__instance, CustomOptionType.Crewmate, "CrewmateSettings");
-                // Modifier
-                createCustomButton(__instance, next++, "ModifierSettings", ModTranslation.getString("modifiers"));
-                createGameOptionsMenu(__instance, CustomOptionType.Modifier, "ModifierSettings");
-
-            }
-            else if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek)
-            {
-                // create Main HNS settings
-                createCustomButton(__instance, next++, "HideNSeekMain", ModTranslation.getString("hideNSeekMain"));
-                createGameOptionsMenu(__instance, CustomOptionType.HideNSeekMain, "HideNSeekMain");
-                // create HNS Role settings
-                createCustomButton(__instance, next++, "HideNSeekRoles", ModTranslation.getString("hideNSeekRoles"));
-                createGameOptionsMenu(__instance, CustomOptionType.HideNSeekRoles, "HideNSeekRoles");
+                var holderGO = new GameObject("copyPasteButtonParent");
+                var bgrenderer = holderGO.AddComponent<SpriteRenderer>();
+                bgrenderer.sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.CopyPasteBG.png", 175f);
+                holderGO.transform.SetParent(template.transform.parent, false);
+                holderGO.transform.localPosition = template.transform.localPosition + new Vector3(-8.3f, 0.73f, -2f);
+                holderGO.layer = template.layer;
+                holderGO.SetActive(true);
+                var copyButton = GameObject.Instantiate(template, holderGO.transform);
+                copyButton.transform.localPosition = new Vector3(-0.3f, 0.02f, -2f);
+                var cbp = copyButton.GetComponent<PassiveButton>();
+                var cbr = copyButton.GetComponentInChildren<SpriteRenderer>();
+                var cbar = copyButton.transform.GetChild(1).GetComponent<SpriteRenderer>();
+                cbr.sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Copy.png", 100f);
+                copyButton.transform.GetChild(1).transform.localPosition = Vector3.zero;
+                cbar.sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.CopyActive.png", 100f);
+                cbp.OnClick.RemoveAllListeners();
+                cbp.OnClick = new UnityEngine.UI.Button.ButtonClickedEvent();
+                cbp.OnClick.AddListener((Action)(() => { copyToClipboard(); cbr.color = Color.green; cbar.color = Color.green; __instance.StartCoroutine(Effects.Lerp(1f, new Action<float>((p) => { if (p > 0.95) { cbr.color = Color.white; cbar.color = Color.white; } }))); }));
+                var pasteButton = GameObject.Instantiate(template, holderGO.transform);
+                pasteButton.transform.localPosition = new Vector3(0.3f, 0.02f, -2f);
+                var pbp = pasteButton.GetComponent<PassiveButton>();
+                var pbr = pasteButton.GetComponentInChildren<SpriteRenderer>();
+                var pbar = pasteButton.transform.GetChild(1).GetComponent<SpriteRenderer>();
+                pbr.sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Paste.png", 100f);
+                pbar.sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.PasteActive.png", 100f);
+                pbp.OnClick.RemoveAllListeners();
+                pbp.OnClick = new UnityEngine.UI.Button.ButtonClickedEvent();
+                pbp.OnClick.AddListener((Action)(() => { pbr.color = Color.yellow; int success = pasteFromClipboard(); pbr.color = success == 3 ? Color.green : success == 0 ? Color.red : Color.yellow; pbar.color = success == 3 ? Color.green : success == 0 ? Color.red : Color.yellow; __instance.StartCoroutine(Effects.Lerp(1f, new Action<float>((p) => { if (p > 0.95) { pbr.color = Color.white; pbar.color = Color.white; } }))); }));
             }
         }
+
     }
 
 
