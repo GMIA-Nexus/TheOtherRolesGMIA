@@ -1,0 +1,55 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<Version>2.3.140</Version>
+		<Description>TheOtherRoles: GM Haoming Edition</Description>
+		<Authors>Haoming</Authors>
+		<DebugType>embedded</DebugType>
+		<Platforms>AnyCPU;x64;x86</Platforms>
+		<Configurations>Debug;Release;Release_Dev;Release_Local;Embedded</Configurations>
+		<LangVersion>latest</LangVersion>
+	</PropertyGroup>
+	<PropertyGroup>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<ApplicationIcon />
+		<Win32Resource />
+		<AssemblyName>TheOtherRolesGM</AssemblyName>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Local|AnyCPU'">
+		<DebugSymbols>false</DebugSymbols>
+		<DebugType>none</DebugType>
+		<Optimize>true</Optimize>
+		<DefineConstants>$(DefineConstants);RELEASE;</DefineConstants>
+		<AssemblyName>TheOtherRolesGM</AssemblyName>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_Dev|AnyCPU'">
+		<DebugSymbols>false</DebugSymbols>
+		<DebugType>none</DebugType>
+		<Optimize>true</Optimize>
+		<DefineConstants>$(DefineConstants);RELEASE;DEV;</DefineConstants>
+	</PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Embedded|AnyCPU'">
+		<DebugSymbols>true</DebugSymbols>
+		<DebugType>embedded</DebugType>
+		<Optimize>false</Optimize>
+		<DefineConstants>$(DefineConstants);DEBUG;</DefineConstants>
+	</PropertyGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Resources\**" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="AmongUs.GameLibs.Steam" Version="2025.3.25" />
+		<PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.733" />
+		<PackageReference Include="BepInEx.IL2CPP.MSBuild" Version="2.1.0-rc.1" />
+		<PackageReference Include="Reactor" Version="2.4.0-ci.344" />
+	</ItemGroup>
+	<Target Name="CopyCustomContent" AfterTargets="AfterBuild">
+		<Message Text="Second occurrence" />
+		<Copy SourceFiles="$(ProjectDir)\bin\$(Configuration)\net6.0\$(AssemblyName).dll" DestinationFolder="$(AmongUs)/BepInEx/plugins/" />
+	</Target>
+	<Target Name="PreBuild" BeforeTargets="PreBuildEvent">
+		<Exec Command="python &quot;$(SolutionDir)stringsToJson.py&quot;" />
+		<!--<Copy SourceFiles="$(SolutionDir)UnityAssets\HaomingAssets\AssetBundles\StandaloneWindows\haomingassets" DestinationFolder="$(SolutionDir)TheOtherRoles\Resources\AssetBundle\" ContinueOnError="true" />
+		<Copy SourceFiles="$(SolutionDir)..\DevAssets\AssetBundles\StandaloneWindows\devassets" DestinationFolder="$(SolutionDir)TheOtherRoles\Resources\AssetBundle\" ContinueOnError="true" />-->
+	</Target>
+</Project>

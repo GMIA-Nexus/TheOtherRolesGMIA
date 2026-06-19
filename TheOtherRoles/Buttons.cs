@@ -119,6 +119,9 @@ namespace TheOtherRoles
         public static CustomButton jailorButton;
         public static CustomButton doomsayerButton;
         public static CustomButton yandereButton;
+        public static CustomButton puppeteerSampleButton;
+        public static CustomButton puppeteerPuppeteerButton;
+        public static TMPro.TMP_Text puppeteerCounterText;
         public static CustomButton baitButton;
         public static CustomButton collatorButton;
         public static CustomButton operateButton;
@@ -240,6 +243,8 @@ namespace TheOtherRoles
             thiefKillButton.MaxTimer = Thief.cooldown;
             mayorMeetingButton.MaxTimer = GameManager.Instance.LogicOptions.GetEmergencyCooldown();
             yandereButton.MaxTimer = GameOptionsManager.Instance.currentNormalGameOptions.KillCooldown;
+            puppeteerSampleButton.MaxTimer = 10f;
+            puppeteerPuppeteerButton.MaxTimer = 0f;
             ninjaButton.MaxTimer = Ninja.stealthCooldown;
             serialKillerButton.MaxTimer = SerialKiller.suicideTimer;
             archaeologistDetectButton.MaxTimer = Archaeologist.cooldown;
@@ -1499,6 +1504,100 @@ namespace TheOtherRoles
                 __instance,
                 KeyCode.Q
             );
+
+            // Puppeteer Buttons
+            puppeteerSampleButton = new CustomButton(
+                () =>
+                {
+                    if (Puppeteer.currentTarget != null)
+                    {
+                        Puppeteer.tmpTarget = Puppeteer.currentTarget;
+                        puppeteerSampleButton.HasEffect = true;
+                        puppeteerPuppeteerButton.MaxTimer = 0f;
+                        puppeteerPuppeteerButton.Timer = 0f;
+                    }
+                },
+                () => { return PlayerControl.LocalPlayer.isRole(RoleId.Puppeteer) && (!PlayerControl.LocalPlayer.Data.IsDead || Puppeteer.canControlDummyEvenIfDead); },
+                () =>
+                {
+                    if (puppeteerSampleButton.isEffectActive && Puppeteer.tmpTarget != Puppeteer.currentTarget)
+                    {
+                        Puppeteer.tmpTarget = null;
+                        puppeteerSampleButton.Timer = 0f;
+                        puppeteerSampleButton.isEffectActive = false;
+                    }
+                    return PlayerControl.LocalPlayer.CanMove && Puppeteer.currentTarget != null;
+                },
+                () =>
+                {
+                    puppeteerSampleButton.Timer = puppeteerSampleButton.MaxTimer;
+                    puppeteerSampleButton.isEffectActive = false;
+                    Puppeteer.target = null;
+                    Puppeteer.tmpTarget = null;
+                },
+                __instance.KillButton.graphic.sprite,
+                CustomButton.ButtonPositions.upperRowRight,
+                __instance,
+                KeyCode.G,
+                true,
+                Puppeteer.sampleDuration,
+                () =>
+                {
+                    if (Puppeteer.tmpTarget != null)
+                    {
+                        Puppeteer.target = Puppeteer.tmpTarget;
+                        Puppeteer.canSpawn = true;
+                    }
+                    Puppeteer.tmpTarget = null;
+                    puppeteerSampleButton.Timer = puppeteerSampleButton.MaxTimer;
+                }
+            )
+            {
+                buttonText = ""
+            };
+
+            puppeteerPuppeteerButton = new CustomButton(
+                () =>
+                {
+                    if (Puppeteer.canSpawn)
+                    {
+                        Puppeteer.spawnDummy();
+                        Puppeteer.switchStealth(true);
+                    }
+                    else
+                    {
+                        Puppeteer.switchStealth(!Puppeteer.stealthed);
+                    }
+                },
+                () => { return PlayerControl.LocalPlayer.isRole(RoleId.Puppeteer) && (!PlayerControl.LocalPlayer.Data.IsDead || Puppeteer.canControlDummyEvenIfDead) && Puppeteer.target != null; },
+                () =>
+                {
+                    if (puppeteerCounterText != null)
+                    {
+                        puppeteerCounterText.text = $"{Puppeteer.counter}/{Puppeteer.numKills}";
+                    }
+                    return true;
+                },
+                () =>
+                {
+                    puppeteerPuppeteerButton.Timer = puppeteerPuppeteerButton.MaxTimer;
+                },
+                __instance.UseButton.graphic.sprite,
+                CustomButton.ButtonPositions.upperRowCenter,
+                __instance,
+                KeyCode.F,
+                false,
+                0f,
+                null
+            )
+            {
+                buttonText = ""
+            };
+            puppeteerCounterText = GameObject.Instantiate(puppeteerPuppeteerButton.actionButton.cooldownTimerText, puppeteerPuppeteerButton.actionButton.cooldownTimerText.transform.parent);
+            puppeteerCounterText.text = "";
+            puppeteerCounterText.enableWordWrapping = false;
+            puppeteerCounterText.transform.localScale = Vector3.one * 0.5f;
+            puppeteerCounterText.transform.localPosition += new Vector3(-0.05f, 0.7f, 0);
 
             jekyllAndHydeKillButton = new CustomButton(
                 // OnClick

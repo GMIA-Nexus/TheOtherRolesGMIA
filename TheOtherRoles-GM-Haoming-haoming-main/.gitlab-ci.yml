@@ -1,0 +1,83 @@
+stages:
+  - build
+  - package
+  - deploy
+
+variables:
+  MAJOR_VERSION: "2"
+  MINOR_VERSION: "3"
+  BUILD_VERSION: "${CI_PIPELINE_IID}"
+  VERSION: ${MAJOR_VERSION}.${MINOR_VERSION}.${BUILD_VERSION}
+
+build:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: always
+  variables:
+    OBJECTS_DIRECTORY: 'obj'
+    NUGET_PACKAGES_DIRECTORY: '.nuget'
+    SOURCE_CODE_PATH: 'TheOtherRoles/'
+  cache:
+    key: "$CI_JOB_STAGE-$CI_COMMIT_REF_SLUG"
+    paths:
+      - '$SOURCE_CODE_PATH$OBJECTS_DIRECTORY/project.assets.json'
+      - '$SOURCE_CODE_PATH$OBJECTS_DIRECTORY/*.csproj.nuget.*'
+      - '$NUGET_PACKAGES_DIRECTORY'
+    policy: pull-push
+  image: haoming37/plugin_build
+  stage: build
+  script:
+    - ln -s /usr/bin/python3 /usr/bin/py
+    - sed -i "s/999.999.999/${VERSION}/" TheOtherRoles/TheOtherRoles.csproj
+    - sed -i "s/999.999.999/${VERSION}/" TheOtherRoles/Main.cs
+    - dotnet restore --packages $NUGET_PACKAGES_DIRECTORY /p:GamePlatform=Steam
+    - dotnet build --configuration Release --no-restore /p:GamePlatform=Steam
+    - mv ${SOURCE_CODE_PATH}/obj/Release/netstandard2.1/TheOtherRolesGM.dll ${CI_PROJECT_DIR}
+  artifacts:
+    name: "TheOtherRoles-GM-H-dll-v${VERSION}"
+    paths:
+      - TheOtherRolesGM.dll
+    
+
+package:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "web"
+      when: always
+  image: haoming37/alpine_curl_zip_git_jq_file
+  dependencies:
+    - build
+  stage: package
+  script:
+    - curl -LO https://builds.bepinex.dev/projects/bepinex_be/570/BepInEx_UnityIL2CPP_x86_3febd6a_6.0.0-be.570.zip
+    - mkdir TheOtherRoles-GM-Haoming
+    - unzip BepInEx_UnityIL2CPP_x86_3febd6a_6.0.0-be.570.zip -d TheOtherRoles-GM-Haoming
+    - mkdir -p TheOtherRoles-GM-Haoming/BepinEx/plugins
+    - mkdir -p TheOtherRoles-GM-Haoming/TheOtherHats/Test
+    - cp CICD/TestHat.png TheOtherRoles-GM-Haoming/TheOtherHats/Test/
+    - cp CICD/steam_appid.txt TheOtherRoles-GM-Haoming/
+    - mv TheOtherRolesGM.dll TheOtherRoles-GM-Haoming/BepinEx/plugins
+    #- curl -L https://github.com/SubmergedAmongUs/Submerged/releases/download/v2022.5.8/Submerged.dll -o TheOtherRoles-GM-Haoming/BepinEx/plugins/Submerged.dll
+    - cd TheOtherRoles-GM-Haoming
+    - zip -r ../TheOtherRoles-GM-Haoming.v${VERSION}.zip *
+  artifacts:
+    name: "TheOtherRoles-GM-Haoming.v${VERSION}"
+    paths:
+      - TheOtherRoles-GM-Haoming.v${VERSION}.zip
+
+deploy:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "web" && $CI_COMMIT_REF_NAME == "haoming-main"
+      when: manual
+  image: haoming37/alpine_curl_zip_git_jq_file
+  dependencies:
+    - build
+    - package
+  stage: deploy
+  script:
+    - git config checkout.defaultRemote origin
+    - git remote add github https://haoming37:${GitHub_TOKEN}@github.com/haoming37/TheOtherRoles-GM-Haoming.git
+    - git fetch github haoming-main
+    - git fetch origin ${CI_COMMIT_REF_NAME}
+    - git checkout haoming-main && git reset --hard origin/${CI_COMMIT_REF_NAME}
+    - git push github haoming-main
+    - ./CICD/create_release.sh

@@ -134,6 +134,13 @@ namespace TheOtherRoles {
         public static CustomOption foxStealthDuration;
         public static CustomOption foxNumRepairs;
 
+        public static CustomRoleOption puppeteerSpawnRate;
+        public static CustomOption puppeteerNumKills;
+        public static CustomOption puppeteerSampleDuration;
+        public static CustomOption puppeteerCanControlDummyEvenIfDead;
+        public static CustomOption puppeteerPenaltyOnDeath;
+        public static CustomOption puppeteerLosesSenriganOnDeath;
+
         public static CustomRoleOption bountyHunterSpawnRate;
         public static CustomOption bountyHunterBountyDuration;
         public static CustomOption bountyHunterReducedCooldown;
@@ -1059,6 +1066,13 @@ namespace TheOtherRoles {
             foxStealthDuration = CustomOption.Create(917, Types.Neutral, "foxStealthDuration", 15f, 1f, 30f, 1f, foxSpawnRate, false, "unitSeconds");
             foxCanCreateImmoralist = CustomOption.Create(918, Types.Neutral, "foxCanCreateImmoralist", true, foxSpawnRate);
             foxNumRepairs = CustomOption.Create(920, Types.Neutral, "foxNumRepair", 1f, 0f, 10f, 1f, foxSpawnRate, false, "unitShots");
+
+            puppeteerSpawnRate = new CustomRoleOption(9070, Types.Neutral, "puppeteer", Puppeteer.color, 1);
+            puppeteerNumKills = CustomOption.Create(9071, Types.Neutral, "puppeteerNumKills", 3f, 1f, 15f, 1f, puppeteerSpawnRate);
+            puppeteerSampleDuration = CustomOption.Create(9072, Types.Neutral, "puppeteerSampleDuration", 1f, 0f, 20f, 0.25f, puppeteerSpawnRate, false, "unitSeconds");
+            puppeteerCanControlDummyEvenIfDead = CustomOption.Create(9073, Types.Neutral, "puppeteerCanControlDummyEvenIfDead", true, puppeteerSpawnRate);
+            puppeteerPenaltyOnDeath = CustomOption.Create(9074, Types.Neutral, "puppeteerPenaltyOnDeath", 1f, 0f, 5f, 1f, puppeteerCanControlDummyEvenIfDead);
+            puppeteerLosesSenriganOnDeath = CustomOption.Create(9075, Types.Neutral, "puppeteerLosesSenriganOnDeath", true, puppeteerCanControlDummyEvenIfDead);
 
             mayorSpawnRate = new CustomRoleOption(80, Types.Crewmate, "mayor", Mayor.color);
             mayorNumVotes = CustomOption.Create(81, Types.Crewmate, "mayorNumVotes", 2f, 2f, 24f, 1f, mayorSpawnRate, false, "unitVotes");

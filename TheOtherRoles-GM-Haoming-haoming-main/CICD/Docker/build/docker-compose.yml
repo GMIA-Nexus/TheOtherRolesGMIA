@@ -1,0 +1,7 @@
+version: "3.0"
+services:
+  build:
+    image: haoming37/plugin_build:latest
+    build:
+      context: .
+      dockerfile: Dockerfile

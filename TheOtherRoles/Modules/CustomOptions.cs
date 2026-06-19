@@ -450,7 +450,6 @@ namespace TheOtherRoles {
         }
     }
 
-    // ===== ATR-style mod settings via RolesSettingsMenu =====
 
     [HarmonyPatch(typeof(RolesSettingsMenu), nameof(RolesSettingsMenu.InitialSetup))]
     class RolesSettingsMenuInitialSetupPatch

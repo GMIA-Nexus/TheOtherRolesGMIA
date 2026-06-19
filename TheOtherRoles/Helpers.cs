@@ -1517,6 +1517,8 @@ namespace TheOtherRoles
             if (!source.Data.Role.IsImpostor && Ninja.isStealthed(target)) return true; // Hide Ninja nametags from non-impostors
             if (Sprinter.isSprinting(target) && source != target) return true; // Hide Sprinter nametags
             if (Fox.stealthed && target.isRole(RoleId.Fox) && source != target) return true; // Hide Fox nametags
+            if (Puppeteer.stealthed && target.isRole(RoleId.Puppeteer)) return true; // Hide Puppeteer nametags when stealthed
+            if (!Puppeteer.stealthed && target == Puppeteer.dummy) return true; // Hide dummy nametags when not stealthed
             if (source != target && Kataomoi.isStalking(target)) return true; // Hide Kataomoi nametags
             if (Patches.SurveillanceMinigamePatch.nightVisionIsActive) return true;
             else if (Assassin.players.Any(x => x.player == target && x.isInvisble)) return true;
@@ -2337,6 +2339,7 @@ namespace TheOtherRoles
                 || player.Object.isRole(RoleId.Fox)
                 || (player.Object.isRole(RoleId.Pelican) && Pelican.hasImpVision)
                 || (player.Object.isRole(RoleId.Yandere) && Yandere.hasImpVision)
+                || player.Object.isRole(RoleId.Puppeteer)
                 || (player.Object.isRole(RoleId.SchrodingersCat) && SchrodingersCat.hasTeam() && SchrodingersCat.team != SchrodingersCat.Team.Crewmate);
         }
         

@@ -112,6 +112,7 @@ namespace TheOtherRoles
         Noisemaker,
         Archaeologist,
         SchrodingersCat,
+        Puppeteer,
         Madmate,
         Crewmate,
         Impostor,

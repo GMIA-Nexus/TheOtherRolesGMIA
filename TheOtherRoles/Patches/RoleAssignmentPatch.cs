@@ -153,6 +153,7 @@ namespace TheOtherRoles.Patches {
             neutralSettings.Add((byte)RoleId.Pelican, CustomOptionHolder.pelicanSpawnRate.data);
             neutralSettings.Add((byte)RoleId.Yandere, CustomOptionHolder.yandereSpawnRate.data);
             neutralSettings.Add((byte)RoleId.Lawyer, CustomOptionHolder.lawyerSpawnRate.data);
+            neutralSettings.Add((byte)RoleId.Puppeteer, CustomOptionHolder.puppeteerSpawnRate.data);
 
             crewSettings.Add((byte)RoleId.Mayor, CustomOptionHolder.mayorSpawnRate.data);
             crewSettings.Add((byte)RoleId.Portalmaker, CustomOptionHolder.portalmakerSpawnRate.data);

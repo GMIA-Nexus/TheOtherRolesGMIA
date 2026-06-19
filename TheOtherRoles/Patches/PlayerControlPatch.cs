@@ -46,6 +46,14 @@ namespace TheOtherRoles.Patches {
             if (Kataomoi.exists && Kataomoi.target != null && Kataomoi.isStalking()) {
                 untargetablePlayers.AddRange(Kataomoi.allPlayers);
             }
+            if (Puppeteer.stealthed) {
+                foreach (var p in Puppeteer.allPlayers) {
+                    if (p != null && !p.Data.IsDead)
+                        untargetablePlayers.Add(p);
+                }
+            } else if (Puppeteer.dummy != null && !Puppeteer.dummy.Data.IsDead) {
+                untargetablePlayers.Add(Puppeteer.dummy);
+            }
 
             Vector2 truePosition = targetingPlayer.GetTruePosition();
             foreach (var playerInfo in GameData.Instance.AllPlayers.GetFastEnumerator())
@@ -795,6 +803,8 @@ namespace TheOtherRoles.Patches {
         {
             if ((player.isRole(RoleId.SchrodingersCat) && !SchrodingersCat.hasTeam() && !SchrodingersCat.isExiled) || Busker.players.Any(x => x.player == player && x.pseudocideFlag) || FreePlayGM.isFreePlayGM)
                 return false;
+            if (player == Puppeteer.dummy)
+                return false;
             if (TimeMaster.hasAlivePlayers && blockAssignRole && TimeMaster.reviveDuringReweind)
                 return false;
 
@@ -1003,6 +1013,12 @@ namespace TheOtherRoles.Patches {
                 if (PlayerControl.LocalPlayer == __instance && Helpers.CurrentMonth == 8 && Helpers.isFungle()) {
                     _ = new StaticAchievementToken("watermelon");
                 }
+            }
+
+            // Puppeteer dummy death handling
+            if (target == Puppeteer.dummy) {
+                target.Revive();
+                Puppeteer.OnDummyDeath(__instance);
             }
 
             // HideNSeek

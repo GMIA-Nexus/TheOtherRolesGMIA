@@ -129,6 +129,7 @@ namespace TheOtherRoles
         public static RoleInfo doomsayer = new("doomsayer", Doomsayer.color, RoleId.Doomsayer, true);
         public static RoleInfo pelican = new("pelican", Pelican.color, RoleId.Pelican, true);
         public static RoleInfo yandere = new("yandere", Yandere.color, RoleId.Yandere, true);
+        public static RoleInfo puppeteer = new("puppeteer", Puppeteer.color, RoleId.Puppeteer, true);
 
         public static RoleInfo hunter = new("hunter", Palette.ImpostorRed, RoleId.Impostor);
         public static RoleInfo hunted = new("hunted", Color.white, RoleId.Crewmate);
@@ -330,6 +331,7 @@ namespace TheOtherRoles
             doomsayer,
             pelican,
             yandere,
+            puppeteer,
             crewmate,
             mayor,
             portalmaker,
@@ -461,6 +463,7 @@ namespace TheOtherRoles
             if (p.isRole(RoleId.Jailor)) infos.Add(jailor);
             if (p.isRole(RoleId.Pelican)) infos.Add(pelican);
             if (p.isRole(RoleId.Yandere)) infos.Add(yandere);
+            if (p.isRole(RoleId.Puppeteer)) infos.Add(puppeteer);
             if (p.isRole(RoleId.FortuneTeller))
             {
                 if (PlayerControl.LocalPlayer.Data.IsDead || includeHidden)
