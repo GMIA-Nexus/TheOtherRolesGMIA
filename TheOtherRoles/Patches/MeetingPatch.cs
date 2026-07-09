@@ -1321,9 +1321,12 @@ namespace TheOtherRoles.Patches
                     }
                 }
 
+                bool blackmailed = Blackmailer.players.Any(x => x.player && x.blackmailed == PlayerControl.LocalPlayer);
                 // Blackmail target
-                if (Blackmailer.players.Any(x => x.player && x.blackmailed == PlayerControl.LocalPlayer) || Jailor.isJailed(PlayerControl.LocalPlayer.PlayerId)) {
+                if (blackmailed || Jailor.isJailed(PlayerControl.LocalPlayer.PlayerId)) {
                     Coroutines.Start(Helpers.BlackmailShhh());
+                    if (blackmailed) RoleHelpers.RoleMessage(RoleId.Blackmailer, "blackmailerBlockedNotification");
+                    if (Jailor.isJailed(PlayerControl.LocalPlayer.PlayerId)) RoleHelpers.RoleMessage(RoleId.Jailor, "jailorJailedNotification");
                 }
 
                 // Clear props here else something will get wrong

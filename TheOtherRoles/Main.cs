@@ -34,7 +34,7 @@ namespace TheOtherRoles
     {
         public const string Id = "me.eisbison.theotherroles";
         public const string VersionString = "1.3.7";
-        public const string SubVersionString = "-Frost";
+        public const string SubVersionString = "-Gale";
         public static uint betaDays = 0;  // amount of days for the build to be usable (0 for infinite!)
 
         public static Version Version = Version.Parse(VersionString);

@@ -67,7 +67,7 @@ namespace TheOtherRoles.Roles
                 PlayerControl.LocalPlayer.MyPhysics.RpcExitVent(Vent.currentVent.Id);
                 PlayerControl.LocalPlayer.MyPhysics.ExitAllVents();
 
-                Helpers.showFlash(color, message: ModTranslation.getString("securityGuardFlushNotification"), textColor: Color.white, textSprite: Illustrations.GetRoleIcon(RoleId.SecurityGuard).GetSprite());
+                Helpers.showFlash(color, message: ModTranslation.getString("securityGuardFlushNotification"), textColor: Color.white, textSprite: RoleHelpers.GetRoleIcon(RoleId.SecurityGuard).GetSprite());
             }
 
             if (isByMe) Coroutines.Start(SeeVenter());

@@ -22,12 +22,6 @@ namespace TheOtherRoles.Roles
             localArrows = [];
         }
 
-        public static void snitchMessage(string message)
-        {
-            var notify = Helpers.CreateAndShowNotification(ModTranslation.getString(message), UnityEngine.Color.white, new UnityEngine.Vector3(0f, 1f, -20f), spr: Illustrations.GetRoleIcon(RoleId.Snitch).GetSprite());
-            notify.AdjustNotification();
-        }
-
         public override void ResetRole(bool isShifted)
         {
             if (localArrows != null)

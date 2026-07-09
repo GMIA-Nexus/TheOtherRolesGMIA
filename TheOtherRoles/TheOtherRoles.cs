@@ -235,7 +235,7 @@ namespace TheOtherRoles
             }
         }
 
-        static internal class Illustrations
+        static internal class RoleHelpers
         {
             static private Dictionary<string, MetaContext.Image> illustrationCache = [];
             static private Dictionary<string, MetaContext.Image> roleIconCache = [];
@@ -257,6 +257,13 @@ namespace TheOtherRoles
             static public MetaContext.Image GetIllustration(RoleId roleId)  => GetImageInternal(roleId, "Illustration", "Assets/Sprites/Illustrations/", illustrationCache);
 
             static public MetaContext.Image GetRoleIcon(RoleId roleId) => GetImageInternal(roleId, "RoleIcon", "Assets/Sprites/RoleIcons/", roleIconCache);
+
+            static public LobbyNotificationMessage RoleMessage(RoleId roleId, string localizedText)
+            {
+                var text = Helpers.CreateAndShowNotification(ModTranslation.getString(localizedText), Color.white, new Vector3(0f, 1f, -20f), null, GetRoleIcon(roleId).GetSprite());
+                text.AdjustNotification();
+                return text;
+            }
         }
 
         public static void OnDeath(this PlayerControl player, PlayerControl killer)

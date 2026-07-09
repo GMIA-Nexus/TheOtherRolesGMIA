@@ -984,6 +984,8 @@ namespace TheOtherRoles.Patches {
                 else num = 1;
                 Diseased.active[__instance.PlayerId] = num;
 
+                RoleHelpers.RoleMessage(RoleId.Diseased, "diseasedKillNotification");
+
                 HudManagerStartPatch.jackalKillButton.MaxTimer *= Diseased.multiplier;
                 HudManagerStartPatch.sheriffKillButton.MaxTimer *= Diseased.multiplier;
                 HudManagerStartPatch.vampireKillButton.MaxTimer *= Diseased.multiplier;

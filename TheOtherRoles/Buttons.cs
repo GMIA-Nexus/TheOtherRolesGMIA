@@ -2893,8 +2893,7 @@ namespace TheOtherRoles
                     }
                     if (count == 0)
                     {
-                        var messageText = Helpers.CreateAndShowNotification(ModTranslation.getString("sherlockMessage1"), Color.white, new Vector3(0f, 1f, -20f), spr: Illustrations.GetRoleIcon(RoleId.Sherlock).GetSprite());
-                        messageText.AdjustNotification();
+                        RoleHelpers.RoleMessage(RoleId.Sherlock, "sherlockMessage1");
                     }
                     if (count >= 3)
                         _ = new StaticAchievementToken("sherlock.common1");
@@ -2972,6 +2971,9 @@ namespace TheOtherRoles
                 {
                     if (Helpers.checkSuspendAction(PlayerControl.LocalPlayer, Cupid.local.currentTarget)) return;
 
+                    var text  = Helpers.CreateAndShowNotification(string.Format(ModTranslation.getString("cupidLoversNotification"), Cupid.local.currentTarget?.Data?.PlayerName ?? ""), Color.white, new Vector3(0f, 1f, -20f), null, RoleHelpers.GetRoleIcon(RoleId.Cupid).GetSprite());
+                    text.AdjustNotification();
+
                     if (Cupid.local.lovers1 == null)
                     {
                         Cupid.local.lovers1 = Cupid.local.currentTarget;
@@ -3016,6 +3018,9 @@ namespace TheOtherRoles
                 {
                     if (Helpers.checkSuspendAction(PlayerControl.LocalPlayer, Cupid.local.currentTarget)) return;
                     Cupid.SetShielded.Invoke((Cupid.local.shieldTarget.PlayerId, PlayerControl.LocalPlayer.PlayerId));
+
+                    var text = Helpers.CreateAndShowNotification(string.Format(ModTranslation.getString("cupidSetShieldedNotification"), Cupid.local.currentTarget?.Data?.PlayerName ?? ""), Color.white, new Vector3(0f, 1f, -20f), null, RoleHelpers.GetRoleIcon(RoleId.Cupid).GetSprite());
+                    text.AdjustNotification();
                 },
                 () => { return Cupid.isShieldOn && PlayerControl.LocalPlayer.isRole(RoleId.Cupid) && !PlayerControl.LocalPlayer.Data.IsDead && Cupid.local.shielded == null; },
                 () => { return PlayerControl.LocalPlayer.CanMove && Cupid.local.shieldTarget != null; },
@@ -3036,6 +3041,9 @@ namespace TheOtherRoles
                     if (Helpers.checkSuspendAction(PlayerControl.LocalPlayer, Akujo.local.currentTarget)) return;
                     _ = new StaticAchievementToken("akujo.common2");
                     Akujo.SetHonmei.Invoke((PlayerControl.LocalPlayer.PlayerId, Akujo.local.currentTarget.PlayerId));
+
+                    var text = Helpers.CreateAndShowNotification(string.Format(ModTranslation.getString("akujoSetHonmeiNotification"), Akujo.local.currentTarget?.Data?.PlayerName ?? ""), Color.white, new Vector3(0f, 1f, -20f), null, RoleHelpers.GetRoleIcon(RoleId.Akujo).GetSprite());
+                    text.AdjustNotification();
                 },
                 () => { return PlayerControl.LocalPlayer.isRole(RoleId.Akujo) && !PlayerControl.LocalPlayer.Data.IsDead && Akujo.local.honmei == null && Akujo.local.cupidHonmei == null && Akujo.local.timeLeft > 0; },
                 () =>
@@ -3066,6 +3074,9 @@ namespace TheOtherRoles
                     if (Helpers.checkSuspendAction(PlayerControl.LocalPlayer, Akujo.local.currentTarget)) return;
                     _ = new StaticAchievementToken("akujo.common1");
                     Akujo.SetKeep.Invoke((PlayerControl.LocalPlayer.PlayerId, Akujo.local.currentTarget.PlayerId));
+
+                    var text = Helpers.CreateAndShowNotification(string.Format(ModTranslation.getString("akujoSetKeepNotification"), Akujo.local.currentTarget?.Data?.PlayerName ?? ""), Color.white, new Vector3(0f, 1f, -20f), null, RoleHelpers.GetRoleIcon(RoleId.Akujo).GetSprite());
+                    text.AdjustNotification();
                 },
                 () => { return PlayerControl.LocalPlayer.isRole(RoleId.Akujo) && !PlayerControl.LocalPlayer.Data.IsDead && Akujo.local.keepsLeft > 0 && Akujo.local.timeLeft > 0; },
                 () =>
@@ -4019,8 +4030,10 @@ namespace TheOtherRoles
                         Pursuer.local.blanks++;
                         pursuerButton.Timer = pursuerButton.MaxTimer;
                         SoundEffectsManager.play("pursuerBlank");
-                    }
 
+                        var text = Helpers.CreateAndShowNotification(string.Format(ModTranslation.getString("pursuerBlankNotification"), Pursuer.local.target?.Data?.PlayerName ?? ""), Color.white, new Vector3(0f, 1f, -20f), spr: RoleHelpers.GetRoleIcon(RoleId.Pursuer).GetSprite());
+                        text.AdjustNotification();
+                    }
                 },
                 () => { return PlayerControl.LocalPlayer.isRole(RoleId.Pursuer) && !PlayerControl.LocalPlayer.Data.IsDead && Pursuer.local.blanks < Pursuer.blanksNumber; },
                 () => {

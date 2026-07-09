@@ -649,7 +649,7 @@ namespace TheOtherRoles.Modules
 #endif
             }
 
-            return new VerticalContextsHolder(GUIAlignment.Left, list) { BackImage = RelatedRole.Any() ? TheOtherRoles.Illustrations.GetIllustration(RelatedRole.FirstOrDefault().roleId) : null, GrayoutedBackImage = !(IsCleared || !hiddenNotClearedAchievement) };
+            return new VerticalContextsHolder(GUIAlignment.Left, list) { BackImage = RelatedRole.Any() ? TheOtherRoles.RoleHelpers.GetIllustration(RelatedRole.FirstOrDefault().roleId) : null, GrayoutedBackImage = !(IsCleared || !hiddenNotClearedAchievement) };
         }
 
         public TextComponent GetTitleComponent(TextComponent hiddenComponent)

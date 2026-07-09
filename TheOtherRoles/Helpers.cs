@@ -869,7 +869,7 @@ namespace TheOtherRoles
             // Seer show flash and add dead player position
             if (Seer.exists && ((PlayerControl.LocalPlayer.isRole(RoleId.Seer) && PlayerControl.LocalPlayer != target) || shouldShowGhostInfo()) && Seer.livingPlayers.Count > 0 && Seer.mode <= 1)
             {
-                showFlash(new Color(42f / 255f, 187f / 255f, 245f / 255f), message: ModTranslation.getString("seerInfo"), textColor: Color.white, textSprite: Illustrations.GetRoleIcon(RoleId.Seer).GetSprite());
+                showFlash(new Color(42f / 255f, 187f / 255f, 245f / 255f), message: ModTranslation.getString("seerInfo"), textColor: Color.white, textSprite: RoleHelpers.GetRoleIcon(RoleId.Seer).GetSprite());
                 if (PlayerControl.LocalPlayer.isRole(RoleId.Seer))
                 {
                     _ = new StaticAchievementToken("seer.common1");

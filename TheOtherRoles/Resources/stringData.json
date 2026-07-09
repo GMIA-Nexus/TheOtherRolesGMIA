@@ -654,7 +654,7 @@
         "0": "<size=60%><color=#FCCE03FF>Special thanks to <color=#FFFFE0FF>Among us</color> & <color=#00FFFFFF>Fangkuai</color></size>",
         "11": "<size=60%><color=#FCCE03FF>\u30b9\u30da\u30b7\u30e3\u30eb\u30b5\u30f3\u30af\u30b9 <color=#FFFFE0FF>Among us</color> & <color=#00FFFFFF>Fangkuai</color></size>",
         "13": "<size=60%><color=#FCCE03FF>\u7279\u522b\u9e23\u8c22<color=#FFFFE0FF>Among us</color> & <color=#00FFFFFF>\u65b9\u5757</color></size>",
-        "14": "<size=60%> <color=#FCCE03FF>\u7279\u5225\u9cf4\u8b1d<color=#FFFFE0FF>Among us</color> & <color=#06FCC6FF>Sukuna</color></size>"
+        "14": "<size=60%> <color=#FCCE03FF>\u7279\u5225\u9cf4\u8b1d<color=#FFFFE0FF>Among us</color>  & <color=#00FFFFFF>Fangkuai</color></size>"
     },
     "mainMenuCredentials": {
         "0": "Modded by <color=#FCCE03FF>Eisbison</color>, <color=#FCCE03FF>Thunderstorm584</color>, <color=#FCCE03FF>EndOfFile</color>, <color=#FCCE03FF>Mall\u00f6ris</color> & <color=#FCCE03FF>Gendelo</color>\nDesign by <color=#FCCE03FF>Bavari</color>\nRebuild by <color=#FCCE03FF>Imp11</color>",
@@ -3179,6 +3179,11 @@
         "11": "\u8ffd\u8de1\u8005\u306e\u7a7a\u5305\u306e\u6570",
         "13": "\u8d77\u8bc9\u4eba\u62e5\u6709\u7a7a\u5305\u5f39\u6570\u91cf",
         "14": "\u8d77\u8a34\u4eba\u7a7a\u5305\u5f48\u6578\u91cf"
+    },
+    "pursuerBlankNotification": {
+        "0": "You have blanked {0}, and their next shot would fire blank.",
+        "13": "\u4f60\u5411{0}\u6295\u63b7\u4e86\u7a7a\u5305\u5f39, \u8be5\u73a9\u5bb6\u4e0b\u4e00\u6b21\u51fb\u6740\u5931\u6548\u3002",
+        "14": "\u4f60\u5411{0}\u6295\u64f2\u4e86\u7a7a\u5305\u5f48, \u8a72\u73a9\u5bb6\u4e0b\u4e00\u6b21\u64ca\u6bba\u5931\u6548\u3002"
     },
     "witch": {
         "0": "Witch",
@@ -6617,6 +6622,21 @@
         "13": "\u5269\u4f59\u65f6\u95f4\uff1a{0}",
         "14": "\u5269\u9918\u6642\u9593\uff1a{0}"
     },
+    "akujoChosenPartnerNotification": {
+        "0": "You have been chosen by the Akujo.",
+        "13": "\u4f60\u88ab\u9b45\u9b54\u9009\u62e9\u4e3a\u4e86\u4f34\u4fa3\u3002",
+        "14": "\u4f60\u88ab\u9b45\u9b54\u9078\u64c7\u70ba\u4e86\u4f34\u4fb6\u3002"
+    },
+    "akujoSetHonmeiNotification": {
+        "0": "You have chosen {0} as your True Love.",
+        "13": "\u4f60\u5c06{0}\u9009\u62e9\u4e3a\u771f\u7231\u3002",
+        "14": "\u4f60\u5c07{0}\u9078\u64c7\u70ba\u771f\u611b\u3002"
+    },
+    "akujoSetKeepNotification": {
+        "0": "You have chosen {0} as one of your Backups.",
+        "13": "\u4f60\u5c06{0}\u9009\u62e9\u4e3a\u4e00\u4e2a\u5907\u80ce\u3002",
+        "14": "\u4f60\u5c07{0}\u9078\u64c7\u70ba\u4e00\u500b\u5099\u80ce\u3002"
+    },
     "jekyllAndHyde": {
         "0": "Jekyll and Hyde",
         "11": "\u30b8\u30ad\u30eb\u3068\u30cf\u30a4\u30c9",
@@ -6719,6 +6739,11 @@
         "13": "\u4f20\u9001\u5e08\u53ef\u4f20\u9001\u6b21\u6570",
         "14": "\u50b3\u9001\u5e2b\u53ef\u50b3\u9001\u6b21\u6578"
     },
+    "teleporterNotification": {
+        "0": "Your position has been swapped by the Teleporter.",
+        "13": "\u4f60\u4e0e\u4e00\u540d\u73a9\u5bb6\u88ab\u4f20\u9001\u5e08\u4ea4\u6362\u4f4d\u7f6e\u3002",
+        "14": "\u4f60\u8207\u4e00\u540d\u73a9\u5bb6\u88ab\u50b3\u9001\u5e2b\u4ea4\u63db\u4f4d\u7f6e\u3002"
+    },
     "cupid": {
         "0": "Cupid",
         "11": "\u30ad\u30e5\u30fc\u30d4\u30c3\u30c9",
@@ -6748,6 +6773,21 @@
         "11": "\u30b7\u30fc\u30eb\u30c9\u3092\u6709\u52b9\u5316",
         "13": "\u5f00\u542f\u4e18\u6bd4\u7279\u66ff\u6b7b\u62a4\u76fe",
         "14": "\u958b\u555f\u4e18\u6bd4\u7279\u66ff\u6b7b\u8b77\u76fe"
+    },
+    "cupidCreateLoversNotification": {
+        "0": "You have been set as lovers by the Cupid.",
+        "13": "\u4f60\u88ab\u4e18\u6bd4\u7279\u9009\u4e3a\u604b\u4eba\u3002",
+        "14": "\u4f60\u88ab\u90b1\u6bd4\u7279\u9078\u70ba\u6200\u4eba\u3002"
+    },
+    "cupidLoversNotification": {
+        "0": "You have selected {0} as one of your lovers.",
+        "13": "\u4f60\u5c06{0}\u9009\u4e3a\u5176\u4e2d\u4e00\u540d\u604b\u4eba\u3002",
+        "14": "\u4f60\u5c07{0}\u9078\u70ba\u5176\u4e2d\u4e00\u540d\u6200\u4eba\u3002"
+    },
+    "cupidSetShieldNotification": {
+        "0": "You have set a shield upon {0}, and you will die for them.",
+        "13": "\u4f60\u4fdd\u62a4\u4e86{0}\u5e76\u5c06\u66ff\u8be5\u73a9\u5bb6\u800c\u6b7b\u3002",
+        "14": "\u4f60\u4fdd\u8b77\u4e86{0}\u4e26\u5c07\u66ff\u8a72\u73a9\u5bb6\u800c\u6b7b\u3002"
     },
     "blackmailer": {
         "0": "Blackmailer",
@@ -6788,6 +6828,11 @@
         "11": "\u8105\u8feb\u3055\u308c\u3066\u3044\u308b!",
         "13": "\u4f60\u88ab\u52d2\u7d22\u4e86\uff01",
         "14": "\u4f60\u88ab\u52d2\u7d22\u4e86\uff01"
+    },
+    "blackmailerBlockedNotification": {
+        "0": "You are blackmailed by the Blackmailer, thus cannot chat.",
+        "13": "\u4f60\u88ab\u52d2\u7d22\u8005\u7981\u8a00\u4e86, \u4e0d\u80fd\u5728\u4f1a\u8bae\u4e2d\u53d1\u8a00\u3002",
+        "14": "\u4f60\u88ab\u52d2\u7d22\u8005\u7981\u8a00\u4e86\uff0c\u4e0d\u80fd\u5728\u6703\u8b70\u4e2d\u767c\u8a00\u3002"
     },
     "fox": {
         "0": "Fox",
@@ -7528,6 +7573,26 @@
         "13": "\u76d1\u7981\u76ee\u6807",
         "14": "\u76e3\u7981\u76ee\u6a19"
     },
+    "jailorJailedNotification": {
+        "0": "You are jailed. Prove your innocence to the Jailor.",
+        "13": "\u4f60\u88ab\u76d1\u7981\u4e86\u3002\u5411\u5178\u72f1\u957f\u8bc1\u660e\u81ea\u5df1\u65e0\u8f9c\u3002",
+        "14": "\u4f60\u88ab\u76e3\u7981\u4e86\u3002\u5411\u5178\u7344\u9577\u8b49\u660e\u81ea\u5df1\u7121\u8f9c\u3002"
+    },
+    "jailorSuicideNotification": {
+        "0": "You have executed wrongly and have paid your life for it.",
+        "13": "\u4f60\u5904\u51b3\u9519\u8bef, \u5e76\u56e0\u6b64\u4ed8\u51fa\u4e86\u751f\u547d\u7684\u4ee3\u4ef7\u3002",
+        "14": "\u4f60\u8655\u6c7a\u932f\u8aa4\uff0c\u4e26\u56e0\u6b64\u4ed8\u51fa\u4e86\u751f\u547d\u7684\u4ee3\u50f9\u3002"
+    },
+    "jailorExecuteCrewNotification": {
+        "0": "You have executed wrongly, and you have lost the ability to jail.",
+        "13": "\u4f60\u5904\u51b3\u9519\u8bef, \u5e76\u5931\u53bb\u4e86\u76d1\u7981\u7684\u80fd\u529b\u3002",
+        "14": "\u4f60\u8655\u6c7a\u932f\u8aa4\uff0c\u4e26\u5931\u53bb\u4e86\u76e3\u7981\u7684\u80fd\u529b\u3002"
+    },
+    "jailorExecuteEvilNotification": {
+        "0": "You have executed correctly.",
+        "13": "\u4f60\u5904\u51b3\u6210\u529f\u3002",
+        "14": "\u4f60\u8655\u6c7a\u6210\u529f\u3002"
+    },
     "multitasker": {
         "0": "Multitasker",
         "13": "\u591a\u7ebf\u7a0b",
@@ -7572,6 +7637,11 @@
         "0": "Cooldown Multiplier",
         "13": "\u51f6\u624b\u51b7\u5374\u500d\u7387",
         "14": "\u5147\u624b\u51b7\u537b\u500d\u7387"
+    },
+    "diseasedKillNotification": {
+        "0": "You've killed the diseased and your cooldown gets multiplied.",
+        "13": "\u4f60\u51fb\u6740\u4e86\u75c5\u4eba, \u51fb\u6740\u51b7\u5374\u589e\u52a0\u3002",
+        "14": "\u4f60\u64ca\u6bba\u4e86\u75c5\u4eba, \u64ca\u6bba\u51b7\u537b\u589e\u52a0\u3002"
     },
     "pelican": {
         "0": "Pelican",

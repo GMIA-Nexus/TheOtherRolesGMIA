@@ -96,7 +96,7 @@ namespace TheOtherRoles.Roles
                 }
 
                 if (PlayerControl.LocalPlayer.isRole(RoleId.MimicA) && !PlayerControl.LocalPlayer.Data.IsDead)
-                    Helpers.showFlash(new Color(42f / 255f, 187f / 255f, 245f / 255f), message: ModTranslation.getString("mimicAInfo"));
+                    Helpers.showFlash(new Color(42f / 255f, 187f / 255f, 245f / 255f), message: ModTranslation.getString("mimicAInfo"), textSprite: RoleHelpers.GetRoleIcon(RoleId.MimicK).GetSprite());
             }
         }
 

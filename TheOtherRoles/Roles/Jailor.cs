@@ -74,6 +74,7 @@ public class Jailor : RoleBase<Jailor>
         if (jailorPlayer == null || jailor == null || player == null) return;
         if (jailorPlayer.Data.IsDead || player.Data.IsDead) return;
 
+        string msg = "";
         if (message.suicide)
         {
             if (suicidesIfFalseJail)
@@ -86,6 +87,10 @@ public class Jailor : RoleBase<Jailor>
                 }
                 jailorPlayer.Exiled();
                 GameHistory.overrideDeathReasonAndKiller(jailorPlayer, DeadPlayer.CustomDeathReason.Suicide);
+                msg = "jailorSuicideNotification";
+            }
+            else {
+                msg = "jailorExecuteCrewNotification";
             }
             jailor.remainingUses = 0;
         }
@@ -97,6 +102,7 @@ public class Jailor : RoleBase<Jailor>
                 jailor.acTokenChallenge.Value++;
             }
             if (player.isRole(RoleId.NekoKabocha)) NekoKabocha.getRole(player).meetingKiller = jailorPlayer;
+            msg = "jailorExecuteEvilNotification";
         }
 
         if (!message.suicide || targetDiesAsWell)
@@ -107,6 +113,9 @@ public class Jailor : RoleBase<Jailor>
         }
 
         jailor.jailTarget = null;
+
+        if (PlayerControl.LocalPlayer == jailorPlayer)
+            RoleHelpers.RoleMessage(RoleId.Jailor, msg);
     });
 
     public static bool isJailed(byte playerId)

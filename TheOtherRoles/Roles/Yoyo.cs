@@ -94,7 +94,7 @@ namespace TheOtherRoles.Roles
             FastDestroyableSingleton<HudManager>.Instance.StartCoroutine(Effects.Lerp(blackoutDuration + 0.5f, new System.Action<float>((p) => { if (p == 1f || MeetingHud.Instance) yoyo.blackout.Remove(player); })));
             if (PlayerControl.LocalPlayer == player)
             {
-                Helpers.flashScreen(new(0, 0, 0), 0.1f, 0.4f, 1f, blackoutDuration, ModTranslation.getString("yoyoBlackoutHint"), textColor: Color.white, Illustrations.GetRoleIcon(RoleId.Yoyo).GetSprite());
+                Helpers.flashScreen(new(0, 0, 0), 0.1f, 0.4f, 1f, blackoutDuration, ModTranslation.getString("yoyoBlackoutHint"), textColor: Color.white, RoleHelpers.GetRoleIcon(RoleId.Yoyo).GetSprite());
             }
             else if (PlayerControl.LocalPlayer == yoyoPlayer)
                 new StaticAchievementToken("yoyo.challenge2");

@@ -134,15 +134,15 @@ namespace TheOtherRoles {
                     if (taskTotal - taskComplete == Snitch.taskCountForReveal)
                     {
                         if (PlayerControl.LocalPlayer == pc) {
-                            Snitch.snitchMessage("snitchTaskLeftNotification");
+                            TheOtherRoles.RoleHelpers.RoleMessage(RoleId.Snitch, "snitchTaskLeftNotification");
                         }
                         else if (PlayerControl.LocalPlayer.Data.Role.IsImpostor || (Snitch.IsEvilRole(PlayerControl.LocalPlayer) && Snitch.includeTeamEvil)) {
-                            Snitch.snitchMessage("snitchAlmostFinishNotification");
+                            TheOtherRoles.RoleHelpers.RoleMessage(RoleId.Snitch, "snitchAlmostFinishNotification");
                         }
                     }
                     if (PlayerControl.LocalPlayer == pc && taskTotal == taskComplete)
                     {
-                        Snitch.snitchMessage("snitchAllTasksCompleteNotification");
+                        TheOtherRoles.RoleHelpers.RoleMessage(RoleId.Snitch, "snitchAllTasksCompleteNotification");
                     }
                 }
             }

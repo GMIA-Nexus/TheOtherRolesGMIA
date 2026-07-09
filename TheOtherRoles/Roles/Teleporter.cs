@@ -54,6 +54,8 @@ namespace TheOtherRoles.Roles
             {
                 Helpers.showFlash(color);
                 if (Minigame.Instance) Minigame.Instance.Close();
+                var messageText = Helpers.CreateAndShowNotification(ModTranslation.getString("teleporterNotification"), Color.white, new Vector3(0f, 1f, -20f), spr: RoleHelpers.GetRoleIcon(RoleId.Teleporter).GetSprite());
+                messageText.AdjustNotification();
             }
         });
 

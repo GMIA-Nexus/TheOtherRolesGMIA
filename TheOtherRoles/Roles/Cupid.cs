@@ -116,6 +116,10 @@ namespace TheOtherRoles.Roles
             breakLovers(p1, p2);
             breakLovers(p2, p1);
             Lovers.addCouple(p1, p2);
+            if (PlayerControl.LocalPlayer == p1 || PlayerControl.LocalPlayer == p2)
+            {
+                RoleHelpers.RoleMessage(RoleId.Cupid, "cupidCreateLoversNotification");
+            }
         });
 
         public static bool checkShieldActive(PlayerControl target)

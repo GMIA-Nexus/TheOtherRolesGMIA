@@ -46,6 +46,8 @@ namespace TheOtherRoles.Roles
                 breakLovers(target);
                 akujoRole.honmei = target;
             }
+
+            if (PlayerControl.LocalPlayer == target) RoleHelpers.RoleMessage(RoleId.Akujo, "akujoChosenPartnerNotification");
         });
 
         public static RemoteProcess<(byte akujoId, byte targetId)> SetKeep = new("AkujoSetKeep", (message, _) =>
@@ -59,6 +61,8 @@ namespace TheOtherRoles.Roles
                 breakLovers(target);
                 akujoRole.keeps.Add(target);
             }
+
+            if (PlayerControl.LocalPlayer == target) RoleHelpers.RoleMessage(RoleId.Akujo, "akujoChosenPartnerNotification");
         });
 
         public static RemoteProcess<byte> Suicide = RemotePrimitiveProcess.OfByte("AkujoSuicide", (message, _) =>
