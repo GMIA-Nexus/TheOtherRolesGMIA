@@ -98,6 +98,7 @@ namespace TheOtherRoles
             Moriarty.clearAndReload();
             Akujo.clearAndReload();
             PlagueDoctor.clearAndReload();
+            Puppeteer.clearAndReload();
             JekyllAndHyde.clearAndReload();
             Cupid.clearAndReload();
             Fox.clearAndReload();
@@ -209,6 +210,7 @@ namespace TheOtherRoles
                 { RoleId.Pursuer, typeof(RoleBase<Pursuer>) },
                 { RoleId.SchrodingersCat, typeof(RoleBase<SchrodingersCat>) },
                 { RoleId.Kataomoi, typeof(RoleBase<Kataomoi>) },
+                { RoleId.Puppeteer, typeof(RoleBase<Puppeteer>) },
                 { RoleId.JekyllAndHyde, typeof(RoleBase<JekyllAndHyde>) },
                 { RoleId.Shifter, typeof(RoleBase<Shifter>) },
                 { RoleId.Moriarty, typeof(RoleBase<Moriarty>) },

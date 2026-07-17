@@ -144,6 +144,7 @@ namespace TheOtherRoles.Patches {
             neutralSettings.Add((byte)RoleId.Moriarty, CustomOptionHolder.moriartySpawnRate.data);
             neutralSettings.Add((byte)RoleId.Akujo, CustomOptionHolder.akujoSpawnRate.data);
             neutralSettings.Add((byte)RoleId.PlagueDoctor, CustomOptionHolder.plagueDoctorSpawnRate.data);
+            neutralSettings.Add((byte)RoleId.Puppeteer, CustomOptionHolder.puppeteerSpawnRate.data);
             neutralSettings.Add((byte)RoleId.JekyllAndHyde, CustomOptionHolder.jekyllAndHydeSpawnRate.data);
             neutralSettings.Add((byte)RoleId.Cupid, CustomOptionHolder.cupidSpawnRate.data);
             neutralSettings.Add((byte)RoleId.Fox, CustomOptionHolder.foxSpawnRate.data);

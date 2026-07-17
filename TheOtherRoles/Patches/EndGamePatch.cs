@@ -31,7 +31,8 @@ namespace TheOtherRoles.Patches {
         KataomoiWin = 22,
         DoomsayerWin = 23,
         PelicanWin = 24,
-        YandereWin = 25
+        YandereWin = 25,
+        PuppeteerWin = 26
         //ProsecutorWin = 16
     }
 
@@ -58,6 +59,7 @@ namespace TheOtherRoles.Patches {
         DoomsayerWin,
         PelicanWin,
         YandereWin,
+        PuppeteerWin,
         EveryoneDied
         //ProsecutorWin
     }
@@ -184,9 +186,11 @@ namespace TheOtherRoles.Patches {
                 .. Fox.allPlayers,
                 .. Immoralist.allPlayers,
                 .. Pelican.allPlayers,
-                .. Yandere.allPlayers
+                .. Yandere.allPlayers,
+                .. Puppeteer.allPlayers
             ];
             if (Shifter.isNeutral) notWinners.AddRange(Shifter.allPlayers);
+            if (Puppeteer.dummy != null) notWinners.Add(Puppeteer.dummy);
 
             List<CachedPlayerData> winnersToRemove = [];
             foreach (CachedPlayerData winner in EndGameResult.CachedWinners.GetFastEnumerator()) {
@@ -216,6 +220,7 @@ namespace TheOtherRoles.Patches {
             bool pelicanWin = Pelican.exists && gameOverReason == (GameOverReason)CustomGameOverReason.PelicanWin;
             bool yandereWin = Yandere.exists && gameOverReason == (GameOverReason)CustomGameOverReason.YandereWin;
             bool foxWin = Fox.exists && gameOverReason == (GameOverReason)CustomGameOverReason.FoxWin;
+            bool puppeteerWin = Puppeteer.exists && gameOverReason == (GameOverReason)CustomGameOverReason.PuppeteerWin;
             bool jekyllAndHydeWin = JekyllAndHyde.exists && gameOverReason == (GameOverReason)CustomGameOverReason.JekyllAndHydeWin;
             bool everyoneDead = AdditionalTempData.playerRoles.All(x => !x.IsAlive);
             //bool prosecutorWin = Lawyer.lawyer != null && gameOverReason == (GameOverReason)CustomGameOverReason.ProsecutorWin;
@@ -489,6 +494,18 @@ namespace TheOtherRoles.Patches {
                 {
                     foreach (var p in SchrodingersCat.allPlayers)
                         EndGameResult.CachedWinners.Add(new CachedPlayerData(p.Data));
+                }
+            }
+
+            else if (puppeteerWin)
+            {
+                EndGameResult.CachedWinners = new Il2CppSystem.Collections.Generic.List<CachedPlayerData>();
+                AdditionalTempData.winCondition = WinCondition.PuppeteerWin;
+
+                foreach (var puppeteer in Puppeteer.allPlayers)
+                {
+                    CachedPlayerData wpd = new(puppeteer.Data);
+                    EndGameResult.CachedWinners.Add(wpd);
                 }
             }
 
@@ -810,6 +827,12 @@ namespace TheOtherRoles.Patches {
                 textRenderer.color = Yandere.color;
                 __instance.BackgroundBar.material.SetColor("_Color", Yandere.color);
             }
+            else if (AdditionalTempData.winCondition == WinCondition.PuppeteerWin)
+            {
+                nonModTranslationText = "puppeteerWin";
+                textRenderer.color = Puppeteer.color;
+                __instance.BackgroundBar.material.SetColor("_Color", Puppeteer.color);
+            }
             else if (AdditionalTempData.winCondition == WinCondition.JekyllAndHydeWin)
             {
                 nonModTranslationText = "jekyllAndHydeWin";
@@ -1023,6 +1046,7 @@ namespace TheOtherRoles.Patches {
             if (CheckAndEndGameForVultureWin(__instance)) return false;
             if (CheckAndEndGameForDoomsayerWin(__instance)) return false;
             if (CheckAndEndGameForPlagueDoctorWin(__instance)) return false;
+            if (CheckAndEndGameForPuppeteerWin(__instance)) return false;
             if (CheckAndEndGameForJekyllAndHydeWin(__instance, statistics)) return false;
             if (CheckAndEndGameForMoriartyWin(__instance, statistics)) return false;
             if (CheckAndEndGameForYandereWin(__instance, statistics)) return false;
@@ -1121,6 +1145,16 @@ namespace TheOtherRoles.Patches {
             if (PlagueDoctor.triggerPlagueDoctorWin)
             {
                 GameManager.Instance.RpcEndGame((GameOverReason)CustomGameOverReason.PlagueDoctorWin, false);
+                return true;
+            }
+            return false;
+        }
+
+        private static bool CheckAndEndGameForPuppeteerWin(ShipStatus __instance)
+        {
+            if (Puppeteer.triggerPuppeteerWin)
+            {
+                GameManager.Instance.RpcEndGame((GameOverReason)CustomGameOverReason.PuppeteerWin, false);
                 return true;
             }
             return false;

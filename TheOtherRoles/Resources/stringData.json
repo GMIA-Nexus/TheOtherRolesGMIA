@@ -647,7 +647,7 @@
     "fullCredentials": {
         "0": "<size=60%>Modded by <color=#FCCE03FF>Eisbison</color>, <color=#FCCE03FF>EndOfFile</color>\n<color=#FCCE03FF>Thunderstorm584</color>, <color=#FCCE03FF>Mall\u00f6ris</color> & <color=#FCCE03FF>Gendelo</color>\nDesign by <color=#FCCE03FF>Bavari</color>\nRebuild by <color=#FCCE03FF>Imp11</color></size>",
         "11": "<size=60%>mod\u88fd\u4f5c <color=#FCCE03FF>Eisbison</color>, <color=#FCCE03FF>Thunderstorm584</color>, <color=#FCCE03FF>EndOfFile</color>, <color=#FCCE03FF>Mall\u00f6ris</color> & <color=#FCCE03FF>Gendelo</color>\n\u30c7\u30b6\u30a4\u30f3 <color=#FCCE03FF>Bavari</color> \n\u30ea\u30d3\u30eb\u30c9 <color=#FCCE03FF>Imp11</color></size>",
-        "13": "<size=60%>\u7531<color=#FCCE03FF>Eisbison</color>, <color=#FCCE03FF>EndOfFile</color>\n<color=#FCCE03FF>Thunderstorm584</color>, <color=#FCCE03FF>Mall\u00f6ris</color> & <color=#FCCE03FF>Gendelo</color>\u5236\u4f5c\u6a21\u7ec4\u672c\u5bb6\n\u7531<color=#FCCE03FF>Bavari</color>\u5236\u4f5c\u6309\u94ae\n\u7531<color=#FCCE03FF>Imp11</color>\u91cd\u5236",
+        "13": "<size=60%>\u7531<color=#FCCE03FF>Eisbison</color>, <color=#FCCE03FF>EndOfFile</color>\n<color=#FCCE03FF>Thunderstorm584</color>, <color=#FCCE03FF>Mall\u00f6ris</color> & <color=#FCCE03FF>Gendelo</color>\u5236\u4f5c\u6a21\u7ec4\u672c\u5bb6\n\u7531<color=#FCCE03FF>Bavari</color>\u5236\u4f5c\u6309\u94ae\n\u7531<color=#FCCE03FF>Imp11</color>\u91cd\u5236</color>",
         "14": "<size=60%>\u7531<color=#FCCE03FF>Eisbison</color>, <color=#FCCE03FF>EndOfFile</color>\n<color=#FCCE03FF>Thunderstorm584</color>, <color=#FCCE03FF>Mall\u00f6ris</color> & <color=#FCCE03FF>Gendelo</color>\u5236\u4f5c\u6a21\u7d44\u672c\u5bb6\n\u7531<color=#FCCE03FF>Bavari</color>\u5236\u4f5c\u6309\u9215\n\u7531<color=#FCCE03FF>Imp11</color>\u91cd\u5236\n\u7531<color=#5A5AAD>\u8ce3\u87d1\u8782NK</color>/<color=#00FF5656>VK</color>\u7e41\u4e2d\u7ffb\u8b6f</size>"
     },
     "contributorsCredentials": {
@@ -4390,6 +4390,11 @@
         "13": "\u9ed1\u6b7b\u75c5",
         "14": "\u9ed1\u6b7b\u75c5"
     },
+    "puppeteerWin": {
+        "0": "Puppeteer Win",
+        "11": "\u4eba\u5f62\u9063\u3044 \u52dd\u5229",
+        "13": "\u4f60\u4eec\u90fd\u662f\u6211\u7684\u5080\u5121"
+    },
     "jekyllAndHydeWin": {
         "0": "Jekyll and Hyde Wins",
         "11": "\u30b8\u30ad\u30eb\u3068\u30cf\u30a4\u30c9\u52dd\u5229",
@@ -4505,6 +4510,11 @@
         "11": "\u30da\u30b9\u30c8\u533b\u5e2b {0} \u52dd\u5229",
         "13": "\u75ab\u533b {0} \u80dc\u5229",
         "14": "\u75ab\u91ab {0} \u52dd\u5229"
+    },
+    "puppeteerWinExtra": {
+        "0": "Puppeteer {0} Win",
+        "11": "\u4eba\u5f62\u9063\u3044 \u52dd\u5229",
+        "13": "\u4f60\u4eec\u90fd\u662f\u6211\u7684\u5080\u5121"
     },
     "jekyllAndHydeWinExtra": {
         "0": "Jekyll and Hyde {0} Win",
@@ -6636,6 +6646,46 @@
         "0": "You have chosen {0} as one of your Backups.",
         "13": "\u4f60\u5c06{0}\u9009\u62e9\u4e3a\u4e00\u4e2a\u5907\u80ce\u3002",
         "14": "\u4f60\u5c07{0}\u9078\u64c7\u70ba\u4e00\u500b\u5099\u80ce\u3002"
+    },
+    "puppeteer": {
+        "0": "Puppeteer",
+        "11": "\u4eba\u5f62\u9063\u3044",
+        "13": "\u5080\u5121\u5e08"
+    },
+    "puppeteerShortDesc": {
+        "0": "Control dummy and get killed",
+        "11": "\u30c0\u30df\u30fc\u3092\u64cd\u4f5c\u3057\u3066\u6bba\u3055\u308c\u308d",
+        "13": "\u64cd\u63a7\u5080\u5121\u5f15\u8bf1\u522b\u4eba\u51fb\u6740\u6765\u83b7\u5f97\u80dc\u5229"
+    },
+    "puppeteerIntroDesc": {
+        "0": "Control dummy and get killed",
+        "11": "\u30c0\u30df\u30fc\u3092\u64cd\u4f5c\u3057\u3066\u6bba\u3055\u308c\u308d",
+        "13": "\u64cd\u63a7\u5080\u5121\u5f15\u8bf1\u522b\u4eba\u51fb\u6740\u6765\u83b7\u5f97\u80dc\u5229"
+    },
+    "puppeteerNumKills": {
+        "0": "Number of points is required to win",
+        "11": "\u52dd\u5229\u306b\u5fc5\u8981\u306a\u30dd\u30a4\u30f3\u30c8\u6570",
+        "13": "\u5080\u5121\u5e08\u80dc\u5229\u6240\u9700\u5f97\u5206"
+    },
+    "puppeteerSampleDuration": {
+        "0": "Sample Duration",
+        "11": "\u30b5\u30f3\u30d7\u30eb\u53d6\u5f97\u306b\u5fc5\u8981\u306a\u6642\u9593",
+        "13": "\u53d6\u6837\u6240\u9700\u65f6\u95f4"
+    },
+    "puppeteerCanControlDummyEvenIfDead": {
+        "0": "Can control dummy even if dead",
+        "11": "\u6b7b\u4ea1\u5f8c\u306b\u3082\u4eba\u5f62\u3092\u64cd\u4f5c\u3067\u304d\u308b",
+        "13": "\u5080\u5121\u5e08\u6b7b\u4ea1\u4e5f\u53ef\u4ee5\u7ee7\u7eed\u4f7f\u7528\u6280\u80fd"
+    },
+    "puppeteerPenaltyOnDeath": {
+        "0": "Number of points is lost on death",
+        "11": "\u6b7b\u4ea1\u6642\u306b\u5931\u3046\u30dd\u30a4\u30f3\u30c8",
+        "13": "\u5080\u5121\u5e08\u6b7b\u4ea1\u5931\u53bb\u7684\u5206\u6570"
+    },
+    "puppeteerLosesSenriganOnDeath": {
+        "0": "Loses Far Sight on death",
+        "11": "\u6b7b\u4ea1\u6642\u306b\u5343\u91cc\u773c\u3092\u5931\u3046",
+        "13": "\u5080\u5121\u5e08\u6b7b\u4ea1\u540e\u64cd\u63a7\u5080\u5121\u65f6\u65e0\u6cd5\u83b7\u5f97\u5343\u91cc\u773c\u89c6\u91ce"
     },
     "jekyllAndHyde": {
         "0": "Jekyll and Hyde",
@@ -8951,6 +9001,11 @@
         "0": "<br>The Akujo knows the roles of the True Love and the Backup.",
         "13": "<br>\u9b45\u9b54\u53ef\u770b\u5230\u771f\u7231\u4e0e\u5907\u80ce\u7684\u804c\u4e1a\u3002",
         "14": "<br>\u9b45\u9b54\u672c\u4eba\u77e5\u9053\u771f\u611b\u548c\u5099\u4efd\u7684\u8077\u696d\u3002"
+    },
+    "puppeteerFullDesc": {
+        "0": "Puppeteer is neutral role has unique win condition.\nHe gets enough points that set in settings to win\n\nHe can get point by two way.(2. is only allowed if puppeteer is alive)\n1. Get killed his dummy doll(sampled player becomes dead if puppeteer is alive)\n2. Get exiled player who are sampled(except jackal and impostor)\n\nPuppeteer can take sample from player and create dummy doll from sample\nPuppeteer can control dummy doll with far sight\nWhile controlling dummy doll, Puppeteer becomes invisible\nDummy doll can be controlled by WASD and E/SPACE(lift up/down,open doors)\n\nLaughing sound will be played on meeting start if sampled player is killed and Puppeteer is alive\nPuppeteer can see arrows that point to killable players.",
+        "11": "\u4eba\u5f62\u9063\u3044\u306f\u56fa\u6709\u306e\u52dd\u5229\u6761\u4ef6\u3092\u6301\u3064\u7b2c3\u9663\u55b6\n\u8a2d\u5b9a\u3055\u308c\u305f\u5fc5\u8981\u306a\u30dd\u30a4\u30f3\u30c8\u3092\u6e80\u305f\u3059\u3068\u52dd\u5229\u3059\u308b\u3053\u3068\u304c\u3067\u304d\u308b\n\n\u4eba\u5f62\u9063\u3044\u306f2\u3064\u306e\u65b9\u6cd5\u3067\u30dd\u30a4\u30f3\u30c8\u3092\u7372\u5f97\u3059\u308b\u3053\u3068\u304c\u3067\u304d\u308b\uff082. \u306f\u4eba\u5f62\u9063\u3044\u751f\u5b58\u6642\u306e\u307f\u6709\u52b9)\n1. \u751f\u6210\u3057\u305f\u30c0\u30df\u30fc\u4eba\u5f62\u3092\u30ad\u30eb\u3055\u305b\u308b(\u4eba\u5f62\u9063\u3044\u304c\u751f\u5b58\u3057\u3066\u3044\u308b\u30b5\u30f3\u30d7\u30eb\u5143\u306e\u30d7\u30ec\u30a4\u30e4\u30fc\u304c\u6b7b\u4ea1\u3059\u308b)\n2. \u30b5\u30f3\u30d7\u30eb\u3092\u53d6\u5f97\u3057\u305f\u30d7\u30ec\u30a4\u30e4\u30fc\u3092\u8ffd\u653e\u3059\u308b(\u30b5\u30f3\u30d7\u30eb\u5143\u304c\u30b8\u30e3\u30c3\u30ab\u30eb\u3001\u30a4\u30f3\u30dd\u30b9\u30bf\u30fc\u306e\u5834\u5408\u306f\u5bfe\u8c61\u5916)\n\n\u4eba\u5f62\u9063\u3044\u306f\u30b5\u30f3\u30d7\u30eb\u3092\u4efb\u610f\u306e\u30d7\u30ec\u30a4\u30e4\u30fc\u304b\u3089\u53d6\u5f97\u3057\u3066\u30c0\u30df\u30fc\u4eba\u5f62\u3092\u4f5c\u308b\u3053\u3068\u304c\u3067\u304d\u308b\n\u30c0\u30df\u30fc\u4eba\u5f62\u30b3\u30f3\u30c8\u30ed\u30fc\u30eb\u6642\u306f\u5343\u91cc\u773c\u72b6\u614b\u306b\u306a\u308b\n\u30c0\u30df\u30fc\u4eba\u5f62\u64cd\u4f5c\u4e2d\u306f\u4eba\u5f62\u9063\u3044\u306f\u900f\u660e\u306b\u306a\u308b\n\u30c0\u30df\u30fc\u4eba\u5f62\u306f WASD\u3068E/SPACE(\u6607\u964d\u30fb\u30c9\u30a2\u958b\u3051\uff09\u3067\u884c\u3046\u3053\u3068\u304c\u3067\u304d\u308b\n\n\u30b5\u30f3\u30d7\u30eb\u5143\u306e\u30d7\u30ec\u30a4\u30e4\u30fc\u30ad\u30eb\u304c\u767a\u751f\u3057\u305f\u5834\u5408\u304b\u3064\u4eba\u5f62\u9063\u3044\u304c\u751f\u5b58\u3057\u3066\u3044\u308b\u5834\u5408\u306f\u30df\u30fc\u30c6\u30a3\u30f3\u30b0\u958b\u59cb\u6642\u306b\u7b11\u3044\u58f0\u304c\u6d41\u308c\u308b\n\u4eba\u5f62\u9063\u3044\u306f\u30ad\u30eb\u80fd\u529b\u3092\u6301\u3064\u30d7\u30ec\u30a4\u30e4\u30fc\u306e\u4f4d\u7f6e\u3092\u793a\u3059\u77e2\u5370\u3092\u898b\u308b\u3053\u3068\u304c\u3067\u304d\u308b",
+        "13": "\u5080\u5121\u5e08\u5c5e\u4e8e\u72ec\u7acb\u9635\u8425\uff0c\u80dc\u5229\u6761\u4ef6\u4e0e\u80fd\u529b\u6781\u5176\u7279\u6b8a\u3002\n\u5080\u5121\u5e08\u53ef\u4ee5\u5bf9\u5176\u4ed6\u73a9\u5bb6\u8fdb\u884c\u53d6\u6837\uff0c\u53d6\u6837\u540e\u5080\u5121\u5e08\u53ef\u4ee5\u521b\u9020\u4e00\u4e2a\u88ab\u53d6\u6837\u73a9\u5bb6\u7684\u5080\u5121\u4eba\u5076\u3002\n\u5080\u5121\u4eba\u5076\u4e0e\u88ab\u53d6\u6837\u73a9\u5bb6\u5916\u8c8c\u76f8\u540c\u3002\u5080\u5121\u5e08\u53ef\u4ee5\u4ee5\u5343\u91cc\u773c\u89c6\u91ce\uff08\u4e0a\u5e1d\u89c6\u89d2\uff09\u64cd\u63a7\u5080\u5121\u884c\u52a8\u3002\n\u64cd\u63a7\u5080\u5121\u4eba\u5076\u884c\u52a8\u65f6\u5080\u5121\u5e08\u5c06\u9690\u5f62\u3002\n\u63a7\u5236\u5080\u5121\u4eba\u5076\u9700\u8981\u4f7f\u7528\u952e\u76d8WASD\u79fb\u52a8\uff0cE/\u7a7a\u683c\u952e\u5f00\u95e8\u6216\u4f7f\u7528\u7a7a\u8247\u68af\u5b50\u3002\n\u5080\u5121\u5e08\u9700\u8981\u901a\u8fc7\u4ee5\u4e0b\u4e24\u79cd\u65b9\u6cd5\u5f97\u5206\uff0c\u8fbe\u5230\u8bbe\u7f6e\u4e2d\u6240\u9700\u70b9\u6570\u5373\u53ef\u72ec\u81ea\u83b7\u80dc\u3002\n1.\u64cd\u63a7\u5080\u5121\u4eba\u5076\u6765\u8ba9\u5080\u5121\u4eba\u5076\u4ee5\u4efb\u4f55\u65b9\u5f0f\u88ab\u51fb\u6740\n*\u5080\u5121\u5e08\u5b58\u6d3b\u7684\u60c5\u51b5\u4e0b\uff0c\u8fd9\u79cd\u65b9\u5f0f\u5f97\u5206\u5c06\u5bfc\u81f4\u88ab\u53d6\u6837\u73a9\u5bb6\u6b7b\u4ea1\n2.\u8ba9\u88ab\u53d6\u6837\u7684\u73a9\u5bb6\u5728\u4f1a\u8bae\u4e2d\u88ab\u653e\u9010\n*\u8fd9\u79cd\u65b9\u5f0f\u53ea\u5728\u5080\u5121\u5e08\u5b58\u6d3b\u4e14\u88ab\u53d6\u6837\u73a9\u5bb6\u4e0d\u4e3a\u8c7a\u72fc\u6216\u5185\u9b3c\u9635\u8425\u73a9\u5bb6\u65f6\u624d\u751f\u6548\n\u5080\u5121\u5e08\u5b58\u6d3b\uff0c\u88ab\u5080\u5121\u5e08\u53d6\u6837\u7684\u73a9\u5bb6\u5728\u884c\u52a8\u9636\u6bb5\u6b7b\u4ea1\u7684\u4e0b\u4e00\u4e2a\u4f1a\u8bae\u9636\u6bb5\u5f00\u59cb\u65f6\uff0c\u6240\u6709\u73a9\u5bb6\u5c06\u542c\u5230\u7b11\u58f0\u3002\n\u5080\u5121\u5e08\u53ef\u4ee5\u770b\u5230\u6307\u5411\u6240\u6709\u62e5\u6709\u51fb\u6740\u80fd\u529b\u7684\u73a9\u5bb6\u7684\u82e5\u5e72\u7bad\u5934\u3002"
     },
     "jekyllAndHydeFullDesc": {
         "0": "The Jekyll and Hyde is a Neutral Role that has two characteristics.\nThe Jekyll is a characteristic that cannot kill and can be killed by any existing killer.\nThe Hyde characteristic can kill and will commit suicide after a configurable amount of time.\nThe Jekyll and Hyde swaps when a player is killed.\neg: Jekyll and Hyde kills a player, turns into a Jekyll that cannot kill.",

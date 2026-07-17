@@ -120,6 +120,7 @@ namespace TheOtherRoles
         public static RoleInfo moriarty = new("moriarty", Moriarty.color, RoleId.Moriarty, true);
         public static RoleInfo akujo = new("akujo", Akujo.color, RoleId.Akujo, true);
         public static RoleInfo plagueDoctor = new("plagueDoctor", PlagueDoctor.color, RoleId.PlagueDoctor, true);
+        public static RoleInfo puppeteer = new("puppeteer", Puppeteer.color, RoleId.Puppeteer, true);
         public static RoleInfo jekyllAndHyde = new("jekyllAndHyde", JekyllAndHyde.color, RoleId.JekyllAndHyde, true);
         public static RoleInfo cupid = new("cupid", Cupid.color, RoleId.Cupid, true);
         public static RoleInfo fox = new("fox", Fox.color, RoleId.Fox, true);
@@ -322,6 +323,7 @@ namespace TheOtherRoles
             fox,
             immoralist,
             akujo,
+            puppeteer,
             jekyllAndHyde,
             moriarty,
             cupid,
@@ -443,6 +445,7 @@ namespace TheOtherRoles
             if (p.isRole(RoleId.Sprinter)) infos.Add(sprinter);
             if (Yasuna.isYasuna(p.PlayerId)) infos.Add(p.Data.Role.IsImpostor ? evilYasuna : yasuna);
             if (p.isRole(RoleId.Moriarty)) infos.Add(moriarty);
+            if (p.isRole(RoleId.Puppeteer)) infos.Add(puppeteer);
             if (p.isRole(RoleId.JekyllAndHyde)) infos.Add(jekyllAndHyde);
             if (p.isRole(RoleId.Akujo)) infos.Add(akujo);
             if (p.isRole(RoleId.Teleporter)) infos.Add(teleporter);

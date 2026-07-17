@@ -15,6 +15,7 @@ using BepInEx.Unity.IL2CPP.Utils;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using HarmonyLib;
 using Hazel;
+using MonoMod.Cil;
 using Reactor.Utilities.Extensions;
 using TheOtherRoles.CustomGameModes;
 using TheOtherRoles.MetaContext;
@@ -629,10 +630,25 @@ namespace TheOtherRoles
         }
 
         public static bool hasFakeTasks(this PlayerControl player) {
-            return player.isRole(RoleId.Jester) || player.isRole(RoleId.Jackal) || player.isRole(RoleId.Sidekick) || player.isRole(RoleId.Arsonist) || player.isRole(RoleId.Vulture) || player.isRole(RoleId.Opportunist) || player.isRole(RoleId.Moriarty)
-                || (Madmate.madmate.Any(x => x.PlayerId == player.PlayerId) && !Madmate.hasTasks) ||
-                (CreatedMadmate.createdMadmate.Any(x => x.PlayerId == player.PlayerId) && !CreatedMadmate.hasTasks) || player.isRole(RoleId.Akujo) || player.isRole(RoleId.Kataomoi) || player.isRole(RoleId.PlagueDoctor) || player.isRole(RoleId.Cupid) || (player.isRole(RoleId.SchrodingersCat) && !SchrodingersCat.hideRole)
-                || player.isRole(RoleId.Immoralist) || player.isRole(RoleId.Doomsayer) || player.isRole(RoleId.Pelican) || player.isRole(RoleId.Yandere);
+            return
+                player.isRole(RoleId.Jester)
+                || player.isRole(RoleId.Jackal)
+                || player.isRole(RoleId.Sidekick)
+                || player.isRole(RoleId.Arsonist)
+                || player.isRole(RoleId.Vulture)
+                || player.isRole(RoleId.Opportunist)
+                || player.isRole(RoleId.Moriarty)
+                || (Madmate.madmate.Any(x => x.PlayerId == player.PlayerId) && !Madmate.hasTasks)
+                ||(CreatedMadmate.createdMadmate.Any(x => x.PlayerId == player.PlayerId) && !CreatedMadmate.hasTasks)
+                || player.isRole(RoleId.Akujo)
+                || player.isRole(RoleId.Kataomoi)
+                || player.isRole(RoleId.PlagueDoctor)
+                || player.isRole(RoleId.Cupid)
+                || (player.isRole(RoleId.SchrodingersCat) && !SchrodingersCat.hideRole)
+                || player.isRole(RoleId.Immoralist)
+                || player.isRole(RoleId.Doomsayer)
+                || player.isRole(RoleId.Pelican)
+                || player.isRole(RoleId.Yandere);
         }
 
         public static bool canBeErased(this PlayerControl player) {
@@ -644,8 +660,15 @@ namespace TheOtherRoles
                 && ClientOption.GetValue(ClientOption.ClientOptionType.SpoilerAfterDeath) == 1) || AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Ended;
         }
 
-        public static bool shouldClearTask(this PlayerControl target) => (target.hasFakeTasks() || target.isRole(RoleId.Thief) || (target.isRole(RoleId.Shifter) && Shifter.isNeutral) || (target.isRole(RoleId.TaskMaster) && target.PlayerId == PlayerControl.LocalPlayer.PlayerId && TaskMaster.isTaskComplete)
-                || Madmate.madmate.Any(x => x.PlayerId == target.PlayerId) || CreatedMadmate.createdMadmate.Any(x => x.PlayerId == target.PlayerId) || target.isRole(RoleId.JekyllAndHyde) || target.isRole(RoleId.Fox)) && !FreePlayGM.isFreePlayGM;
+        public static bool shouldClearTask(this PlayerControl target) =>
+            (target.hasFakeTasks()
+            || target.isRole(RoleId.Thief)
+            || (target.isRole(RoleId.Shifter) && Shifter.isNeutral)
+            || (target.isRole(RoleId.TaskMaster) && target.PlayerId == PlayerControl.LocalPlayer.PlayerId && TaskMaster.isTaskComplete)
+            || Madmate.madmate.Any(x => x.PlayerId == target.PlayerId)
+            || CreatedMadmate.createdMadmate.Any(x => x.PlayerId == target.PlayerId)
+            || target.isRole(RoleId.JekyllAndHyde)
+            || target.isRole(RoleId.Fox)) && !FreePlayGM.isFreePlayGM;
 
         public static void clearAllTasks(this PlayerControl player) {
             if (player == null) return;
@@ -1517,6 +1540,8 @@ namespace TheOtherRoles
             if (!source.Data.Role.IsImpostor && Ninja.isStealthed(target)) return true; // Hide Ninja nametags from non-impostors
             if (Sprinter.isSprinting(target) && source != target) return true; // Hide Sprinter nametags
             if (Fox.stealthed && target.isRole(RoleId.Fox) && source != target) return true; // Hide Fox nametags
+            if (Puppeteer.stealthed && target.isRole(RoleId.Puppeteer)) return true; // Hide Puppeteer nametags when stealthed
+            if (!Puppeteer.stealthed && target == Puppeteer.dummy) return true; // Hide dummy nametags when not stealthed
             if (source != target && Kataomoi.isStalking(target)) return true; // Hide Kataomoi nametags
             if (Patches.SurveillanceMinigamePatch.nightVisionIsActive) return true;
             else if (Assassin.players.Any(x => x.player == target && x.isInvisble)) return true;
@@ -2237,6 +2262,7 @@ namespace TheOtherRoles
                 !player.isRole(RoleId.Pursuer) &&
                 !player.isRole(RoleId.Opportunist) &&
                 !player.isRole(RoleId.Akujo) &&
+                !player.isRole(RoleId.Puppeteer) &&
                 !player.isRole(RoleId.PlagueDoctor) &&
                 !player.isRole(RoleId.Cupid) &&
                 !(player.isRole(RoleId.SchrodingersCat) && !SchrodingersCat.hasTeam()));
@@ -2332,6 +2358,7 @@ namespace TheOtherRoles
                 || (player.Object.isRole(RoleId.Thief) && Thief.hasImpostorVision)
                 || (Madmate.madmate.Any(x => x.PlayerId == player.PlayerId) && Madmate.hasImpostorVision)
                 || (CreatedMadmate.createdMadmate.Any(x => x.PlayerId == player.PlayerId) && CreatedMadmate.hasImpostorVision)
+                || player.Object.isRole(RoleId.Puppeteer)
                 || player.Object.isRole(RoleId.Moriarty)
                 || JekyllAndHyde.players.Any(x => x.player && x.player.PlayerId == player.PlayerId && !x.isJekyll())
                 || player.Object.isRole(RoleId.Fox)

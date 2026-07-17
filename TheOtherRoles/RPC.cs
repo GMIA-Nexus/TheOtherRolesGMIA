@@ -84,6 +84,7 @@ namespace TheOtherRoles
         Akujo,
         Cupid,
         JekyllAndHyde,
+        Puppeteer,
         Fox,
         Immoralist,
         Witch,
