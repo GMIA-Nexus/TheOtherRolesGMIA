@@ -635,6 +635,7 @@ namespace TheOtherRoles {
         public static CustomOption airshipOptimize;
         public static CustomOption airshipAdditionalSpawn;
         public static CustomOption fungleElectrical;
+        public static CustomOption cleanedBodyShowAsMissing;
         public static CustomOption randomGameStartPosition;
         public static CustomOption activateProps;
         public static CustomOption numAccelTraps;
@@ -1411,6 +1412,7 @@ namespace TheOtherRoles {
             airshipOptimize = CustomOption.Create(6072, Types.General, "airshipOptimize", false);
             airshipAdditionalSpawn = CustomOption.Create(6073, Types.General, "airshipAdditionalSpawn", false);
             fungleElectrical = CustomOption.Create(6074, Types.General, "fungleElectrical", false);
+            cleanedBodyShowAsMissing = CustomOption.Create(6075, Types.General, "cleanedBodyShowAsMissing", true);
             randomGameStartPosition = CustomOption.Create(6071, Types.General, "randomGameStartPosition", false);
 
             camsNightVision = CustomOption.Create(11, Types.General, "camsNightVision", false, null, true, heading: "headingNightVision");

@@ -6,6 +6,7 @@ using System.Text;
 using AmongUs.Data;
 using AmongUs.GameOptions;
 using BepInEx.Configuration;
+using Epic.OnlineServices.RTC;
 using HarmonyLib;
 using Hazel;
 using Il2CppSystem.Linq;
@@ -18,6 +19,13 @@ using UnityEngine;
 using static TheOtherRoles.CustomOption;
 
 namespace TheOtherRoles {
+    public class OptionGroup
+    {
+        public CustomOptionType GroupType;
+        public CategoryHeaderMasked Header;
+        public List<CustomOption> Options;
+    }
+
     public class CustomOption {
         public enum CustomOptionType {
             General,
@@ -31,6 +39,7 @@ namespace TheOtherRoles {
         }
 
         public static List<CustomOption> options = new();
+        public static List<OptionGroup> optionGroups = new();
         public static int preset = 0;
         public static ConfigEntry<string> vanillaSettings;
 
@@ -113,20 +122,6 @@ namespace TheOtherRoles {
                 if (option.optionBehaviour != null && option.optionBehaviour is StringOption stringOption) {
                     stringOption.oldValue = stringOption.Value = option.selection;
                     stringOption.ValueText.text = option.getString();
-                }
-            }
-
-            // make sure to reload all tabs, even the ones in the background, because they might have changed when the preset was switched!
-            if (AmongUsClient.Instance?.AmHost == true)
-            {
-                foreach (var entry in GameOptionsMenuStartPatch.currentGOMs)
-                {
-                    CustomOptionType optionType = (CustomOptionType)entry.Key;
-                    GameOptionsMenu gom = entry.Value;
-                    if (gom != null)
-                    {
-                        GameOptionsMenuStartPatch.updateGameOptionsMenu(optionType, gom);
-                    }
                 }
             }
         }
@@ -294,17 +289,6 @@ namespace TheOtherRoles {
                 switchPreset(selection);
                 ShareOptionSelections();// Share all selections
             }
-
-            if (AmongUsClient.Instance?.AmHost == true)
-            {
-                var currentTab = GameOptionsMenuStartPatch.currentTabs.FirstOrDefault(x => x.active).GetComponent<GameOptionsMenu>();
-                if (currentTab != null)
-                {
-                    var optionType = options.First(x => x.optionBehaviour == currentTab.Children[0]).type;
-                    GameOptionsMenuStartPatch.updateGameOptionsMenu(optionType, currentTab);
-                }
-
-            }
         }
 
         public static byte[] serializeOptions() {
@@ -376,24 +360,6 @@ namespace TheOtherRoles {
                 string torSettings = settingsSplit[1];
                 string vanillaSettingsSub = settingsSplit[2];
                 torOptionsFine = deserializeOptions(Convert.FromBase64String(torSettings));
-
-                try
-                {
-                    if (AmongUsClient.Instance?.AmHost == true)
-                    {
-                        foreach (var entry in GameOptionsMenuStartPatch.currentGOMs)
-                        {
-                            CustomOptionType optionType = (CustomOptionType)entry.Key;
-                            GameOptionsMenu gom = entry.Value;
-                            if (gom != null)
-                            {
-                                GameOptionsMenuStartPatch.updateGameOptionsMenu(optionType, gom);
-                            }
-                        }
-                    }
-                }
-                catch
-                { }
 
                 ShareOptionSelections();
                 if (TheOtherRolesPlugin.Version > versionInfo && versionInfo < Version.Parse("1.2.7"))
@@ -834,6 +800,36 @@ namespace TheOtherRoles {
         }
     }
 
+    [HarmonyPatch(typeof(GameOptionsMenu), nameof(GameOptionsMenu.Update))]
+    class GameOptionsUpdatePatch
+    {
+        public static void Postfix(GameOptionsMenu __instance)
+        {
+            var num = 1.5f;
+            List<OptionGroup> filteredGroups = [];
+            if (__instance.name is "TORSettings")
+                filteredGroups = [.. optionGroups.Where(x => x.GroupType == CustomOptionType.General)];
+            else if (__instance.name is "GuesserSettings")
+                filteredGroups = [.. optionGroups.Where(x => x.GroupType == CustomOptionType.Guesser)];
+            else if (__instance.name is "ImpostorSettings")
+                filteredGroups = [.. optionGroups.Where(x => x.GroupType == CustomOptionType.Impostor)];
+            else if (__instance.name is "NeutralSettings")
+                filteredGroups = [.. optionGroups.Where(x => x.GroupType == CustomOptionType.Neutral)];
+            else if (__instance.name is "CrewmateSettings")
+                filteredGroups = [.. optionGroups.Where(x => x.GroupType == CustomOptionType.Crewmate)];
+            else if (__instance.name is "ModifierSettings")
+                filteredGroups = [.. optionGroups.Where(x => x.GroupType == CustomOptionType.Modifier)];
+            else if (__instance.name is "HideNSeekMain")
+                filteredGroups = [.. optionGroups.Where(x => x.GroupType == CustomOptionType.HideNSeekMain)];
+            else if (__instance.name is "HideNSeekRoles")
+                filteredGroups = [.. optionGroups.Where(x => x.GroupType == CustomOptionType.HideNSeekRoles)];
+
+            foreach (var group in filteredGroups) GameOptionsMenuStartPatch.UpdateGroup(group, ref num);
+
+            __instance.scrollBar.SetYBoundsMax(-num - 1.65f);
+        }
+    }
+
     class CreateGameOptionsTORBehaviour : MonoBehaviour
     {
         static CreateGameOptionsTORBehaviour() => ClassInjector.RegisterTypeInIl2Cpp<CreateGameOptionsTORBehaviour>();
@@ -1236,9 +1232,14 @@ namespace TheOtherRoles {
                     categoryHeaderMasked.transform.GetChild(0).GetComponent<SpriteRenderer>().color = option.getColor();
                     categoryHeaderMasked.transform.GetChild(1).GetComponent<SpriteRenderer>().color = option.getColor();
                     num -= 0.63f;
+                    optionGroups.Add(new OptionGroup
+                    {
+                        GroupType = option.type,
+                        Header = categoryHeaderMasked,
+                        Options = []
+                    });
                 }
-                else if (!ShouldBeEnabled(option)) continue;  // Hides options, for which the parent is disabled!
-                else if (option.parent != null && option.parent.selection != 0 && option.invertedParent) continue;
+
                 OptionBehaviour optionBehaviour = UnityEngine.Object.Instantiate<StringOption>(menu.stringOptionOrigin, Vector3.zero, Quaternion.identity, menu.settingsContainer);
                 optionBehaviour.transform.localPosition = new Vector3(0.952f, num, -2f);
                 optionBehaviour.SetClickMask(menu.ButtonClickMask);
@@ -1269,7 +1270,8 @@ namespace TheOtherRoles {
                 stringOption.Value = stringOption.oldValue = option.selection;
                 stringOption.ValueText.text = option.getString();
                 option.optionBehaviour = stringOption;
-
+                
+                optionGroups.LastOrDefault().Options.Add(option);
                 menu.Children.Add(optionBehaviour);
                 num -= 0.45f;
                 menu.scrollBar.SetYBoundsMax(-num - 1.65f);
@@ -1282,6 +1284,33 @@ namespace TheOtherRoles {
                 {
                     optionBehaviour.SetAsPlayer();
                 }
+            }
+        }
+
+        public static void UpdateGroup(OptionGroup group, ref float num)
+        {
+            if (group.Options.Count == 0 || group.Header is null) return;
+            group.Header.gameObject.SetActive(true);
+            group.Header.transform.localScale = Vector3.one * 0.63f;
+            group.Header.transform.localPosition = new Vector3(-0.903f, num, -2f);
+
+            num -= 0.58f;
+
+            foreach (var opt in group.Options)
+            {
+                var newOpt = opt.optionBehaviour;
+
+                if (newOpt is null) continue;
+
+                if (!ShouldBeEnabled(opt) || (opt.parent != null && opt.parent.selection != 0 && opt.invertedParent))
+                {
+                    newOpt.gameObject.SetActive(false);
+                    continue;
+                }
+
+                newOpt.gameObject.SetActive(true);
+                newOpt.transform.localPosition = new Vector3(0.952f, num, -2f);
+                num -= 0.45f;
             }
         }
 

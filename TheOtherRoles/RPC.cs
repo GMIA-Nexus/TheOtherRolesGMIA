@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Threading.Channels;
-using AmongUs.Data;
 using AmongUs.GameOptions;
 using HarmonyLib;
 using Hazel;
@@ -17,7 +15,6 @@ using TheOtherRoles.Patches;
 using TheOtherRoles.Roles;
 using TheOtherRoles.Utilities;
 using UnityEngine;
-using static Il2CppMono.Security.X509.X520;
 using static TheOtherRoles.GameHistory;
 using static TheOtherRoles.HudManagerStartPatch;
 using static TheOtherRoles.TheOtherRoles;
@@ -682,6 +679,7 @@ namespace TheOtherRoles
             CustomNormalPlayerTask.reset();
             Shrine.reset();
             RolloverMessage.Initialize();
+            VitalsStatePatch.ClearMissingPlayers();
             Antique.clearAllAntiques();
             clearAndReloadMapOptions();
             clearAndReloadRoles();
@@ -954,6 +952,8 @@ namespace TheOtherRoles
                         vulture.triggerVultureWin = true;
                     }
                 }
+                if (cleanedBodyShowAsMissing)
+                    VitalsStatePatch.AddMissingPlayer(player.Data);
             });
 
         public static RemoteProcess<byte> RpcRevive = RemotePrimitiveProcess.OfByte("ModRpcRevive", (message, _) =>
@@ -969,6 +969,7 @@ namespace TheOtherRoles
                     UnityEngine.Object.Destroy(array[i].gameObject);
                 }
             }
+            VitalsStatePatch.RemoveMissingPlayer(player.Data);
         });
 
         public static void timeMasterRewindTime(byte playerId) {

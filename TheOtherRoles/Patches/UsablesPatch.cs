@@ -437,6 +437,10 @@ namespace TheOtherRoles.Patches {
                             v.Cardio.gameObject.SetActive(true);
                         }
                     }
+                    else if (myInfo.state == VitalsState.Missing)
+                    {
+                        v.SetMissing();
+                    }
                     else
                     {
                         if (v.IsDiscon || v.IsDead)

@@ -457,6 +457,14 @@ namespace TheOtherRoles
             }
         }
 
+        public static void SetMissing(this VitalsPanel panel)
+        {
+            panel.IsDead = true;
+            panel.IsDiscon = false;
+            panel.Background.sprite = VitalsStatePatch.MissBackground.GetSprite();
+            panel.Cardio.gameObject.SetActive(false);
+        }
+
         public static bool isRole(this PlayerControl player, RoleId role)
         {
             foreach (var t in RoleData.allRoleIds)

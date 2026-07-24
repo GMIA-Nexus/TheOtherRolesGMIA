@@ -158,7 +158,7 @@ namespace TheOtherRoles.Patches {
                     // Revive local player
                     if (TimeMaster.exists && TimeMaster.reviveDuringReweind && PlayerControl.LocalPlayer.Data.IsDead)
                     {
-                        DeadPlayer deadPlayer = deadPlayers.Where(x => x.player == PlayerControl.LocalPlayer).FirstOrDefault();
+                        DeadPlayer deadPlayer = deadPlayers.FirstOrDefault(x => x.player == PlayerControl.LocalPlayer);
                         if (deadPlayer != null && next.Item3 < deadPlayer.timeOfDeath)
                             RPCProcedure.RpcRevive.Invoke(PlayerControl.LocalPlayer.PlayerId);
                     }

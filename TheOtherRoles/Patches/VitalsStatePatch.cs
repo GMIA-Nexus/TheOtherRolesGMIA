@@ -14,11 +14,13 @@ namespace TheOtherRoles.Patches
         Disconnected,
         Alive,
         Dead,
+        Missing
     }
     public record FakeVitals(FakeVitalsParam[] Players);
 
     public class VitalsStatePatch
     {
+        static public MetaContext.Image MissBackground = MetaContext.SpriteLoader.FromResource("TheOtherRoles.Resources.VitalBgMissing.png", 100f);
         static public FakeVitals VitalsFromActuals
         {
             get
@@ -31,10 +33,32 @@ namespace TheOtherRoles.Patches
                     if (p.IsDead)
                         state = deadBodies.Any(d => d.ParentId == p.PlayerId) ? VitalsState.Dead : VitalsState.Disconnected;
 
+                    if (MissingPlayers.Any(x => x.PlayerId == p.PlayerId))
+                        state = VitalsState.Missing;
+
                     param.Add(new(p.PlayerId, state));
                 }
                 return new(param.ToArray());
             }
+        }
+
+        internal static List<NetworkedPlayerInfo> MissingPlayers = [];
+
+        public static void AddMissingPlayer(NetworkedPlayerInfo player)
+        {
+            MissingPlayers.Add(player);
+            TheOtherRolesPlugin.Logger.LogMessage($"Player {player.PlayerId} is now marked as missing.");
+        }
+
+        public static void RemoveMissingPlayer(NetworkedPlayerInfo player)
+        {
+            MissingPlayers.Remove(player);
+            TheOtherRolesPlugin.Logger.LogMessage($"Player {player.PlayerId} is no longer marked as missing.");
+        }
+
+        public static void ClearMissingPlayers()
+        {
+            MissingPlayers.Clear();
         }
     }
 }

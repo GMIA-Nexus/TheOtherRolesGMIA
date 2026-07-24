@@ -11,6 +11,7 @@ namespace TheOtherRoles{
         public static bool allowParallelMedBayScans = false;
         public static bool enableHorseMode = false;
         public static bool shieldFirstKill = false;
+        public static bool cleanedBodyShowAsMissing = true;
         public static CustomGamemodes gameMode = CustomGamemodes.Classic;
 
         // Updating values
@@ -33,6 +34,7 @@ namespace TheOtherRoles{
             hidePlayerNames = CustomOptionHolder.hidePlayerNames.getBool();
             allowParallelMedBayScans = CustomOptionHolder.allowParallelMedBayScans.getBool();
             shieldFirstKill = CustomOptionHolder.shieldFirstKill.getBool();
+            cleanedBodyShowAsMissing = CustomOptionHolder.cleanedBodyShowAsMissing.getBool();
             firstKillPlayer = null;
         }
 

@@ -1285,6 +1285,9 @@ namespace TheOtherRoles.Patches
                 // Save real tasks
                 MapBehaviourPatch.shareRealTasks();
 
+                // Remove all missing players
+                VitalsStatePatch.ClearMissingPlayers();
+
                 // Medium meeting start time
                 Medium.meetingStartTime = DateTime.UtcNow;
                 // Mini

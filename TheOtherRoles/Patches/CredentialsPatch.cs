@@ -14,12 +14,10 @@ using UnityEngine.Networking;
 namespace TheOtherRoles.Patches {
     [HarmonyPatch]
     public static class CredentialsPatch {
-        public static string fullCredentialsVersion = $"<size=130%>{Helpers.GradientColorText("FFD700", "FF0000", $"TheOtherRoles GM IA")}</size>" + $" v{TheOtherRolesPlugin.Version.ToString() + (TheOtherRolesPlugin.betaDays > 0 ? "-BETA" : "")}";
-        /*  public static string fullCredentialsVersion = 
-  $@"<size=130%><color=#ff351f>TheOtherRoles GM IA</color></size> v{TheOtherRolesPlugin.Version.ToString() + (TheOtherRolesPlugin.betaDays>0 ? "-BETA": "")}"; */
+        public static string fullCredentialsVersion = $"<size=130%>{Helpers.GradientColorText("FFD700", "FF0000", $"TheOtherRoles GM IA")}</size>" + $" v{TheOtherRolesPlugin.Version.ToString() + TheOtherRolesPlugin.SubVersionString + (TheOtherRolesPlugin.betaDays > 0 ? "-BETA" : "")}";
         public static string fullCredentials = "fullCredentials";
 
-    public static string mainMenuCredentials = "mainMenuCredentials";
+        public static string mainMenuCredentials = "mainMenuCredentials";
 
         public static string contributorsCredentials = "contributorsCredentials";
 
