@@ -216,7 +216,7 @@ namespace TheOtherRoles.CustomGameModes
                     }
                     else
                     {
-                        revealRenderer[pc.PlayerId].gameObject.Destroy();
+                        UnityEngine.Object.Destroy(revealRenderer[pc.PlayerId].gameObject);
                         isCurrentlyRevealed.Remove(pc.PlayerId);
                         revealRenderer.Remove(pc.PlayerId);
                         poolablePlayer.gameObject.SetActive(true);

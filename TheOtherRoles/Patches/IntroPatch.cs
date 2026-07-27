@@ -1,12 +1,14 @@
 using HarmonyLib;
 using System;
 using System.Reflection;
+using System.IO;
 using static TheOtherRoles.TheOtherRoles;
 using UnityEngine;
 using UnityEngine.Video;
 using System.Collections.Generic;
 using System.Linq;
 using Hazel;
+using Reactor.Utilities.Extensions;
 using TheOtherRoles.Utilities;
 using TheOtherRoles.CustomGameModes;
 using TheOtherRoles.Objects;
@@ -173,7 +175,7 @@ namespace TheOtherRoles.Patches
                 var assembly = Assembly.GetExecutingAssembly();
                 var resourceBundle = assembly.GetManifestResourceStream("TheOtherRoles.Resources.IntroAnimation.intro");
                 var assetBundle = AssetBundle.LoadFromMemory(resourceBundle.ReadFully());
-                var introVid = assetBundle.LoadAsset<VideoClip>("Assets/Video/intro.webm");
+                var introVid = assetBundle.LoadAsset("Assets/Video/intro.webm").Cast<VideoClip>();
                 var camera = GameObject.Find("Main Camera");
                 var videoPlayer = camera.AddComponent<VideoPlayer>();
                 videoPlayer.playOnAwake = false;
@@ -191,7 +193,7 @@ namespace TheOtherRoles.Patches
                         RPCProcedure.PropHuntStartTimer.Invoke(false);
                         PlayerControl.LocalPlayer.moveable = true;
                         HudManager.Instance.FullScreen.enabled = false;
-                        videoPlayer.Destroy();
+                        UnityEngine.Object.Destroy(videoPlayer);
                         assetBundle.Unload(false);
                     } else {
                         HudManager.Instance.FullScreen.enabled = true;
