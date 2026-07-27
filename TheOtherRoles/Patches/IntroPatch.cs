@@ -1,7 +1,9 @@
 using HarmonyLib;
 using System;
+using System.Reflection;
 using static TheOtherRoles.TheOtherRoles;
 using UnityEngine;
+using UnityEngine.Video;
 using System.Collections.Generic;
 using System.Linq;
 using Hazel;
@@ -167,12 +169,30 @@ namespace TheOtherRoles.Patches
                 }
                 RPCProcedure.PropHuntStartTimer.Invoke(true);
 
-                // Full screen overlay during blackout
-                FastDestroyableSingleton<HudManager>.Instance.StartCoroutine(Effects.Lerp(PropHuntGM.initialBlackoutTime, new Action<float>((p) => {
+                // Play intro video during blackout
+                var assembly = Assembly.GetExecutingAssembly();
+                var resourceBundle = assembly.GetManifestResourceStream("TheOtherRoles.Resources.IntroAnimation.intro");
+                var assetBundle = AssetBundle.LoadFromMemory(resourceBundle.ReadFully());
+                var introVid = assetBundle.LoadAsset<VideoClip>("Assets/Video/intro.webm");
+                var camera = GameObject.Find("Main Camera");
+                var videoPlayer = camera.AddComponent<VideoPlayer>();
+                videoPlayer.playOnAwake = false;
+                videoPlayer.renderMode = VideoRenderMode.CameraNearPlane;
+                videoPlayer.targetCameraAlpha = 1F;
+                videoPlayer.source = VideoSource.VideoClip;
+                videoPlayer.clip = introVid;
+                videoPlayer.aspectRatio = VideoAspectRatio.FitVertically;
+                videoPlayer.frame = (21 - (int)PropHuntGM.initialBlackoutTime) * 25;
+                videoPlayer.isLooping = false;
+                videoPlayer.Play();
+
+                FastDestroyableSingleton<HudManager>.Instance.StartCoroutine(Effects.Lerp(PropHuntGM.initialBlackoutTime + 10f / 25, new Action<float>((p) => {
                     if (p == 1f) {
                         RPCProcedure.PropHuntStartTimer.Invoke(false);
                         PlayerControl.LocalPlayer.moveable = true;
                         HudManager.Instance.FullScreen.enabled = false;
+                        videoPlayer.Destroy();
+                        assetBundle.Unload(false);
                     } else {
                         HudManager.Instance.FullScreen.enabled = true;
                         HudManager.Instance.FullScreen.gameObject.SetActive(true);
@@ -185,7 +205,7 @@ namespace TheOtherRoles.Patches
 
                 GameOptionsManager.Instance.currentNormalGameOptions.ImpostorLightMod = CustomOptionHolder.propHunterVision.getFloat();
                 GameOptionsManager.Instance.currentNormalGameOptions.CrewLightMod = CustomOptionHolder.propVision.getFloat();
-                GameOptionsManager.Instance.currentNormalGameOptions.KillCooldown = CustomOptionHolder.propHuntKillCooldown.getFloat();
+                GameOptionsManager.Instance.currentNormalGameOptions.KillCooldown = CustomOptionHolder.hunterHitCooldown.getFloat();
             }
         }
     }
