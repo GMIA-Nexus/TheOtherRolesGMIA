@@ -1934,40 +1934,52 @@ namespace TheOtherRoles
             new GuesserGM(target);
         }
 
-        public static void shareTimer(float punish) {
-            HideNSeek.timer -= punish;
-        }
+        // PropHunt Game Mode RPCs
 
-        public static void huntedShield(byte playerId) {
-            if (!Hunted.timeshieldActive.Contains(playerId)) Hunted.timeshieldActive.Add(playerId);
-            FastDestroyableSingleton<HudManager>.Instance.StartCoroutine(Effects.Lerp(Hunted.shieldDuration, new Action<float>((p) => {
-                if (p == 1f) Hunted.timeshieldActive.Remove(playerId);
-            })));
-        }
-
-        public static void huntedRewindTime(byte playerId) {
-            Hunted.timeshieldActive.Remove(playerId); // Shield is no longer active when rewinding
-            SoundEffectsManager.stop("timemasterShield");  // Shield sound stopped when rewinding
-            if (playerId == PlayerControl.LocalPlayer.PlayerId) {
-                resetHuntedRewindButton();
+        public static RemoteProcess<bool> PropHuntStartTimer = new("PropHuntStartTimer", (message, _) =>
+        {
+            if (message)
+            {
+                PropHuntGM.blackOutTimer = PropHuntGM.initialBlackoutTime;
+                PropHuntGM.transformLayers();
             }
-            FastDestroyableSingleton<HudManager>.Instance.FullScreen.color = new Color(0f, 0.5f, 0.8f, 0.3f);
-            FastDestroyableSingleton<HudManager>.Instance.FullScreen.enabled = true;
-            FastDestroyableSingleton<HudManager>.Instance.FullScreen.gameObject.SetActive(true);
-            FastDestroyableSingleton<HudManager>.Instance.StartCoroutine(Effects.Lerp(Hunted.shieldRewindTime, new Action<float>((p) => {
-                if (p == 1f) FastDestroyableSingleton<HudManager>.Instance.FullScreen.enabled = false;
-            })));
+            else
+            {
+                PropHuntGM.timerRunning = true;
+                PropHuntGM.blackOutTimer = 0f;
+            }
+            PropHuntGM.startTime = DateTime.UtcNow;
+            foreach (PlayerControl pc in PlayerControl.AllPlayerControls.ToArray().Where(x => x.Data.Role.IsImpostor))
+                pc.MyPhysics.SetBodyType(PlayerBodyTypes.Seeker);
+        });
 
-            if (!PlayerControl.LocalPlayer.Data.Role.IsImpostor) return; // only rewind hunter
+        public static RemoteProcess<(byte playerId, string propName, float posX)> PropHuntSetProp = new("PropHuntSetProp", (message, _) =>
+        {
+            PlayerControl player = Helpers.playerById(message.playerId);
+            GameObject prop = PropHuntGM.FindPropByNameAndPos(message.propName, message.posX);
+            if (prop == null || player == null) return;
+            player.GetComponent<SpriteRenderer>().sprite = prop.GetComponent<SpriteRenderer>().sprite;
+            player.transform.localScale = prop.transform.lossyScale;
+            player.Visible = false;
+            PropHuntGM.currentObject[player.PlayerId] = new Tuple<string, float>(message.propName, message.posX);
+        });
 
-            TimeMaster.isRewinding = true;
+        public static RemoteProcess<byte> PropHuntSetRevealed = RemotePrimitiveProcess.OfByte("PropHuntSetRevealed", (message, _) =>
+        {
+            SoundEffectsManager.play("morphlingMorph");
+            PropHuntGM.isCurrentlyRevealed.Add(message, HunterPH.revealDuration);
+            PropHuntGM.timer -= HunterPH.revealPunish;
+        });
 
-            if (MapBehaviour.Instance)
-                MapBehaviour.Instance.Close();
-            if (Minigame.Instance)
-                Minigame.Instance.ForceClose();
-            PlayerControl.LocalPlayer.moveable = false;
-        }
+        public static RemoteProcess<byte> PropHuntSetInvis = RemotePrimitiveProcess.OfByte("PropHuntSetInvis", (message, _) =>
+        {
+            PropHuntGM.invisPlayers.Add(message, PropPH.invisDuration);
+        });
+
+        public static RemoteProcess<byte> PropHuntSetSpeedboost = RemotePrimitiveProcess.OfByte("PropHuntSetSpeedboost", (message, _) =>
+        {
+            PropHuntGM.speedboostActive.Add(message, PropPH.speedboostDuration);
+        });
 
         public enum GhostInfoTypes {
             HandcuffNoticed,
@@ -2257,18 +2269,6 @@ namespace TheOtherRoles
                 case (byte)CustomRPC.SetGuesserGm:
                     byte guesserGm = reader.ReadByte();
                     RPCProcedure.setGuesserGm(guesserGm);
-                    break;
-                case (byte)CustomRPC.ShareTimer:
-                    float punish = reader.ReadSingle();
-                    RPCProcedure.shareTimer(punish);
-                    break;
-                case (byte)CustomRPC.HuntedShield:
-                    byte huntedPlayer = reader.ReadByte();
-                    RPCProcedure.huntedShield(huntedPlayer);
-                    break;
-                case (byte)CustomRPC.HuntedRewindTime:
-                    byte rewindPlayer = reader.ReadByte();
-                    RPCProcedure.huntedRewindTime(rewindPlayer);
                     break;
                 case (byte)CustomRPC.ShareGhostInfo:
                     RPCProcedure.receiveGhostInfo(reader.ReadByte(), reader);

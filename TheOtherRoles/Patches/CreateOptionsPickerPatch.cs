@@ -26,9 +26,9 @@ namespace TheOtherRoles.Patches {
                 __instance.GameModeText.text = ModTranslation.getString("torGuesser");
                 TORMapOptions.gameMode = CustomGamemodes.Guesser;
             }
-            else if (gm == CustomGamemodes.HideNSeek) {
-                __instance.GameModeText.text = ModTranslation.getString("torHideNSeek");
-                TORMapOptions.gameMode = CustomGamemodes.HideNSeek;
+            else if (gm == CustomGamemodes.PropHunt) {
+                __instance.GameModeText.text = ModTranslation.getString("torPropHunt");
+                TORMapOptions.gameMode = CustomGamemodes.PropHunt;
             }
             else if (gm == CustomGamemodes.FreePlay) {
                 __instance.GameModeText.text = ModTranslation.getString("torFreePlay");
@@ -45,8 +45,8 @@ namespace TheOtherRoles.Patches {
             if (TORMapOptions.gameMode == CustomGamemodes.Guesser) {
                 __instance.GameModeText.text = ModTranslation.getString("torGuesser");
             }
-            else if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek) {
-                __instance.GameModeText.text = ModTranslation.getString("torHideNSeek");
+            else if (TORMapOptions.gameMode == CustomGamemodes.PropHunt) {
+                __instance.GameModeText.text = ModTranslation.getString("torPropHunt");
             }
             else if (TORMapOptions.gameMode == CustomGamemodes.FreePlay)
             {
@@ -74,7 +74,7 @@ namespace TheOtherRoles.Patches {
                     if (i <= 2)
                         chatLanguageButton.Text.text = DestroyableSingleton<TranslationController>.Instance.GetString(GameModesHelpers.ModeToName[entry], new Il2CppReferenceArray<Il2CppSystem.Object>(0));
                     else {
-                        chatLanguageButton.Text.text = i == 3 ? ModTranslation.getString("torGuesser") : ModTranslation.getString("torHideNSeek");
+                        chatLanguageButton.Text.text = i == 3 ? ModTranslation.getString("torGuesser") : ModTranslation.getString("torPropHunt");
                         if (i == 5)
                             chatLanguageButton.Text.text = "TOR Fee Play";
                     }
@@ -83,7 +83,7 @@ namespace TheOtherRoles.Patches {
                         __instance.ChooseOption(entry);
                     });
 
-                    bool isCurrentMode = i <= 2 && TORMapOptions.gameMode == CustomGamemodes.Classic ? (long)entry == (long)((ulong)gameMode) : (i == 3 && TORMapOptions.gameMode == CustomGamemodes.Guesser || i == 4 && TORMapOptions.gameMode == CustomGamemodes.HideNSeek
+                    bool isCurrentMode = i <= 2 && TORMapOptions.gameMode == CustomGamemodes.Classic ? (long)entry == (long)((ulong)gameMode) : (i == 3 && TORMapOptions.gameMode == CustomGamemodes.Guesser || i == 4 && TORMapOptions.gameMode == CustomGamemodes.PropHunt
                         || i == 5 && TORMapOptions.gameMode == CustomGamemodes.FreePlay);
                     chatLanguageButton.SetSelected(isCurrentMode);
                     __instance.controllerSelectable.Add(chatLanguageButton.Button);

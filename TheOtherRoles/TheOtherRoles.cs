@@ -125,7 +125,7 @@ namespace TheOtherRoles
 
             // Gamemodes
             HandleGuesser.clearAndReload();
-            HideNSeek.clearAndReload();
+            PropHuntGM.clearAndReload();
             FreePlayGM.clearAndReload();
         }
 

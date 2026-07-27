@@ -670,10 +670,10 @@ namespace TheOtherRoles.Patches {
             }
                 
 
-            AdditionalTempData.timer = ((float)(DateTime.UtcNow - HideNSeek.startTime).TotalMilliseconds) / 1000;
+            AdditionalTempData.timer = ((float)(DateTime.UtcNow - PropHuntGM.startTime).TotalMilliseconds) / 1000;
 
             // Reset Settings
-            if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek) ShipStatusPatch.resetVanillaSettings();
+            if (TORMapOptions.gameMode == CustomGamemodes.PropHunt) ShipStatusPatch.resetVanillaSettings();
             RPCProcedure.resetVariables();
             EventUtility.gameEndsUpdate();
         }
@@ -937,14 +937,14 @@ namespace TheOtherRoles.Patches {
                 }
             }
 
-            if (ClientOption.GetValue(ClientOption.ClientOptionType.ShowRoleSummary) == 1 || HideNSeek.isHideNSeekGM) {
+            if (ClientOption.GetValue(ClientOption.ClientOptionType.ShowRoleSummary) == 1 || PropHuntGM.isPropHuntGM) {
                 var position = Camera.main.ViewportToWorldPoint(new Vector3(0f, 1f, Camera.main.nearClipPlane));
                 GameObject roleSummary = UnityEngine.Object.Instantiate(__instance.WinText.gameObject);
                 roleSummary.transform.position = new Vector3(__instance.Navigation.ExitButton.transform.position.x + 0.1f, position.y - 0.1f, -214f); 
                 roleSummary.transform.localScale = new Vector3(1f, 1f, 1f);
 
                 var roleSummaryText = new StringBuilder();
-                if (HideNSeek.isHideNSeekGM) {
+                if (PropHuntGM.isPropHuntGM) {
                     int minutes = (int)AdditionalTempData.timer / 60;
                     int seconds = (int)AdditionalTempData.timer % 60;
                     roleSummaryText.AppendLine($"<color=#FAD934FF>Time: {minutes:00}:{seconds:00}</color> \n");
@@ -1166,7 +1166,7 @@ namespace TheOtherRoles.Patches {
         }
 
         private static bool CheckAndEndGameForTaskWin(ShipStatus __instance) {
-            if (HideNSeek.isHideNSeekGM && !HideNSeek.taskWinPossible) return false;
+            if (PropHuntGM.isPropHuntGM) return false; // No task win in PropHunt
             if ((GameData.Instance.TotalTasks > 0 && GameData.Instance.TotalTasks <= GameData.Instance.CompletedTasks) || (TaskMaster.triggerTaskMasterWin && TaskMaster.hasAlivePlayers)) {
                 //__instance.enabled = false;
                 GameManager.Instance.RpcEndGame(GameOverReason.CrewmatesByTask, false);
@@ -1239,7 +1239,7 @@ namespace TheOtherRoles.Patches {
         }
 
         private static bool CheckAndEndGameForImpostorWin(ShipStatus __instance, PlayerStatistics statistics) {
-            if (HideNSeek.isHideNSeekGM) 
+            if (PropHuntGM.isPropHuntGM)
                 if ((0 != statistics.TotalAlive - statistics.TeamImpostorsAlive)) return false;
 
             if (statistics.TeamImpostorsAlive >= statistics.TotalAlive - statistics.TeamImpostorsAlive && statistics.TeamPelicanAlive == 0 && statistics.YandereAlive == 0
@@ -1265,7 +1265,7 @@ namespace TheOtherRoles.Patches {
         }
 
         private static bool CheckAndEndGameForCrewmateWin(ShipStatus __instance, PlayerStatistics statistics) {
-            if (HideNSeek.isHideNSeekGM && HideNSeek.timer <= 0 && !HideNSeek.isWaitingTimer) {
+            if (PropHuntGM.isPropHuntGM && PropHuntGM.timer <= 0 && PropHuntGM.timerRunning) {
                 //__instance.enabled = false;
                 GameManager.Instance.RpcEndGame(GameOverReason.CrewmatesByVote, false);
                 return true;

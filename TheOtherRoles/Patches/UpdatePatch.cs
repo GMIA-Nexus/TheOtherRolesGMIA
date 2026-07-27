@@ -461,7 +461,7 @@ namespace TheOtherRoles.Patches {
                 tracker.corpsesTrackingTimer -= dt;
             foreach (var assassin in Assassin.players)
                 assassin.invisibleTimer -= dt;
-            HideNSeek.timer -= dt;
+            // PropHunt timer managed inside PropHuntGM.update()
             foreach (byte key in Deputy.handcuffedKnows.Keys)
                 Deputy.handcuffedKnows[key] -= dt;
         }
@@ -544,7 +544,7 @@ namespace TheOtherRoles.Patches {
         }
 
         static void updateSabotageButton(HudManager __instance) {
-            if (MeetingHud.Instance || TORMapOptions.gameMode == CustomGamemodes.HideNSeek || !PlayerControl.LocalPlayer.roleCanUseSabotage()) __instance.SabotageButton.Hide();
+            if (MeetingHud.Instance || TORMapOptions.gameMode == CustomGamemodes.PropHunt || !PlayerControl.LocalPlayer.roleCanUseSabotage()) __instance.SabotageButton.Hide();
             else if (PlayerControl.LocalPlayer.roleCanUseSabotage() && !__instance.SabotageButton.isActiveAndEnabled) __instance.SabotageButton.Show();
 
             if (Helpers.ShowButtons) {

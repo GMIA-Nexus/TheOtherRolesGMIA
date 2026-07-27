@@ -59,7 +59,7 @@ namespace TheOtherRoles.Objects
         public static void AddAdditionalVents()
         {
             if (AmongUsClient.Instance.GameState != InnerNet.InnerNetClient.GameStates.Started ||
-                HideNSeek.isHideNSeekGM || GameOptionsManager.Instance.currentGameOptions.GameMode == AmongUs.GameOptions.GameModes.HideNSeek) return;
+                PropHuntGM.isPropHuntGM || GameOptionsManager.Instance.currentGameOptions.GameMode == AmongUs.GameOptions.GameModes.HideNSeek) return;
 
             // Polus Vents
             if (GameOptionsManager.Instance.currentNormalGameOptions.MapId == 2 && CustomOptionHolder.additionalVents.getBool())

@@ -132,6 +132,7 @@ namespace TheOtherRoles
 
         public static RoleInfo hunter = new("hunter", Palette.ImpostorRed, RoleId.Impostor);
         public static RoleInfo hunted = new("hunted", Color.white, RoleId.Crewmate);
+        public static RoleInfo prop = new("prop", Palette.CrewmateBlue, RoleId.Crewmate);
 
         // Modifier
         public static RoleInfo bloody = new("bloody", Color.yellow, RoleId.Bloody, false, true);
@@ -509,9 +510,10 @@ namespace TheOtherRoles
             // Default roles (just impostor, just crewmate, or hunter / hunted for hide n seek
             if (infos.Count == count) {
                 if (p.Data.Role.IsImpostor)
-                    infos.Add(TORMapOptions.gameMode == CustomGamemodes.HideNSeek ? hunter : impostor);
+                    infos.Add(TORMapOptions.gameMode == CustomGamemodes.HideNSeek || TORMapOptions.gameMode == CustomGamemodes.PropHunt ? hunter : impostor);
                 else
-                    infos.Add(TORMapOptions.gameMode == CustomGamemodes.HideNSeek ? hunted : crewmate);
+                    infos.Add(TORMapOptions.gameMode == CustomGamemodes.HideNSeek ? hunted :
+                        TORMapOptions.gameMode == CustomGamemodes.PropHunt ? prop : crewmate);
             }
 
             if (excludeRoles != null)

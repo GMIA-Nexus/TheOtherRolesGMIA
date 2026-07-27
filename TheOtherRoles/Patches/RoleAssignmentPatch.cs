@@ -22,9 +22,8 @@ namespace TheOtherRoles.Patches {
     [HarmonyPatch(typeof(IGameOptionsExtensions), nameof(IGameOptionsExtensions.GetAdjustedNumImpostors))]
     class GameOptionsDataGetAdjustedNumImpostorsPatch {
         public static void Postfix(ref int __result) {
-            if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek) {
-                int impCount = Mathf.RoundToInt(CustomOptionHolder.hideNSeekHunterCount.getFloat());
-                __result = impCount; ; // Set Imp Num
+            if (TORMapOptions.gameMode == CustomGamemodes.PropHunt) {
+                __result = CustomOptionHolder.propHuntNumberOfHunters.getQuantity();
             }
             else if (TORMapOptions.gameMode == CustomGamemodes.FreePlay) {
                 __result = 0; // No imps for freeplay
@@ -38,7 +37,7 @@ namespace TheOtherRoles.Patches {
     [HarmonyPatch(typeof(LegacyGameOptions), nameof(LegacyGameOptions.Validate))]
     class GameOptionsDataValidatePatch {
         public static void Postfix(LegacyGameOptions __instance) {
-            if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek || GameOptionsManager.Instance.CurrentGameOptions.GameMode != GameModes.Normal) return;
+            if (TORMapOptions.gameMode == CustomGamemodes.PropHunt || GameOptionsManager.Instance.CurrentGameOptions.GameMode != GameModes.Normal) return;
             __instance.NumImpostors = GameOptionsManager.Instance.CurrentGameOptions.NumImpostors;
         }
     }
@@ -54,7 +53,7 @@ namespace TheOtherRoles.Patches {
             MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ResetVaribles, Hazel.SendOption.Reliable, -1);
             AmongUsClient.Instance.FinishRpcImmediately(writer);
             RPCProcedure.resetVariables();
-            if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek || GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek || TORMapOptions.gameMode == CustomGamemodes.FreePlay || RoleDraft.isEnabled) return; // Don't assign Roles in Hide N Seek
+            if (TORMapOptions.gameMode == CustomGamemodes.PropHunt || GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek || TORMapOptions.gameMode == CustomGamemodes.FreePlay || RoleDraft.isEnabled) return; // Don't assign Roles in Prop Hunt
             assignRoles();
         }
 

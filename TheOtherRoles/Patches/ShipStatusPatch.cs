@@ -19,31 +19,38 @@ namespace TheOtherRoles.Patches {
         public static bool Prefix(ref float __result, ShipStatus __instance, [HarmonyArgument(0)] NetworkedPlayerInfo player) {
             if ((!__instance.Systems.ContainsKey(SystemTypes.Electrical)) || GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek) return true;
 
+            // If Game Mode is PropHunt:
+            if (PropHuntGM.isPropHuntGM)
+            {
+                if (!PropHuntGM.timerRunning)
+                {
+                    float progress = PropHuntGM.blackOutTimer > 0f && PropHuntGM.blackOutTimer < 1f ? 1 - PropHuntGM.blackOutTimer : 0f;
+                    float minVision = __instance.MaxLightRadius * (PropHuntGM.propBecomesHunterWhenFound ? 0.25f : PropHuntGM.propVision);
+                    __result = Mathf.Lerp(minVision, __instance.MaxLightRadius * PropHuntGM.propVision, progress);
+                }
+                else
+                {
+                    __result = __instance.MaxLightRadius * (PlayerControl.LocalPlayer.Data.Role.IsImpostor ? PropHuntGM.hunterVision : PropHuntGM.propVision);
+                }
+                return false;
+            }
+
             if (Pelican.players.Any(x => x.eatenPlayers.Any(p => p.PlayerId == player.PlayerId)))
             {
                 __result = __instance.MinLightRadius * 1.25f;
                 return false;
             }
 
-            if (!HideNSeek.isHideNSeekGM || (HideNSeek.isHideNSeekGM && !Hunter.lightActive.Contains(player.PlayerId))) {
-                // If player is a role which has Impostor vision
-                if (Helpers.hasImpVision(player)) {
-                    //__result = __instance.MaxLightRadius * GameOptionsManager.Instance.currentNormalGameOptions.ImpostorLightMod;
-                    __result = GetNeutralLightRadius(__instance, true);
-                    return false;
-                }
+            // If player is a role which has Impostor vision
+            if (Helpers.hasImpVision(player)) {
+                __result = GetNeutralLightRadius(__instance, true);
+                return false;
             }
 
             // If player is Lighter with ability active
             if (Lighter.players.Any(x => x.player && x.player?.PlayerId == player.PlayerId && x.lightActive)) {
                 float unlerped = Mathf.InverseLerp(__instance.MinLightRadius, __instance.MaxLightRadius, GetNeutralLightRadius(__instance, false));
                 __result = Mathf.Lerp(__instance.MaxLightRadius * Lighter.lighterModeLightsOffVision, __instance.MaxLightRadius * Lighter.lighterModeLightsOnVision, unlerped);
-            }
-
-            // If Game mode is Hide N Seek and hunter with ability active
-            else if (HideNSeek.isHideNSeekGM && Hunter.isLightActive(player.PlayerId)) {
-                float unlerped = Mathf.InverseLerp(__instance.MinLightRadius, __instance.MaxLightRadius, GetNeutralLightRadius(__instance, false));
-                __result = Mathf.Lerp(__instance.MaxLightRadius * Hunter.lightVision, __instance.MaxLightRadius * Hunter.lightVision, unlerped);
             }
 
             // If there is a Trickster with their ability active
@@ -111,7 +118,7 @@ namespace TheOtherRoles.Patches {
             originalNumShortTasksOption = GameOptionsManager.Instance.currentNormalGameOptions.NumShortTasks;
             originalNumLongTasksOption = GameOptionsManager.Instance.currentNormalGameOptions.NumLongTasks;
 
-            if (TORMapOptions.gameMode != CustomGamemodes.HideNSeek) {
+            if (TORMapOptions.gameMode != CustomGamemodes.PropHunt) {
                 var commonTaskCount = __instance.CommonTasks.Count;
                 var normalTaskCount = __instance.ShortTasks.Count;
                 var longTaskCount = __instance.LongTasks.Count;
@@ -120,9 +127,9 @@ namespace TheOtherRoles.Patches {
                 if (GameOptionsManager.Instance.currentNormalGameOptions.NumShortTasks > normalTaskCount) GameOptionsManager.Instance.currentNormalGameOptions.NumShortTasks = normalTaskCount;
                 if (GameOptionsManager.Instance.currentNormalGameOptions.NumLongTasks > longTaskCount) GameOptionsManager.Instance.currentNormalGameOptions.NumLongTasks = longTaskCount;
             } else {
-                GameOptionsManager.Instance.currentNormalGameOptions.NumCommonTasks = Mathf.RoundToInt(CustomOptionHolder.hideNSeekCommonTasks.getFloat());
-                GameOptionsManager.Instance.currentNormalGameOptions.NumShortTasks = Mathf.RoundToInt(CustomOptionHolder.hideNSeekShortTasks.getFloat());
-                GameOptionsManager.Instance.currentNormalGameOptions.NumLongTasks = Mathf.RoundToInt(CustomOptionHolder.hideNSeekLongTasks.getFloat());
+                GameOptionsManager.Instance.currentNormalGameOptions.NumCommonTasks = 0;
+                GameOptionsManager.Instance.currentNormalGameOptions.NumShortTasks = 0;
+                GameOptionsManager.Instance.currentNormalGameOptions.NumLongTasks = 0;
             }
             MapBehaviourPatch.VentNetworks.Clear();
             return true;
