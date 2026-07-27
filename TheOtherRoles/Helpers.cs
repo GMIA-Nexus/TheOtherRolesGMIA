@@ -42,7 +42,7 @@ namespace TheOtherRoles
     public enum CustomGamemodes {
         Classic,
         Guesser,
-        HideNSeek,
+        PropHunt,
         FreePlay
     }
 
@@ -2050,7 +2050,7 @@ namespace TheOtherRoles
             if (killer == null || killer.Data == null || (killer.Data.IsDead && !ignoreIfKillerIsDead) || killer.Data.Disconnected) return MurderAttemptResult.SuppressKill; // Allow non Impostor kills compared to vanilla code
             if (target == null || target.Data == null || target.Data.IsDead || target.Data.Disconnected) return MurderAttemptResult.SuppressKill; // Allow killing players in vents compared to vanilla code
 
-            if (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek) return MurderAttemptResult.PerformKill;
+            if (GameOptionsManager.Instance.currentGameOptions.GameMode == GameModes.HideNSeek || PropHuntGM.isPropHuntGM) return MurderAttemptResult.PerformKill;
 
             // Handle first kill attempt
             if (TORMapOptions.shieldFirstKill && TORMapOptions.firstKillPlayer == target) return MurderAttemptResult.SuppressKill;
@@ -2124,15 +2124,7 @@ namespace TheOtherRoles
                 return MurderAttemptResult.BlankKill;
             }
 
-            // Block hunted with time shield kill
-            else if (Hunted.timeshieldActive.Contains(target.PlayerId)) {
-                MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(killer.NetId, (byte)CustomRPC.HuntedRewindTime, Hazel.SendOption.Reliable, -1);
-                writer.Write(target.PlayerId);
-                AmongUsClient.Instance.FinishRpcImmediately(writer);
-                RPCProcedure.huntedRewindTime(target.PlayerId);
-
-                return MurderAttemptResult.SuppressKill;
-            }
+            // Block hunted with time shield kill (removed - PropHunt replaces HideNSeek)
 
             if (TransportationToolPatches.isUsingTransportation(target) && !blockRewind && killer.isRole(RoleId.Vampire))
             {

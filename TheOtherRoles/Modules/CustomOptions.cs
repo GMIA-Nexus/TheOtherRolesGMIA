@@ -34,8 +34,7 @@ namespace TheOtherRoles {
             Crewmate,
             Modifier,
             Guesser,
-            HideNSeekMain,
-            HideNSeekRoles
+            PropHunt
         }
 
         public static List<CustomOption> options = new();
@@ -769,12 +768,9 @@ namespace TheOtherRoles {
                 createCustomButton(__instance, next++, "ModifierSettings", ModTranslation.getString("modifiers"), CustomOptionType.Modifier);
 
             }
-            else if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek)
+            else if (TORMapOptions.gameMode == CustomGamemodes.PropHunt)
             {
-                // create Main HNS settings
-                createCustomButton(__instance, next++, "HideNSeekMain", ModTranslation.getString("hideNSeekMain"), CustomOptionType.HideNSeekMain);
-                // create HNS Role settings
-                createCustomButton(__instance, next++, "HideNSeekRoles", ModTranslation.getString("hideNSeekRoles"), CustomOptionType.HideNSeekRoles);
+                createCustomButton(__instance, next++, "PropHunt", ModTranslation.getString("PropHuntSetting"), CustomOptionType.PropHunt);
             }
         }
     }
@@ -819,10 +815,8 @@ namespace TheOtherRoles {
                 filteredGroups = [.. optionGroups.Where(x => x.GroupType == CustomOptionType.Crewmate)];
             else if (__instance.name is "ModifierSettings")
                 filteredGroups = [.. optionGroups.Where(x => x.GroupType == CustomOptionType.Modifier)];
-            else if (__instance.name is "HideNSeekMain")
-                filteredGroups = [.. optionGroups.Where(x => x.GroupType == CustomOptionType.HideNSeekMain)];
-            else if (__instance.name is "HideNSeekRoles")
-                filteredGroups = [.. optionGroups.Where(x => x.GroupType == CustomOptionType.HideNSeekRoles)];
+            else if (__instance.name is "PropHunt")
+                filteredGroups = [.. optionGroups.Where(x => x.GroupType == CustomOptionType.PropHunt)];
 
             foreach (var group in filteredGroups) GameOptionsMenuStartPatch.UpdateGroup(group, ref num);
 
@@ -1025,7 +1019,7 @@ namespace TheOtherRoles {
         static void Postfix(CreateGameOptions __instance)
         {
             if ((CreateGameOptionsPatch.modeButtonGS != null && CreateGameOptionsPatch.modeButtonGS.IsSelected()) ||
-                (CreateGameOptionsPatch.modeButtonHK != null && CreateGameOptionsPatch.modeButtonHK.IsSelected()))
+                (CreateGameOptionsPatch.modeButtonPH != null && CreateGameOptionsPatch.modeButtonPH.IsSelected()))
                 __instance.modeButtons[0].SelectButton(false);
         }
     }
@@ -1034,7 +1028,7 @@ namespace TheOtherRoles {
     public static class CreateGameOptionsPatch
     {
         public static PassiveButton modeButtonGS;
-        public static PassiveButton modeButtonHK;
+        public static PassiveButton modeButtonPH;
 
         private static void Postfix(CreateGameOptions __instance)
         {
@@ -1060,20 +1054,20 @@ namespace TheOtherRoles {
                 TORMapOptions.gameMode = CustomGamemodes.Guesser;
                 modeButtonGS.SelectButton(true);
                 __instance.modeButtons[0].SelectButton(false);
-                modeButtonHK.SelectButton(false);
+                modeButtonPH.SelectButton(false);
             }
             ));
 
-            modeButtonHK = UnityEngine.Object.Instantiate(modeButtonGS, __instance.modeButtons[0].transform);
-            modeButtonHK.name = "TORHIDENSEEK";
-            changeButtonText(modeButtonHK, ModTranslation.getString("torHideNSeek"));
-            modeButtonHK.transform.localPosition = new Vector3(2.91f, 0f, -3f);
-            modeButtonHK.OnClick.RemoveAllListeners();
-            __instance.StartCoroutine(Effects.Lerp(0.1f, new Action<float>(p => modeButtonHK.SelectButton(false))));
-            modeButtonHK.OnClick.AddListener((Action)(() =>
+            modeButtonPH = UnityEngine.Object.Instantiate(modeButtonGS, __instance.modeButtons[0].transform);
+            modeButtonPH.name = "TORPROPHUNT";
+            changeButtonText(modeButtonPH, ModTranslation.getString("PropHuntButtonText"));
+            modeButtonPH.transform.localPosition = new Vector3(0f, 0f, -3f);
+            modeButtonPH.OnClick.RemoveAllListeners();
+            __instance.StartCoroutine(Effects.Lerp(0.1f, new Action<float>(p => modeButtonPH.SelectButton(false))));
+            modeButtonPH.OnClick.AddListener((Action)(() =>
             {
-                TORMapOptions.gameMode = CustomGamemodes.HideNSeek;
-                modeButtonHK.SelectButton(true);
+                TORMapOptions.gameMode = CustomGamemodes.PropHunt;
+                modeButtonPH.SelectButton(true);
                 __instance.modeButtons[0].SelectButton(false);
                 modeButtonGS.SelectButton(false);
             }
@@ -1083,7 +1077,7 @@ namespace TheOtherRoles {
             {
                 TORMapOptions.gameMode = CustomGamemodes.Classic;
                 modeButtonGS.SelectButton(false);
-                modeButtonHK.SelectButton(false);
+                modeButtonPH.SelectButton(false);
             }
             ));
         }
@@ -1415,14 +1409,14 @@ namespace TheOtherRoles {
                 createGameOptionsMenu(__instance, CustomOptionType.Modifier, "ModifierSettings");
 
             }
-            else if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek)
+            else if (TORMapOptions.gameMode == CustomGamemodes.PropHunt)
             {
-                // create Main HNS settings
-                createCustomButton(__instance, next++, "HideNSeekMain", ModTranslation.getString("hideNSeekMain"));
-                createGameOptionsMenu(__instance, CustomOptionType.HideNSeekMain, "HideNSeekMain");
-                // create HNS Role settings
-                createCustomButton(__instance, next++, "HideNSeekRoles", ModTranslation.getString("hideNSeekRoles"));
-                createGameOptionsMenu(__instance, CustomOptionType.HideNSeekRoles, "HideNSeekRoles");
+                createCustomButton(__instance, next++, "PropHunt", ModTranslation.getString("PropHuntSetting"));
+                createGameOptionsMenu(__instance, CustomOptionType.PropHunt, "PropHunt");
+            }
+            {
+                createCustomButton(__instance, next++, "PropHunt", ModTranslation.getString("PropHuntSetting"));
+                createGameOptionsMenu(__instance, CustomOptionType.PropHunt, "PropHunt");
             }
         }
     }
@@ -1566,8 +1560,8 @@ namespace TheOtherRoles {
                 options = options.Where(x => !remove.Contains(x.id));
             } else if (TORMapOptions.gameMode == CustomGamemodes.Classic) 
                 options = options.Where(x => !(x.type == CustomOption.CustomOptionType.Guesser || x == CustomOptionHolder.crewmateRolesFill || x.id == 7007));
-            else if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek)
-                options = options.Where(x => (x.type == CustomOption.CustomOptionType.HideNSeekMain || x.type == CustomOption.CustomOptionType.HideNSeekRoles));
+            else if (TORMapOptions.gameMode == CustomGamemodes.PropHunt)
+                options = options.Where(x => x.type == CustomOption.CustomOptionType.PropHunt);
             if (TORMapOptions.gameMode != CustomGamemodes.FreePlay)
                 options = options.Where(x => x.id != 10429);
             foreach (var option in options) {
@@ -1594,7 +1588,7 @@ namespace TheOtherRoles {
             else sb = new StringBuilder();
 
             foreach (CustomOption option in options) {
-                if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek && option.type != CustomOptionType.HideNSeekMain && option.type != CustomOptionType.HideNSeekRoles) continue;
+                if (TORMapOptions.gameMode == CustomGamemodes.PropHunt && option.type != CustomOptionType.PropHunt) continue;
                 if (option.parent != null) {
                     bool isIrrelevant = !ShouldBeEnabled(option);
 
@@ -1699,8 +1693,8 @@ namespace TheOtherRoles {
             AddOption(StringNames.GameVisualTasks, SimpleTrigger(vanillaOptions.VisualTasks));
 
             string hudString = "";
-            if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek) {
-                hudString += buildOptionsOfType(CustomOptionType.HideNSeekMain, false) + buildOptionsOfType(CustomOptionType.HideNSeekRoles, false);
+            if (TORMapOptions.gameMode == CustomGamemodes.PropHunt) {
+                hudString += buildOptionsOfType(CustomOptionType.PropHunt, false);
             } else {
                 hudString += buildOptionsOfType(CustomOptionType.General, false) + buildRoleOptions() + buildOptionsOfType(CustomOptionType.Impostor, false) +
                     buildOptionsOfType(CustomOptionType.Neutral, false) + buildOptionsOfType(CustomOptionType.Crewmate, false) +

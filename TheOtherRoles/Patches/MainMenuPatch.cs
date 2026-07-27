@@ -40,7 +40,7 @@ namespace TheOtherRoles.Modules {
             SceneManager.add_sceneLoaded((Action<Scene, LoadSceneMode>)((scene, _) => {
                 if (!scene.name.Equals("MatchMaking", StringComparison.Ordinal)) return;
                 TORMapOptions.gameMode = CustomGamemodes.Classic;
-                // Add buttons For Guesser Mode, Hide N Seek in this scene.
+                // Add buttons For Guesser Mode, PropHunt in this scene.
                 // find "HostLocalGameButton"
                 var template = GameObject.FindObjectOfType<HostLocalGameButton>();
                 var gameButton = template.transform.FindChild("CreateGameButton");
@@ -57,14 +57,14 @@ namespace TheOtherRoles.Modules {
                     template.OnClick();
                 }));
 
-                var HideNSeekButton = GameObject.Instantiate<Transform>(gameButton, gameButton.parent);
-                HideNSeekButton.transform.localPosition += new Vector3(1.7f, -0.5f);
-                var HideNSeekButtonText = HideNSeekButton.GetComponentInChildren<TMPro.TextMeshPro>();
-                var HideNSeekButtonPassiveButton = HideNSeekButton.GetComponentInChildren<PassiveButton>();
-                
-                HideNSeekButtonPassiveButton.OnClick = new Button.ButtonClickedEvent();
-                HideNSeekButtonPassiveButton.OnClick.AddListener((System.Action)(() => {
-                    TORMapOptions.gameMode = CustomGamemodes.HideNSeek;
+                var PropHuntButton = GameObject.Instantiate<Transform>(gameButton, gameButton.parent);
+                PropHuntButton.transform.localPosition += new Vector3(1.7f, -0.5f);
+                var PropHuntButtonText = PropHuntButton.GetComponentInChildren<TMPro.TextMeshPro>();
+                var PropHuntButtonPassiveButton = PropHuntButton.GetComponentInChildren<PassiveButton>();
+
+                PropHuntButtonPassiveButton.OnClick = new Button.ButtonClickedEvent();
+                PropHuntButtonPassiveButton.OnClick.AddListener((System.Action)(() => {
+                    TORMapOptions.gameMode = CustomGamemodes.PropHunt;
                     template.OnClick();
                 }));
 
@@ -81,7 +81,7 @@ namespace TheOtherRoles.Modules {
 
                 template.StartCoroutine(Effects.Lerp(0.1f, new System.Action<float>((p) => {
                     guesserButtonText.SetText(ModTranslation.getString("torGuesser"));
-                    HideNSeekButtonText.SetText(ModTranslation.getString("torHideNSeek"));
+                    PropHuntButtonText.SetText(ModTranslation.getString("torPropHunt"));
                     FreePlaytButtonText.SetText(ModTranslation.getString("torFreePlay"));
                  })));
             }));

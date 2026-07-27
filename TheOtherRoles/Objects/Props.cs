@@ -307,7 +307,7 @@ namespace TheOtherRoles.Objects
 
         public static void placeProps()
         {
-            if (HideNSeek.isHideNSeekGM || GameOptionsManager.Instance.currentGameOptions.GameMode == AmongUs.GameOptions.GameModes.HideNSeek) return;
+            if (PropHuntGM.isPropHuntGM || GameOptionsManager.Instance.currentGameOptions.GameMode == AmongUs.GameOptions.GameModes.HideNSeek) return;
             AccelTrap.placeAccelTrap();
             DecelTrap.placeDecelTrap();
         }

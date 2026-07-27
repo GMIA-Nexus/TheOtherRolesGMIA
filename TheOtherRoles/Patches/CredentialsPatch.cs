@@ -30,7 +30,7 @@ namespace TheOtherRoles.Patches {
                 position.Alignment = AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started ? AspectPosition.EdgeAlignments.Top : AspectPosition.EdgeAlignments.LeftTop;
                 if (AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started) {
                     string gameModeText = $"";
-                    if (HideNSeek.isHideNSeekGM) gameModeText = ModTranslation.getString("gamemodeHideNSeek");
+                    if (PropHuntGM.isPropHuntGM) gameModeText = ModTranslation.getString("gamemodePropHunt");
                     else if (HandleGuesser.isGuesserGm) gameModeText = ModTranslation.getString("gamemodeGuesser");
                     else if (FreePlayGM.isFreePlayGM) gameModeText = ModTranslation.getString("gamemodeFreePlay");
                     if (gameModeText != "") gameModeText = Helpers.cs(Color.yellow, gameModeText) + "\n";
@@ -38,7 +38,7 @@ namespace TheOtherRoles.Patches {
                     position.DistanceFromEdge = new Vector3(1.5f, 0.11f, 0);
                 } else {
                     string gameModeText = $"";
-                    if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek) gameModeText = ModTranslation.getString("gamemodeHideNSeek");
+                    if (TORMapOptions.gameMode == CustomGamemodes.PropHunt) gameModeText = ModTranslation.getString("gamemodePropHunt");
                     else if (TORMapOptions.gameMode == CustomGamemodes.Guesser) gameModeText = ModTranslation.getString("gamemodeGuesser");
                     else if (TORMapOptions.gameMode == CustomGamemodes.FreePlay) gameModeText = ModTranslation.getString("gamemodeFreePlay");
                     if (gameModeText != "") gameModeText = Helpers.cs(Color.yellow, gameModeText);

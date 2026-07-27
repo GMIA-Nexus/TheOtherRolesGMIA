@@ -1092,8 +1092,8 @@ namespace TheOtherRoles.Patches {
     [HarmonyPatch(typeof(MapBehaviour), nameof(MapBehaviour.ShowSabotageMap))]
     class ShowSabotageMapPatch {
         static bool Prefix(MapBehaviour __instance) {
-            if (HideNSeek.isHideNSeekGM)
-                return HideNSeek.canSabotage;
+            if (PropHuntGM.isPropHuntGM)
+                return false; // No sabotage in PropHunt
             return true;
         }
     }

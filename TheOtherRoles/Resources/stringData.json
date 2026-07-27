@@ -230,6 +230,11 @@
         "13": "\u771f\u83cc\u4e16\u754c: \u589e\u52a0\u7535\u529b\u7cfb\u7edf(\u98df\u5802-\u5b9e\u9a8c\u5ba4-\u4e0a\u5f15\u64ce)",
         "14": "Fungle: \u589e\u52a0\u96fb\u529b\u7cfb\u7d71(\u9910\u5ef3-\u5be6\u9a57\u5ba4-\u4e0a\u5f15\u64ce)"
     },
+    "cleanedBodyShowAsMissing": {
+        "0": "Cleaned Bodies Show As Missing",
+        "13": "\u88ab\u6e05\u7406\u7684\u5c38\u4f53\u5728\u751f\u547d\u68c0\u6d4b\u88c5\u7f6e\u4e2d\u663e\u793a\u4e3a\u5931\u8e2a",
+        "14": "\u88ab\u6e05\u7406\u7684\u5c4d\u9ad4\u5728\u751f\u547d\u5075\u6e2c\u88dd\u7f6e\u4e2d\u986f\u793a\u70ba\u5931\u8e64"
+    },
     "randomGameStartPosition": {
         "0": "Random Spawn Location",
         "11": "\u30e9\u30f3\u30c0\u30e0\u30b9\u30dd\u30fc\u30f3",
@@ -6328,9 +6333,7 @@
     },
     "hunter": {
         "0": "Hunter",
-        "11": "\u30cf\u30f3\u30bf\u30fc",
-        "13": "\u730e\u4eba",
-        "14": "\u7375\u4eba"
+        "13": "\u730e\u4eba"
     },
     "hunterIntroDesc": {
         "0": "Seek and kill everyone",
@@ -6339,10 +6342,8 @@
         "14": "\u8ffd\u6bba\u6240\u6709\u7375\u7269"
     },
     "hunterShortDesc": {
-        "0": "Seek and kill everyone",
-        "11": "\u7686\u3092\u63a2\u3057\u3001\u7686\u6bba\u3057\u306b\u3057\u3066\u3042\u3052\u3088\u3046",
-        "13": "\u8ffd\u6740\u6240\u6709\u730e\u7269",
-        "14": "\u8ffd\u6bba\u6240\u6709\u7375\u7269"
+        "0": "Find and Kill Props",
+        "13": "\u627e\u51fa\u5e76\u51fb\u6740\u9053\u5177"
     },
     "hunted": {
         "0": "Hunted",
@@ -7743,6 +7744,170 @@
         "13": "\u75c5\u5a07\u62e5\u6709\u5185\u9b3c\u89c6\u91ce",
         "14": "\u75c5\u5b0c\u64c1\u6709\u507d\u88dd\u8005\u8996\u91ce"
     },
+    "PropHuntSetting": {
+        "0": "Prop Hunt",
+        "13": "\u9053\u5177\u8eb2\u732b\u732b"
+    },
+    "PropHuntButtonText": {
+        "0": "TOR Prop Hunt",
+        "13": "TOR \u9053\u5177\u8eb2\u732b\u732b"
+    },
+    "PropHuntButtonTooltip": {
+        "0": "A standalone Gamemode where Hunters have to find the disguised players (Props).",
+        "13": "\u730e\u4eba\u9700\u8981\u627e\u51fa\u4f2a\u88c5\u6210\u9053\u5177\u7684\u73a9\u5bb6\u7684\u72ec\u7acb\u6a21\u5f0f"
+    },
+    "isPropHuntGM": {
+        "0": "PropHunt",
+        "13": "\u9053\u5177\u8eb2\u732b\u732b"
+    },
+    "gamemodePropHunt": {
+        "0": "PropHunt",
+        "13": "\u9053\u5177\u8eb2\u732b\u732b"
+    },
+    "torPropHunt": {
+        "0": "TOR PropHunt",
+        "13": "TOR \u9053\u5177\u8eb2\u732b\u732b"
+    },
+    "propHunt1": {
+        "0": "Page 1: Prop Hunt Settings",
+        "13": "\u7b2c1\u9875\uff1a\u9053\u5177\u8eb2\u732b\u732b\u8bbe\u7f6e"
+    },
+    "propHuntTimerHeading": {
+        "0": "General PropHunt Settings",
+        "13": "\u9053\u5177\u8eb2\u732b\u732b\u901a\u7528\u8bbe\u7f6e"
+    },
+    "propHuntNumberOfHuntersHeading": {
+        "0": "Hunter Settings (Prop Hunt)",
+        "13": "\u730e\u4eba\u8bbe\u7f6e\uff08\u9053\u5177\u8eb2\u732b\u732b\uff09"
+    },
+    "propBecomesHunterWhenFoundHeading": {
+        "0": "Prop Settings",
+        "13": "\u9053\u5177\u8bbe\u7f6e"
+    },
+    "propHuntTimer": {
+        "0": "Timer In Min (Prop Hunt)",
+        "13": "\u6e38\u620f\u65f6\u957f\uff08\u5206\u949f\uff09"
+    },
+    "propHuntMap": {
+        "0": "Map",
+        "13": "\u5730\u56fe"
+    },
+    "propHuntNumberOfHunters": {
+        "0": "Number Of Hunters",
+        "13": "\u730e\u4eba\u6570\u91cf"
+    },
+    "hunterInitialBlackoutTime": {
+        "0": "Initial Blackout Duration",
+        "13": "\u521d\u59cb\u9ed1\u5c4f\u65f6\u95f4"
+    },
+    "hunterMissCooldown": {
+        "0": "Kill Cooldown After Miss",
+        "13": "\u7a7a\u5200\u51b7\u5374\u65f6\u95f4"
+    },
+    "hunterHitCooldown": {
+        "0": "Kill Cooldown After Hit",
+        "13": "\u547d\u4e2d\u51b7\u5374\u65f6\u95f4"
+    },
+    "propHunterVision": {
+        "0": "Hunter Vision",
+        "13": "\u730e\u4eba\u89c6\u91ce"
+    },
+    "propVision": {
+        "0": "Prop Vision",
+        "13": "\u9053\u5177\u89c6\u91ce"
+    },
+    "propHuntRevealCooldown": {
+        "0": "Reveal Prop Cooldown",
+        "13": "\u63ed\u793a\u9053\u5177\u51b7\u5374"
+    },
+    "propHuntRevealDuration": {
+        "0": "Reveal Prop Duration",
+        "13": "\u63ed\u793a\u9053\u5177\u6301\u7eed\u65f6\u95f4"
+    },
+    "propHuntRevealPunish": {
+        "0": "Reveal Time Punish",
+        "13": "\u63ed\u793a\u65f6\u95f4\u60e9\u7f5a"
+    },
+    "propHuntAdminCooldown": {
+        "0": "Hunter Admin Cooldown",
+        "13": "\u730e\u4eba\u7ba1\u7406\u5730\u56fe\u51b7\u5374"
+    },
+    "propHuntFindCooldown": {
+        "0": "Find Cooldown",
+        "13": "\u641c\u5bfb\u51b7\u5374"
+    },
+    "propHuntFindDuration": {
+        "0": "Find Duration",
+        "13": "\u641c\u5bfb\u6301\u7eed\u65f6\u95f4"
+    },
+    "propHuntUnstuckCooldown": {
+        "0": "Unstuck Cooldown",
+        "13": "\u7a7f\u5899\u51b7\u5374"
+    },
+    "propHuntUnstuckDuration": {
+        "0": "Unstuck Duration",
+        "13": "\u7a7f\u5899\u6301\u7eed\u65f6\u95f4"
+    },
+    "propHuntInvisEnabled": {
+        "0": "Invisibility Enabled",
+        "13": "\u542f\u7528\u9690\u8eab"
+    },
+    "propHuntInvisCooldown": {
+        "0": "Invisibility Cooldown",
+        "13": "\u9690\u8eab\u51b7\u5374"
+    },
+    "propHuntInvisDuration": {
+        "0": "Invisibility Duration",
+        "13": "\u9690\u8eab\u6301\u7eed\u65f6\u95f4"
+    },
+    "propHuntSpeedboostEnabled": {
+        "0": "Speedboost Enabled",
+        "13": "\u542f\u7528\u52a0\u901f"
+    },
+    "propHuntSpeedboostCooldown": {
+        "0": "Speedboost Cooldown",
+        "13": "\u52a0\u901f\u51b7\u5374"
+    },
+    "propHuntSpeedboostDuration": {
+        "0": "Speedboost Duration",
+        "13": "\u52a0\u901f\u6301\u7eed\u65f6\u95f4"
+    },
+    "propHuntSpeedboostSpeed": {
+        "0": "Speedboost Ratio",
+        "13": "\u52a0\u901f\u500d\u7387"
+    },
+    "propBecomesHunterWhenFound": {
+        "0": "Props Become Hunters When Found",
+        "13": "\u9053\u5177\u88ab\u53d1\u73b0\u540e\u53d8\u6210\u730e\u4eba"
+    },
+    "prop": {
+        "0": "Prop",
+        "13": "\u9053\u5177"
+    },
+    "propShortDesc": {
+        "0": "Disguise As An Object",
+        "13": "\u4f2a\u88c5\u6210\u7269\u4f53"
+    },
+    "propDisguiseButtonText": {
+        "0": "Disguise",
+        "13": "\u4f2a\u88c5"
+    },
+    "propHuntUnstuckButtonText": {
+        "0": "Unstuck",
+        "13": "\u7a7f\u5899"
+    },
+    "propHuntRevealButtonText": {
+        "0": "Reveal",
+        "13": "\u63ed\u793a"
+    },
+    "propHuntInvisButtonText": {
+        "0": "Invis",
+        "13": "\u9690\u8eab"
+    },
+    "propHuntSpeedboostButtonText": {
+        "0": "Boost",
+        "13": "\u52a0\u901f"
+    },
     "colorSalmon": {
         "0": "Salmon",
         "11": "\u30b5\u30fc\u30e2\u30f3",
@@ -8470,8 +8635,8 @@
     },
     "cleanerOPTHint": {
         "0": "<br>They may also see dead body locations on the map.",
-        "13": "<br>\u6839\u636e\u8bbe\u7f6e\uff0c\u4ed6\u4eec\u8fd8\u53ef\u4ee5\u5728\u5730\u56fe\u4e0a\u770b\u5230\u5c38\u4f53\u4f4d\u7f6e\u3002",
-        "14": "<br>\u6839\u64da\u8a2d\u7f6e\uff0c\u4ed6\u5011\u9084\u53ef\u4ee5\u5728\u5730\u5716\u4e0a\u770b\u5230\u5c4d\u9ad4\u4f4d\u7f6e\u3002"
+        "13": "<br>\u4ed6\u4eec\u8fd8\u53ef\u4ee5\u5728\u5730\u56fe\u4e0a\u770b\u5230\u5c38\u4f53\u4f4d\u7f6e\u3002",
+        "14": "<br>\u4ed6\u5011\u9084\u53ef\u4ee5\u5728\u5730\u5716\u4e0a\u770b\u5230\u5c4d\u9ad4\u4f4d\u7f6e\u3002"
     },
     "warlockFullDesc": {
         "0": "The Warlock is an Impostor, that can curse another player.\nIf the cursed person stands next to another player, the Warlock is able to kill that player.\nPerforming a kill with the help of a cursed player, will lift the curse and it will result in the Warlock being unable to move for <var>%SEC%s</var>.\nThe Warlock can still perform normal kills, but the two buttons share the same cooldown.",
