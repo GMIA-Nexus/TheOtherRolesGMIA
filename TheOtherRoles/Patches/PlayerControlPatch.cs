@@ -854,8 +854,8 @@ namespace TheOtherRoles.Patches {
             if (PlayerControl.LocalPlayer == target && Helpers.CurrentMonth == 4 && Helpers.isSkeld())
                 _ = new StaticAchievementToken("rainyStep");
 
-            if (PlayerControl.LocalPlayer.isRole(RoleId.Seer)) {
-                if (__instance.Data.Role.IsImpostor && __instance != target) Seer.local.acTokenAnother.Value.impKill = true;
+            if (PlayerControl.LocalPlayer.isRole(RoleId.Seer) && __instance != target) {
+                if (__instance.Data.Role.IsImpostor) Seer.local.acTokenAnother.Value.impKill = true;
                 if (Seer.canSeeKillTeams)
                 {
                     switch (__instance)
@@ -871,9 +871,6 @@ namespace TheOtherRoles.Patches {
                             break;
                         case var _ when __instance.isRole(RoleId.Moriarty) || (__instance.isRole(RoleId.SchrodingersCat) && SchrodingersCat.team == SchrodingersCat.Team.Moriarty):
                             Seer.killTeams.moriarty++;
-                            break;
-                        case var _ when __instance.isRole(RoleId.Pelican):
-                            Seer.killTeams.pelican++;
                             break;
                         case var _ when __instance.isRole(RoleId.Yandere) || (__instance.isRole(RoleId.SchrodingersCat) && SchrodingersCat.team == SchrodingersCat.Team.Yandere):
                             Seer.killTeams.yandere++;

@@ -103,11 +103,10 @@ namespace TheOtherRoles.Roles
             public int jackal;
             public int moriarty;
             public int jekyllAndHyde;
-            public int pelican;
             public int yandere;
 
             public KillInfo() {
-                impostor = crewmate = jackal = moriarty = jekyllAndHyde = pelican = yandere = 0;
+                impostor = crewmate = jackal = moriarty = jekyllAndHyde = yandere = 0;
             }
         }
 

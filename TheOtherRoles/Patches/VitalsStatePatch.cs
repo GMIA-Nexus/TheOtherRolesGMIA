@@ -46,6 +46,7 @@ namespace TheOtherRoles.Patches
 
         public static void AddMissingPlayer(NetworkedPlayerInfo player)
         {
+            if (!TORMapOptions.cleanedBodyShowAsMissing) return;
             MissingPlayers.Add(player);
             TheOtherRolesPlugin.Logger.LogMessage($"Player {player.PlayerId} is now marked as missing.");
         }

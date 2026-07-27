@@ -952,8 +952,8 @@ namespace TheOtherRoles
                         vulture.triggerVultureWin = true;
                     }
                 }
-                if (cleanedBodyShowAsMissing)
-                    VitalsStatePatch.AddMissingPlayer(player.Data);
+
+                VitalsStatePatch.AddMissingPlayer(player.Data);
             });
 
         public static RemoteProcess<byte> RpcRevive = RemotePrimitiveProcess.OfByte("ModRpcRevive", (message, _) =>

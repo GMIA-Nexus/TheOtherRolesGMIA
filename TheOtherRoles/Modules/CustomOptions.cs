@@ -6,11 +6,11 @@ using System.Text;
 using AmongUs.Data;
 using AmongUs.GameOptions;
 using BepInEx.Configuration;
-using Epic.OnlineServices.RTC;
 using HarmonyLib;
 using Hazel;
 using Il2CppSystem.Linq;
 using Reactor.Utilities.Extensions;
+using TheOtherRoles.MetaContext;
 using TheOtherRoles.Modules;
 using TheOtherRoles.Roles;
 using TheOtherRoles.Utilities;
@@ -533,8 +533,11 @@ namespace TheOtherRoles {
                 torSettingsButton = GameObject.Instantiate(buttonTemplate, buttonTemplate.transform.parent);
                 torSettingsButton.transform.localPosition += Vector3.right * 1.75f * (targetMenu - 2);
                 torSettingsButton.name = buttonName;
-                __instance.StartCoroutine(Effects.Lerp(2f, new Action<float>(p => { torSettingsButton.transform.FindChild("FontPlacer").GetComponentInChildren<TextMeshPro>().text = buttonText; })));
                 var torSettingsPassiveButton = torSettingsButton.GetComponent<PassiveButton>();
+                torSettingsPassiveButton.ChangeButtonText(buttonText);
+                if (torSettingsPassiveButton.buttonText.TryGetComponent<TextTranslatorTMP>(out var tmp)) {
+                    UnityEngine.Object.Destroy(tmp);
+                }
                 torSettingsPassiveButton.OnClick.RemoveAllListeners();
                 torSettingsPassiveButton.OnClick.AddListener((System.Action)(() => {
                     __instance.ChangeTab((StringNames)targetMenu);
@@ -557,6 +560,23 @@ namespace TheOtherRoles {
 
             createSettingTabs(__instance);
 
+            var gamemodeText = string.Empty;
+            switch (TORMapOptions.gameMode)
+            {
+                case CustomGamemodes.Classic:
+                    gamemodeText = DestroyableSingleton<TranslationController>.Instance.GetString(StringNames.GameTypeClassic);
+                    break;
+                case CustomGamemodes.Guesser:
+                    gamemodeText = ModTranslation.getString("gamemodeGuesser");
+                    break;
+                case CustomGamemodes.HideNSeek:
+                    gamemodeText = ModTranslation.getString("gamemodeHideNSeek");
+                    break;
+                case CustomGamemodes.FreePlay:
+                    gamemodeText = ModTranslation.getString("gamemodeFreePlay");
+                    break;
+            }
+            __instance.gameModeText.SetText(gamemodeText);
         }
 
         public static void removeVanillaTabs(LobbyViewSettingsPane __instance)
@@ -805,6 +825,8 @@ namespace TheOtherRoles {
     {
         public static void Postfix(GameOptionsMenu __instance)
         {
+            // Skip original game tabs
+            if (__instance.Children.Count == 0 || __instance.name == "GAME SETTINGS TAB") return;
             var num = 1.5f;
             List<OptionGroup> filteredGroups = [];
             if (__instance.name is "TORSettings")
@@ -1218,7 +1240,6 @@ namespace TheOtherRoles {
 
         private static void createSettings(GameOptionsMenu menu, List<CustomOption> options)
         {
-            float num = 1.5f;
             foreach (CustomOption option in options)
             {
                 if (option.isHeader)
@@ -1227,11 +1248,8 @@ namespace TheOtherRoles {
                     categoryHeaderMasked.SetHeader(StringNames.ImpostorsCategory, 20);
                     string titleText = option.heading != "" ? option.getHeading() : option.getName();
                     categoryHeaderMasked.Title.text = titleText;
-                    categoryHeaderMasked.transform.localScale = Vector3.one * 0.63f;
-                    categoryHeaderMasked.transform.localPosition = new Vector3(-0.903f, num, -2f);
                     categoryHeaderMasked.transform.GetChild(0).GetComponent<SpriteRenderer>().color = option.getColor();
                     categoryHeaderMasked.transform.GetChild(1).GetComponent<SpriteRenderer>().color = option.getColor();
-                    num -= 0.63f;
                     optionGroups.Add(new OptionGroup
                     {
                         GroupType = option.type,
@@ -1241,7 +1259,6 @@ namespace TheOtherRoles {
                 }
 
                 OptionBehaviour optionBehaviour = UnityEngine.Object.Instantiate<StringOption>(menu.stringOptionOrigin, Vector3.zero, Quaternion.identity, menu.settingsContainer);
-                optionBehaviour.transform.localPosition = new Vector3(0.952f, num, -2f);
                 optionBehaviour.SetClickMask(menu.ButtonClickMask);
 
                 // "SetUpFromData"
@@ -1273,8 +1290,7 @@ namespace TheOtherRoles {
                 
                 optionGroups.LastOrDefault().Options.Add(option);
                 menu.Children.Add(optionBehaviour);
-                num -= 0.45f;
-                menu.scrollBar.SetYBoundsMax(-num - 1.65f);
+                optionBehaviour.gameObject.SetActive(true);
             }
 
             for (int i = 0; i < menu.Children.Count; i++)
@@ -1289,12 +1305,12 @@ namespace TheOtherRoles {
 
         public static void UpdateGroup(OptionGroup group, ref float num)
         {
-            if (group.Options.Count == 0 || group.Header is null) return;
+            if (group.Options.Count == 0 || group.Header == null) return;
             group.Header.gameObject.SetActive(true);
             group.Header.transform.localScale = Vector3.one * 0.63f;
             group.Header.transform.localPosition = new Vector3(-0.903f, num, -2f);
 
-            num -= 0.58f;
+            num -= 0.63f;
 
             foreach (var opt in group.Options)
             {

@@ -42,11 +42,11 @@ namespace TheOtherRoles.CustomGameModes
             var roleMaskedTittleAttr = gui.GetAttribute(AttributeAsset.MetaRoleButton);
             var roleTittleAttr = new TextAttributes(roleMaskedTittleAttr) { Font = gui.GetFont(FontAsset.Gothic) };
 
-            void SetWidget(int tab)
+            void SetContext(int tab)
             {
                 List<GUIContext> guis = new()
-                { gui.LocalizedButton(GUIAlignment.Center, roleTittleAttr, "freePlayRoles", () => SetWidget(0), color: tab == 0 ? Color.yellow : null),
-                    gui.LocalizedButton(GUIAlignment.Center, roleTittleAttr, "freePlayModifiers", () => SetWidget(1), color: tab == 1 ? Color.yellow : null)};
+                { gui.LocalizedButton(GUIAlignment.Center, roleTittleAttr, "freePlayRoles", () => SetContext(0), color: tab == 0 ? Color.yellow : null),
+                    gui.LocalizedButton(GUIAlignment.Center, roleTittleAttr, "freePlayModifiers", () => SetContext(1), color: tab == 1 ? Color.yellow : null)};
                 var holder = gui.HorizontalHolder(GUIAlignment.Center,
                     guis
                     );
@@ -98,20 +98,20 @@ namespace TheOtherRoles.CustomGameModes
                         gui.Arrange(GUIAlignment.Center, RoleInfo.allRoleInfos.Where(r => r.isModifier && RoleInfo.getRoleInfoForPlayer(PlayerControl.LocalPlayer).Contains(r)).Select(r => gui.RawButton(GUIAlignment.Center, roleMaskedTittleAttr, Helpers.cs(r.color, r.name), () =>
                         {
                             removeModifier(r.roleId);
-                            SetWidget(1);
+                            SetContext(1);
                         })), 4),
                         gui.LocalizedText(GUIAlignment.Center, roleMaskedTittleAttr, "freePlayModifiersUnequipped"),
                         gui.Arrange(GUIAlignment.Center, RoleInfo.allRoleInfos.Where(r => r.isModifier && r != RoleInfo.lover && r != RoleInfo.mini && !RoleInfo.getRoleInfoForPlayer(PlayerControl.LocalPlayer).Contains(r)).Select(r => gui.RawButton(GUIAlignment.Center, roleMaskedTittleAttr, Helpers.cs(r.color, r.name), () =>
                         {
                             RPCProcedure.setModifier((byte)r.roleId, PlayerControl.LocalPlayer.PlayerId, 0);
-                            SetWidget(1);
+                            SetContext(1);
                         })), 4)}
                         );
                 }
                 roleScreen?.SetContext(gui.VerticalHolder(GUIAlignment.Center, new List<GUIContext>() { holder, TORGUIContextEngine.API.VerticalMargin(0.15f), gui.ScrollView(GUIAlignment.Center, new(7.4f, 3.5f), null, inner, out _) }), out _);
             }
 
-            SetWidget(0);
+            SetContext(0);
         }
 
         public static void FastSetRole(this PlayerControl targetPlayer, RoleTypes roleType)

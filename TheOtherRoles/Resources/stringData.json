@@ -230,6 +230,11 @@
         "13": "\u771f\u83cc\u4e16\u754c: \u589e\u52a0\u7535\u529b\u7cfb\u7edf(\u98df\u5802-\u5b9e\u9a8c\u5ba4-\u4e0a\u5f15\u64ce)",
         "14": "Fungle: \u589e\u52a0\u96fb\u529b\u7cfb\u7d71(\u9910\u5ef3-\u5be6\u9a57\u5ba4-\u4e0a\u5f15\u64ce)"
     },
+    "cleanedBodyShowAsMissing": {
+        "0": "Cleaned Bodies Show As Missing",
+        "13": "\u88ab\u6e05\u7406\u7684\u5c38\u4f53\u5728\u751f\u547d\u68c0\u6d4b\u88c5\u7f6e\u4e2d\u663e\u793a\u4e3a\u5931\u8e2a",
+        "14": "\u88ab\u6e05\u7406\u7684\u5c4d\u9ad4\u5728\u751f\u547d\u5075\u6e2c\u88dd\u7f6e\u4e2d\u986f\u793a\u70ba\u5931\u8e64"
+    },
     "randomGameStartPosition": {
         "0": "Random Spawn Location",
         "11": "\u30e9\u30f3\u30c0\u30e0\u30b9\u30dd\u30fc\u30f3",
@@ -8470,8 +8475,8 @@
     },
     "cleanerOPTHint": {
         "0": "<br>They may also see dead body locations on the map.",
-        "13": "<br>\u6839\u636e\u8bbe\u7f6e\uff0c\u4ed6\u4eec\u8fd8\u53ef\u4ee5\u5728\u5730\u56fe\u4e0a\u770b\u5230\u5c38\u4f53\u4f4d\u7f6e\u3002",
-        "14": "<br>\u6839\u64da\u8a2d\u7f6e\uff0c\u4ed6\u5011\u9084\u53ef\u4ee5\u5728\u5730\u5716\u4e0a\u770b\u5230\u5c4d\u9ad4\u4f4d\u7f6e\u3002"
+        "13": "<br>\u4ed6\u4eec\u8fd8\u53ef\u4ee5\u5728\u5730\u56fe\u4e0a\u770b\u5230\u5c38\u4f53\u4f4d\u7f6e\u3002",
+        "14": "<br>\u4ed6\u5011\u9084\u53ef\u4ee5\u5728\u5730\u5716\u4e0a\u770b\u5230\u5c4d\u9ad4\u4f4d\u7f6e\u3002"
     },
     "warlockFullDesc": {
         "0": "The Warlock is an Impostor, that can curse another player.\nIf the cursed person stands next to another player, the Warlock is able to kill that player.\nPerforming a kill with the help of a cursed player, will lift the curse and it will result in the Warlock being unable to move for <var>%SEC%s</var>.\nThe Warlock can still perform normal kills, but the two buttons share the same cooldown.",
