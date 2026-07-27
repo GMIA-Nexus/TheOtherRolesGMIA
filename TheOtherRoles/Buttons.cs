@@ -375,13 +375,6 @@ namespace TheOtherRoles
             SoundEffectsManager.stop("timemasterShield");
         }
 
-        public static void resetHuntedRewindButton() {
-            huntedShieldButton.Timer = huntedShieldButton.MaxTimer;
-            huntedShieldButton.isEffectActive = false;
-            huntedShieldButton.actionButton.cooldownTimerText.color = Palette.EnabledColor;
-            SoundEffectsManager.stop("timemasterShield");
-        }
-
         private static void addReplacementHandcuffedButton(CustomButton button, Vector3? positionOffset = null, Func<bool> couldUse = null)
         {
             Vector3 positionOffsetValue = positionOffset ?? button.PositionOffset;  // For non custom buttons, we can set these manually.

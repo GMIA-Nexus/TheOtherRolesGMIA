@@ -81,9 +81,9 @@ namespace TheOtherRoles.Modules {
                         {
                             gameMode = CustomGamemodes.Guesser;
                         }
-                        else if (gm.StartsWith("hide") || gm.StartsWith("hn")) // /gm hide -> hide N seek
+                        else if (gm.StartsWith("hide") || gm.StartsWith("hn")) // /gm hide -> prop hunt
                         {
-                            gameMode = CustomGamemodes.HideNSeek;
+                            gameMode = CustomGamemodes.PropHunt;
                         }
                         // else its classic!
 

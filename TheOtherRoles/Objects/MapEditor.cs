@@ -76,7 +76,7 @@ namespace TheOtherRoles.Objects
 
         public static void moveVital()
         {
-            if (HideNSeek.isHideNSeekGM || GameOptionsManager.Instance.currentGameOptions.GameMode == AmongUs.GameOptions.GameModes.HideNSeek) return;
+            if (PropHuntGM.isPropHuntGM || GameOptionsManager.Instance.currentGameOptions.GameMode == AmongUs.GameOptions.GameModes.HideNSeek) return;
             if (GameOptionsManager.Instance.currentNormalGameOptions.MapId == 2 && CustomOptionHolder.specimenVital.getBool())
             {
                 var panel = GameObject.Find("panel_vitals");

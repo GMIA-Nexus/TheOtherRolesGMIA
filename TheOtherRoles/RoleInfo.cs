@@ -510,10 +510,9 @@ namespace TheOtherRoles
             // Default roles (just impostor, just crewmate, or hunter / hunted for hide n seek
             if (infos.Count == count) {
                 if (p.Data.Role.IsImpostor)
-                    infos.Add(TORMapOptions.gameMode == CustomGamemodes.HideNSeek || TORMapOptions.gameMode == CustomGamemodes.PropHunt ? hunter : impostor);
+                    infos.Add(TORMapOptions.gameMode == CustomGamemodes.PropHunt ? hunter : impostor);
                 else
-                    infos.Add(TORMapOptions.gameMode == CustomGamemodes.HideNSeek ? hunted :
-                        TORMapOptions.gameMode == CustomGamemodes.PropHunt ? prop : crewmate);
+                    infos.Add(TORMapOptions.gameMode == CustomGamemodes.PropHunt ? prop : crewmate);
             }
 
             if (excludeRoles != null)

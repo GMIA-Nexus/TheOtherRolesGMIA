@@ -109,11 +109,11 @@ namespace TheOtherRoles.CustomGameModes
 
             if (timerText == null)
             {
-                RoomTracker roomTracker = FastDestroyableSingleton<HudManager>.Instance?.roomTracker;
+                RoomTracker roomTracker = HudManager.Instance?.roomTracker;
                 if (roomTracker != null)
                 {
                     GameObject gameObject = UnityEngine.Object.Instantiate(roomTracker.gameObject);
-                    gameObject.transform.SetParent(FastDestroyableSingleton<HudManager>.Instance.transform);
+                    gameObject.transform.SetParent(HudManager.Instance.transform);
                     UnityEngine.Object.DestroyImmediate(gameObject.GetComponent<RoomTracker>());
                     timerText = gameObject.GetComponent<TMP_Text>();
                     gameObject.transform.localPosition = new Vector3(0, -1.8f, gameObject.transform.localPosition.z);
@@ -216,7 +216,7 @@ namespace TheOtherRoles.CustomGameModes
                     }
                     else
                     {
-                        revealRenderer[pc.PlayerId].Destroy();
+                        revealRenderer[pc.PlayerId].gameObject.Destroy();
                         isCurrentlyRevealed.Remove(pc.PlayerId);
                         revealRenderer.Remove(pc.PlayerId);
                         poolablePlayer.gameObject.SetActive(true);
