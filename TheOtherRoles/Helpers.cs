@@ -465,6 +465,13 @@ namespace TheOtherRoles
             panel.Cardio.gameObject.SetActive(false);
         }
 
+        /// <summary>
+        /// Determines whether this role is Nice Swapper or Shifter (both uses the same RoleId for variants)
+        /// </summary>
+        /// <param name="roleInfo">The RoleInfo</param>
+        /// <returns></returns>
+        public static bool isSpecialRoleInfo(RoleInfo roleInfo) => (roleInfo.roleId == RoleId.Swapper && !roleInfo.isOrgImpostor) || (roleInfo.roleId == RoleId.Shifter && !roleInfo.isOrgNeutral);
+
         public static bool isRole(this PlayerControl player, RoleId role)
         {
             foreach (var t in RoleData.allRoleIds)

@@ -779,6 +779,56 @@ public static class HelpMenu
         ];
     }
 
+    public static bool CheckSpawnable(RoleInfo roleInfo)
+    {
+        // Deputy uses the independent spawn rate, but we also need to check the Sheriff's
+        if (roleInfo.roleId == RoleId.Deputy)
+            return CustomOptionHolder.sheriffSpawnRate.getSelection() > 0 && CustomOptionHolder.deputySpawnRate.getSelection() > 0;
+        if (Configurations.TryGetValue(roleInfo.roleId, out var option))
+            return option.getSelection() > 0;
+        if (roleInfo.roleId is RoleId.NiceGuesser or RoleId.EvilGuesser)
+        {
+            if (TORMapOptions.gameMode == CustomGamemodes.Guesser)
+                return false;
+            int impRate = CustomOptionHolder.guesserIsImpGuesserRate.getSelection();
+            int bothRate = CustomOptionHolder.guesserSpawnBothRate.getSelection();
+            bool isNice = roleInfo.roleId == RoleId.NiceGuesser;
+            if (isNice && impRate == 10 && bothRate == 0) return false;
+            if (!isNice && impRate == 0 && bothRate == 0) return false;
+        }
+
+        if (roleInfo.roleId is RoleId.NiceWatcher or RoleId.EvilWatcher)
+        {
+            int impWatchRate = CustomOptionHolder.watcherIsImpWatcherRate.getSelection();
+            bool assignEqually = CustomOptionHolder.watcherAssignEqually.getSelection() == 0;
+            bool isNice = roleInfo.roleId == RoleId.NiceWatcher;
+            if (isNice && impWatchRate == 10 && !assignEqually) return false;
+            if (!isNice && impWatchRate == 0 && !assignEqually) return false;
+        }
+
+        if (roleInfo.roleId is RoleId.Yasuna or RoleId.EvilYasuna)
+        {
+            int impRate = CustomOptionHolder.yasunaIsImpYasunaRate.getSelection();
+            bool isNice = roleInfo.roleId == RoleId.Yasuna;
+            if (isNice && impRate == 10) return false;
+            if (!isNice && impRate == 0) return false;
+        }
+
+        if (roleInfo.roleId == RoleId.Swapper)
+        {
+            int impRate = CustomOptionHolder.swapperIsImpRate.getSelection();
+            return !(roleInfo.isOrgImpostor ? impRate == 0 : impRate == 10);
+        }
+
+        if (roleInfo.roleId == RoleId.Shifter)
+        {
+            int neutralRate = CustomOptionHolder.shifterIsNeutralRate.getSelection();
+            return !(roleInfo.isOrgNeutral ? neutralRate == 0 : neutralRate == 100);
+        }
+
+        return true;
+    }
+
     private static void ShowScreen(MetaScreen screen, HelpTab tab, HelpTab validTabs)
     {
         MetaContextOld context = new();

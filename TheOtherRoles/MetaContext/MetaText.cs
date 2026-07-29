@@ -110,6 +110,11 @@ public enum AttributeAsset
     StandardLargeWideMasked,
 
     /// <summary>
+    /// 中揃えの小見出しや注目を浴びるテキスト向けの可変サイズテキスト属性です。
+    /// </summary>
+    CenteredBold,
+
+    /// <summary>
     /// 主にオーバーレイ向けの本文用可変サイズテキスト属性です。
     /// </summary>
     OverlayContent,
@@ -222,8 +227,10 @@ public class TextAttributes
     public Size Size { get; init; }
     public Color Color { get; init; }
     public bool IsFlexible { get; init; }
+    public bool Wrapping { get; init; } = false;
+    public float? OutlineWidth { get; init; } = null;
 
-    public TextAttributes(TextAlignment alignment, Font font, FontStyle style, FontSize fontSize, Size size, Color color, bool isFlexible)
+    public TextAttributes(TextAlignment alignment, Font font, FontStyle style, FontSize fontSize, Size size, Color color, bool isFlexible, float? outlineWidth = null)
     {
         Alignment = alignment;
         Font = font;
@@ -232,6 +239,7 @@ public class TextAttributes
         Size = size;
         Color = color;
         IsFlexible = isFlexible;
+        OutlineWidth = outlineWidth;
     }
 
     public TextAttributes(TextAttributes original)
@@ -243,7 +251,11 @@ public class TextAttributes
         Size = original.Size;
         Color = original.Color;
         IsFlexible = original.IsFlexible;
+        OutlineWidth = original.OutlineWidth;
     }
+
+    public static implicit operator TextAttributes(AttributeParams param) => TORGUIContextEngine.API.GetAttribute(param);
+    public static implicit operator TextAttributes(AttributeAsset asset) => TORGUIContextEngine.API.GetAttribute(asset);
 }
 
 public interface TextComponent

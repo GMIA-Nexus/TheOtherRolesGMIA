@@ -313,45 +313,51 @@ namespace TheOtherRoles.Patches {
 
             // Assign roles until we run out of either players we can assign roles to or run out of roles we can assign to players
             while (
-                (data.impostors.Count > 0 && data.maxImpostorRoles > 0 && ensuredImpostorRoles.Count > 0) || 
+                (data.impostors.Count > 0 && data.maxImpostorRoles > 0 && ensuredImpostorRoles.Count > 0) ||
                 (data.crewmates.Count > 0 && (
-                    (data.maxCrewmateRoles > 0 && ensuredCrewmateRoles.Count > 0) || 
+                    (data.maxCrewmateRoles > 0 && ensuredCrewmateRoles.Count > 0) ||
                     (data.maxNeutralRoles > 0 && ensuredNeutralRoles.Count > 0)
-                ))) {
-                    
+                )))
+            {
+
                 Dictionary<RoleType, List<byte>> rolesToAssign = new();
                 if (data.crewmates.Count > 0 && data.maxCrewmateRoles > 0 && ensuredCrewmateRoles.Count > 0) rolesToAssign.Add(RoleType.Crewmate, ensuredCrewmateRoles);
                 if (data.crewmates.Count > 0 && data.maxNeutralRoles > 0 && ensuredNeutralRoles.Count > 0) rolesToAssign.Add(RoleType.Neutral, ensuredNeutralRoles);
                 if (data.impostors.Count > 0 && data.maxImpostorRoles > 0 && ensuredImpostorRoles.Count > 0) rolesToAssign.Add(RoleType.Impostor, ensuredImpostorRoles);
-                
+
                 // Randomly select a pool of roles to assign a role from next (Crewmate role, Neutral role or Impostor role) 
                 // then select one of the roles from the selected pool to a player 
                 // and remove the role (and any potentially blocked role pairings) from the pool(s)
-                var roleType = rolesToAssign.Keys.ElementAt(rnd.Next(0, rolesToAssign.Keys.Count())); 
+                var roleType = rolesToAssign.Keys.ElementAt(rnd.Next(0, rolesToAssign.Keys.Count()));
                 var players = roleType == RoleType.Crewmate || roleType == RoleType.Neutral ? data.crewmates : data.impostors;
                 var index = rnd.Next(0, rolesToAssign[roleType].Count);
                 var roleId = rolesToAssign[roleType][index];
                 setRoleToRandomPlayer(rolesToAssign[roleType][index], players);
                 rolesToAssign[roleType].RemoveAt(index);
 
-                if (CustomOptionHolder.blockedRolePairings.ContainsKey(roleId)) {
-                    foreach(var blockedRoleId in CustomOptionHolder.blockedRolePairings[roleId]) {
+                if (CustomOptionHolder.blockedRolePairings.Any(pair => pair.Select(x => x.roleId).Contains((RoleId)roleId)))
+                {
+                    foreach (var blockedRoleId in CustomOptionHolder.blockedRolePairings.Where(pair => pair.Select(x => x.roleId).Contains((RoleId)roleId))
+                        .SelectMany(x => x).Where(x => x.roleId != (RoleId)roleId).Select(x => (byte)x.roleId))
+                    {
                         // Set chance for the blocked roles to 0 for chances less than 100%
                         if (data.impSettings.ContainsKey(blockedRoleId)) data.impSettings[blockedRoleId] = (0, 0);
                         if (data.neutralSettings.ContainsKey(blockedRoleId)) data.neutralSettings[blockedRoleId] = (0, 0);
                         if (data.crewSettings.ContainsKey(blockedRoleId)) data.crewSettings[blockedRoleId] = (0, 0);
+
                         // Remove blocked roles even if the chance was 100%
-                        foreach(var ensuredRolesList in rolesToAssign.Values) {
+                        foreach (var ensuredRolesList in rolesToAssign.Values) {
                             ensuredRolesList.RemoveAll(x => x == blockedRoleId);
                         }
                     }
-                }
 
-                // Adjust the role limit
-                switch (roleType) {
-                    case RoleType.Crewmate: data.maxCrewmateRoles--; crewValues -= 10; break;
-                    case RoleType.Neutral: data.maxNeutralRoles--; break;
-                    case RoleType.Impostor: data.maxImpostorRoles--; impValues -= 10;  break;
+                    // Adjust the role limit
+                    switch (roleType)
+                    {
+                        case RoleType.Crewmate: data.maxCrewmateRoles--; crewValues -= 10; break;
+                        case RoleType.Neutral: data.maxNeutralRoles--; break;
+                        case RoleType.Impostor: data.maxImpostorRoles--; impValues -= 10; break;
+                    }
                 }
             }
         }
@@ -477,12 +483,14 @@ namespace TheOtherRoles.Patches {
                 setRoleToRandomPlayer(roleId, players);
                 rolesToAssign[roleType].RemoveAll(x => x == roleId);
 
-                if (CustomOptionHolder.blockedRolePairings.ContainsKey(roleId)) {
-                    foreach(var blockedRoleId in CustomOptionHolder.blockedRolePairings[roleId]) {
-                        // Remove tickets of blocked roles from all pools
-                        crewmateTickets.RemoveAll(x => x == blockedRoleId);
-                        neutralTickets.RemoveAll(x => x == blockedRoleId);
-                        impostorTickets.RemoveAll(x => x == blockedRoleId);
+                if (CustomOptionHolder.blockedRolePairings.Any(pair => pair.Select(x => x.roleId).Contains((RoleId)roleId)))
+                {
+                    foreach (var blockedRoleId in CustomOptionHolder.blockedRolePairings.Where(pair => pair.Select(x => x.roleId).Contains((RoleId)roleId)).SelectMany(pair => pair))
+                    {
+                        // Remove tickets of blocked roles from all pools 
+                        crewmateTickets.RemoveAll(x => (RoleId)x == blockedRoleId.roleId);
+                        neutralTickets.RemoveAll(x => (RoleId)x == blockedRoleId.roleId);
+                        impostorTickets.RemoveAll(x => (RoleId)x == blockedRoleId.roleId);
                     }
                 }
 

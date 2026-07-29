@@ -700,6 +700,7 @@ namespace TheOtherRoles.MetaContext
                     AttributeAsset.OblongHeader => new TextAttributes(TextAlignment.Left, GetFont(FontAsset.Oblong), FontStyle.Normal, new(5.2f, false), new(0.45f, 3f), new(255, 255, 255), true),
                     AttributeAsset.StandardMediumMasked => new TextAttributes(TextAlignment.Center, GetFont(FontAsset.Gothic), FontStyle.Bold, new(1.6f, 0.8f, 1.6f), new(1.45f, 0.3f), new(255, 255, 255), false),
                     AttributeAsset.StandardLargeWideMasked => new TextAttributes(TextAlignment.Center, GetFont(FontAsset.Gothic), FontStyle.Bold, new(1.7f, 1f, 1.7f), new(2.9f, 0.45f), new(255, 255, 255), false),
+                    AttributeAsset.CenteredBold => new TextAttributes(TextAlignment.Center, GetFont(FontAsset.Gothic), FontStyle.Bold, new(1.9f, 1f, 1.9f), new(8f, 8f), new(255, 255, 255), true),
                     AttributeAsset.CenteredBoldFixed => new TextAttributes(TextAlignment.Center, GetFont(FontAsset.Gothic), FontStyle.Bold, new(1.9f, 1f, 1.9f), new(1.1f, 0.32f), new(255, 255, 255), false),
                     AttributeAsset.OverlayContent => new TextAttributes(Instance.GetAttribute(AttributeParams.StandardBaredLeft)) { FontSize = new(1.5f, 1.1f, 1.5f), Size = new(5f, 6f) },
                     AttributeAsset.OverlayTitle => new TextAttributes(Instance.GetAttribute(AttributeParams.StandardBaredBoldLeft)) { FontSize = new(1.8f) },
@@ -1016,24 +1017,28 @@ namespace TheOtherRoles.MetaContext
             Text = text;
         }
 
-        private void ReflectMyAttribute(TextMeshPro text, float width)
+        protected void ReflectMyAttribute(TMPro.TextMeshPro text, float width) => ReflectAttribute(Attr, text, width);
+        static public void ReflectAttribute(TextAttributes attr, TMPro.TextMeshPro text, float width)
         {
-            text.color = Attr.Color;
-            text.alignment = (TextAlignmentOptions)Attr.Alignment;
-            text.fontStyle = (FontStyles)Attr.Style;
-            text.fontSize = Attr.FontSize.FontSizeDefault;
-            text.fontSizeMin = Attr.FontSize.FontSizeMin;
-            text.fontSizeMax = Attr.FontSize.FontSizeMax;
-            text.enableAutoSizing = Attr.FontSize.AllowAutoSizing;
-            text.rectTransform.sizeDelta = new(Math.Min(width, Attr.Size.Width), Attr.Size.Height);
-            text.rectTransform.anchorMin = new Vector2(0.5f, 0.5f);
-            text.rectTransform.anchorMax = new Vector2(0.5f, 0.5f);
-            text.rectTransform.pivot = new Vector2(0.5f, 0.5f);
-            if (Attr.Font != null)
+            text.color = attr.Color;
+            text.alignment = (TMPro.TextAlignmentOptions)attr.Alignment;
+            text.fontStyle = (TMPro.FontStyles)attr.Style;
+            text.fontSize = attr.FontSize.FontSizeDefault;
+            text.fontSizeMin = attr.FontSize.FontSizeMin;
+            text.fontSizeMax = attr.FontSize.FontSizeMax;
+            text.enableAutoSizing = attr.FontSize.AllowAutoSizing;
+            text.enableWordWrapping = attr.Wrapping;
+            text.rectTransform.sizeDelta = new(Mathf.Min(width, attr.Size.Width), attr.Size.Height);
+            text.rectTransform.anchorMin = new UnityEngine.Vector2(0.5f, 0.5f);
+            text.rectTransform.anchorMax = new UnityEngine.Vector2(0.5f, 0.5f);
+            text.rectTransform.pivot = new UnityEngine.Vector2(0.5f, 0.5f);
+
+            if (attr.Font != null)
             {
-                text.font = Attr.Font.Font;
-                if (Attr.Font.FontMaterial != null) text.fontMaterial = Attr.Font.FontMaterial;
+                text.font = attr.Font.Font;
+                if (attr.Font.FontMaterial != null) text.fontMaterial = attr.Font.FontMaterial;
             }
+            if (attr.OutlineWidth.HasValue) text.SetOutlineThickness(attr.OutlineWidth.Value);
         }
 
         internal override GameObject Instantiate(Size size, out Size actualSize)
@@ -1095,6 +1100,67 @@ namespace TheOtherRoles.MetaContext
             PostBuilder?.Invoke(text);
             actualSize = new Size(text.rectTransform.sizeDelta);
             return text.gameObject;
+        }
+    }
+
+    public class TORGUICheckbox : AbstractGUIContext
+    {
+        internal ListArtifact<(Func<bool> getter, Action toggle)> Artifact = new();
+        private bool defaultValue;
+        public Action<bool> OnValueChanged = null;
+        public TORGUICheckbox(GUIAlignment alignment, bool defaultValue) : base(alignment)
+        {
+            this.defaultValue = defaultValue;
+        }
+
+
+        internal override GameObject Instantiate(Size size, out Size actualSize)
+        {
+            bool currentValue = defaultValue;
+
+            var backText = UnityEngine.Object.Instantiate(VanillaAsset.StandardTextPrefab, null);
+            backText.transform.localPosition = new UnityEngine.Vector3(0f, 0f, 0f);
+
+            var text = UnityEngine.Object.Instantiate(VanillaAsset.StandardTextPrefab, backText.transform);
+            text.transform.localPosition = new UnityEngine.Vector3(0f, 0f, -0.1f);
+
+            TORGUIText.ReflectAttribute(TORGUIContextEngine.API.GetAttribute(AttributeAsset.CenteredBold), backText, size.Width);
+            TORGUIText.ReflectAttribute(TORGUIContextEngine.API.GetAttribute(AttributeAsset.CenteredBold), text, size.Width);
+            backText.sortingOrder = 10;
+            backText.color = Color.white;
+            text.sortingOrder = 11;
+            text.color = Color.green;
+
+            void UpdateText() => text.text = currentValue ? "✓" : "";
+
+            backText.text = "□";
+            text.text = "✓";
+
+            backText.ForceMeshUpdate();
+            text.ForceMeshUpdate();
+
+            backText.rectTransform.sizeDelta = new(backText.preferredWidth, backText.preferredHeight);
+            text.rectTransform.sizeDelta = new(text.preferredWidth, text.preferredHeight);
+
+            UpdateText();
+
+            backText.ForceMeshUpdate();
+            text.ForceMeshUpdate();
+
+
+            var button = text.gameObject.SetUpButton(true);
+            var collider = text.gameObject.AddComponent<BoxCollider2D>();
+            collider.isTrigger = true;
+            collider.size = text.rectTransform.sizeDelta;
+
+            button.OnMouseOver.AddListener((Action)(() => backText.color = Color.green));
+            button.OnMouseOut.AddListener((Action)(() => backText.color = Color.white));
+            button.OnClick.AddListener((Action)(() => { currentValue = !currentValue; UpdateText(); OnValueChanged?.Invoke(currentValue); }));
+
+            Artifact.Values.Add((() => currentValue, button.OnClick.Invoke));
+
+            actualSize = new Size(text.rectTransform.sizeDelta);
+            return backText.gameObject;
         }
     }
 

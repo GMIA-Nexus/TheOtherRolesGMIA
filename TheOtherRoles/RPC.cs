@@ -136,6 +136,7 @@ namespace TheOtherRoles
 
         ResetVaribles = 100,
         ShareOptions,
+        ShareFilterOptions,
         ForceEnd,
         WorkaroundSetRoles,
         SetRole,
@@ -693,7 +694,7 @@ namespace TheOtherRoles
             RoleDraft.isRunning = false;
         }
 
-    public static void HandleShareOptions(byte numberOfOptions, MessageReader reader) {            
+        public static void HandleShareOptions(byte numberOfOptions, MessageReader reader) {            
             try {
                 for (int i = 0; i < numberOfOptions; i++) {
                     uint optionId = reader.ReadPackedUInt32();
@@ -705,6 +706,29 @@ namespace TheOtherRoles
             } catch (Exception e) {
                 TheOtherRolesPlugin.Logger.LogError("Error while deserializing options: " + e.Message);
             }
+        }
+
+        public static void HandleShareFilterOptions(byte numberOfOptions, MessageReader reader)
+        {
+            for (int i = 0; i < numberOfOptions; i++)
+            {
+                uint optionId = reader.ReadPackedUInt32();
+                string filterText = reader.ReadString();
+                var filterOpt = CustomOption.options.OfType<CustomFilterOption>().FirstOrDefault(o => o.id == (int)optionId);
+                if (filterOpt == null) continue;
+
+                filterOpt.exclusiveAssignment.Clear();
+                if (!string.IsNullOrWhiteSpace(filterText))
+                {
+                    var names = filterText.Split(',').Where(s => !string.IsNullOrWhiteSpace(s));
+                    foreach (var name in names)
+                    {
+                        var role = RoleInfo.allRoleInfos.FirstOrDefault(r => r.nameKey == name);
+                        if (role != null) filterOpt.exclusiveAssignment.Add(role);
+                    }
+                }
+            }
+            HelpMenu.OnUpdateOptions();
         }
 
         public static void forceEnd() {
@@ -2056,6 +2080,9 @@ namespace TheOtherRoles
                     break;
                 case (byte)CustomRPC.ShareOptions:
                     RPCProcedure.HandleShareOptions(reader.ReadByte(), reader);
+                    break;
+                case (byte)CustomRPC.ShareFilterOptions:
+                    RPCProcedure.HandleShareFilterOptions(reader.ReadByte(), reader);
                     break;
                 case (byte)CustomRPC.ForceEnd:
                     RPCProcedure.forceEnd();

@@ -127,6 +127,9 @@ namespace TheOtherRoles
             HandleGuesser.clearAndReload();
             HideNSeek.clearAndReload();
             FreePlayGM.clearAndReload();
+
+            // Blocked role pairing
+            CustomOptionHolder.HandleBlockRole();
         }
 
         public static class RoleData

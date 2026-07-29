@@ -636,6 +636,9 @@ namespace TheOtherRoles {
         public static CustomOption airshipAdditionalSpawn;
         public static CustomOption fungleElectrical;
         public static CustomOption cleanedBodyShowAsMissing;
+        public static CustomFilterOption exclusiveAssignmentOne;
+        public static CustomFilterOption exclusiveAssignmentTwo;
+        public static CustomFilterOption exclusiveAssignmentThree;
         public static CustomOption randomGameStartPosition;
         public static CustomOption activateProps;
         public static CustomOption numAccelTraps;
@@ -706,7 +709,7 @@ namespace TheOtherRoles {
         public static CustomOption huntedShieldRewindTime;
         public static CustomOption huntedShieldNumber;
 
-        internal static Dictionary<byte, byte[]> blockedRolePairings = new();
+        internal static List<RoleInfo[]> blockedRolePairings = new();
 
         public static string cs(Color c, string s) {
             return string.Format("<color=#{0:X2}{1:X2}{2:X2}{3:X2}>{4}</color>", ToByte(c.r), ToByte(c.g), ToByte(c.b), ToByte(c.a), s);
@@ -1415,6 +1418,10 @@ namespace TheOtherRoles {
             cleanedBodyShowAsMissing = CustomOption.Create(6092, Types.General, "cleanedBodyShowAsMissing", true);
             randomGameStartPosition = CustomOption.Create(6071, Types.General, "randomGameStartPosition", false);
 
+            exclusiveAssignmentOne = new CustomFilterOption(6093, Types.General, "exclusiveAssignmentOne", true, "blockedRolePairingHeader");
+            exclusiveAssignmentTwo = new CustomFilterOption(6094, Types.General, "exclusiveAssignmentTwo");
+            exclusiveAssignmentThree = new CustomFilterOption(6095, Types.General, "exclusiveAssignmentThree");
+
             camsNightVision = CustomOption.Create(11, Types.General, "camsNightVision", false, null, true, heading: "headingNightVision");
             camsNoNightVisionIfImpVision = CustomOption.Create(12, Types.General, "camsNoNightVisionIfImpVision", false, camsNightVision, false);
 
@@ -1436,13 +1443,16 @@ namespace TheOtherRoles {
             dynamicMapEnableSubmerged = CustomOption.Create(505, Types.General, "Submerged", rates, dynamicMap, false);
             dynamicMapEnableFungle = CustomOption.Create(506, Types.General, "Fungle", rates, dynamicMap, false);
             dynamicMapSeparateSettings = CustomOption.Create(509, Types.General, "dynamicMapSeparateSettings", false, dynamicMap, false);
+        }
 
-            blockedRolePairings.Add((byte)RoleId.Vampire, [(byte)RoleId.Warlock]);
-            blockedRolePairings.Add((byte)RoleId.Warlock, [(byte)RoleId.Vampire]);
-            blockedRolePairings.Add((byte)RoleId.Spy, [(byte)RoleId.Mini]);
-            blockedRolePairings.Add((byte)RoleId.Mini, [(byte)RoleId.Spy]);
-            blockedRolePairings.Add((byte)RoleId.Vulture, [(byte)RoleId.Cleaner]);
-            blockedRolePairings.Add((byte)RoleId.Cleaner, [(byte)RoleId.Vulture]);
+        public static void HandleBlockRole()
+        {
+            blockedRolePairings.Clear();
+            blockedRolePairings.Add([RoleInfo.vampire, RoleInfo.warlock]);
+            blockedRolePairings.Add([RoleInfo.cleaner, RoleInfo.vulture]);
+            blockedRolePairings.Add([.. exclusiveAssignmentOne.exclusiveAssignment]);
+            blockedRolePairings.Add([.. exclusiveAssignmentTwo.exclusiveAssignment]);
+            blockedRolePairings.Add([.. exclusiveAssignmentThree.exclusiveAssignment]);
         }
     }
 }

@@ -12,6 +12,7 @@ using Il2CppSystem.Linq;
 using Reactor.Utilities.Extensions;
 using TheOtherRoles.MetaContext;
 using TheOtherRoles.Modules;
+using TheOtherRoles.Patches;
 using TheOtherRoles.Roles;
 using TheOtherRoles.Utilities;
 using TMPro;
@@ -123,6 +124,9 @@ namespace TheOtherRoles {
                     stringOption.oldValue = stringOption.Value = option.selection;
                     stringOption.ValueText.text = option.getString();
                 }
+                if (option is CustomFilterOption filterOption) {
+                    filterOption.Bind();
+                }
             }
         }
 
@@ -156,6 +160,17 @@ namespace TheOtherRoles {
             AmongUsClient.Instance.FinishRpcImmediately(writer);
         }
 
+        public static void ShareFilterOptionChange(uint optionId)
+        {
+            if (options.FirstOrDefault(x => x.id == optionId) is not CustomFilterOption filterOpts) return;
+            var writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ShareFilterOptions, SendOption.Reliable, -1);
+            writer.Write((byte)1);
+            writer.WritePacked(optionId);
+            string dataStr = string.Join(",", filterOpts.exclusiveAssignment.Select(r => r.nameKey));
+            writer.Write(dataStr);
+            AmongUsClient.Instance.FinishRpcImmediately(writer);
+        }
+
         public static void ShareOptionSelections() {
             if (PlayerControl.AllPlayerControls.Count <= 1 || AmongUsClient.Instance!.AmHost == false && PlayerControl.LocalPlayer == null) return;
             var optionsList = new List<CustomOption>(CustomOption.options);
@@ -168,11 +183,22 @@ namespace TheOtherRoles {
                 {
                     var option = optionsList[0];
                     optionsList.RemoveAt(0);
-                    writer.WritePacked((uint) option.id);
+                    writer.WritePacked((uint)option.id);
                     writer.WritePacked(Convert.ToUInt32(option.selection));
                 }
                 AmongUsClient.Instance.FinishRpcImmediately(writer);
             }
+
+            var filterWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ShareFilterOptions, SendOption.Reliable, -1);
+            var filterOpts = options.OfType<CustomFilterOption>().ToList();
+            filterWriter.Write((byte)filterOpts.Count);
+            foreach (var opt in filterOpts)
+            {
+                filterWriter.WritePacked((uint)opt.id);
+                string dataStr = string.Join(",", opt.exclusiveAssignment.Select(r => r.nameKey));
+                filterWriter.Write(dataStr);
+            }
+            AmongUsClient.Instance.FinishRpcImmediately(filterWriter);
         }
 
         public static bool ShouldBeEnabled(CustomOption option)
@@ -345,9 +371,58 @@ namespace TheOtherRoles {
             return Convert.ToInt32(somethingApplied) + (errors > 0 ? 0 : 1);
         }
 
+        public static void deserializeFilterOption(byte[] filterBytes)
+        {
+            using var extReader = new BinaryReader(new MemoryStream(filterBytes));
+            int filterCount = extReader.ReadUInt16();
+            for (int i = 0; i < filterCount; i++)
+            {
+                ushort optId = extReader.ReadUInt16();
+                string filterText = extReader.ReadString();
+                var filterOpt = options.OfType<CustomFilterOption>().FirstOrDefault(x => x.id == optId);
+                if (filterOpt == null) continue;
+
+                filterOpt.exclusiveAssignment.Clear();
+                filterOpt.filterEntry.Value = filterText;
+                if (!string.IsNullOrWhiteSpace(filterText))
+                {
+                    var names = filterText.Split(',').Where(s => !string.IsNullOrWhiteSpace(s));
+                    foreach (var name in names)
+                    {
+                        var role = RoleInfo.allRoleInfos.FirstOrDefault(r => r.nameKey == name);
+                        if (role != null)
+                            filterOpt.exclusiveAssignment.Add(role);
+                    }
+                }
+            }
+        }
+
         // Copy to or paste from clipboard (as string)
         public static void copyToClipboard() {
-            GUIUtility.systemCopyBuffer = $"{TheOtherRolesPlugin.VersionString}!{Convert.ToBase64String(serializeOptions())}!{vanillaSettings.Value}";
+            byte[] torRawBinary = serializeOptions();
+            using var filterMs = new MemoryStream();
+            using var filterWriter = new BinaryWriter(filterMs);
+            var filterOpts = options.OfType<CustomFilterOption>().OrderBy(o => o.id).ToList();
+            filterWriter.Write((ushort)filterOpts.Count);
+            foreach (var opt in filterOpts)
+            {
+                filterWriter.Write((ushort)opt.id);
+                string saveStr = string.Join(",", opt.exclusiveAssignment.Select(r => r.nameKey));
+                filterWriter.Write(saveStr);
+            }
+            byte[] filterBinary = filterMs.ToArray();
+
+            string base64Part;
+            if (filterBinary.Length > 0)
+            {
+                string torBase64 = Convert.ToBase64String(torRawBinary);
+                string filterBase64 = Convert.ToBase64String(filterBinary);
+                base64Part = $"{torBase64}|{filterBase64}";
+            }
+            else {
+                base64Part = Convert.ToBase64String(torRawBinary);
+            }
+            GUIUtility.systemCopyBuffer = $"{TheOtherRolesPlugin.VersionString}!{base64Part}!{vanillaSettings.Value}";
         }
 
         public static int pasteFromClipboard() {
@@ -359,8 +434,20 @@ namespace TheOtherRoles {
                 Version versionInfo = Version.Parse(settingsSplit[0]);
                 string torSettings = settingsSplit[1];
                 string vanillaSettingsSub = settingsSplit[2];
-                torOptionsFine = deserializeOptions(Convert.FromBase64String(torSettings));
 
+                byte[] torBytes;
+                byte[] filterBytes = [];
+                if (torSettings.Contains('|'))
+                {
+                    var parts = torSettings.Split('|', 2);
+                    torBytes = Convert.FromBase64String(parts[0]);
+                    filterBytes = Convert.FromBase64String(parts[1]);
+                }
+                else {
+                    torBytes = Convert.FromBase64String(torSettings);
+                }
+
+                torOptionsFine = deserializeOptions(torBytes);
                 ShareOptionSelections();
                 if (TheOtherRolesPlugin.Version > versionInfo && versionInfo < Version.Parse("1.2.7"))
                 {
@@ -372,6 +459,8 @@ namespace TheOtherRoles {
                     vanillaSettings.Value = vanillaSettingsSub;
                     vanillaOptionsFine = loadVanillaOptions();
                 }
+                if (filterBytes.Length > 0) deserializeFilterOption(filterBytes);
+
             } catch (Exception e) {
                 TheOtherRolesPlugin.Logger.LogWarning($"{e}: tried to paste invalid settings!\n{allSettings}");
                 string errorStr = allSettings.Length > 2 ? allSettings.Substring(0, 3) : "(empty clipboard) ";
@@ -436,6 +525,148 @@ namespace TheOtherRoles {
 
             if (max > 1)
                 countOption = Create(id + 20000, type, "roleNumAssigned", 1f, 1f, max, 1f, this, false, "unitPlayers");
+        }
+    }
+
+    public class CustomFilterOption : CustomOption
+    {
+        public CustomFilterOption(int id, CustomOptionType type, string name, bool isHeader = false, string heading = "") : base(id, type, name, [0, 1], 0, null, isHeader, "", Color.white, heading: heading)
+        {
+            Bind();
+        }
+
+        public void Bind()
+        {
+            filterEntry = TheOtherRolesPlugin.Instance.Config.Bind($"Preset{preset}", id.ToString() + "_RoleFilter", string.Empty);
+            if (filterEntry.Value != string.Empty)
+            {
+                var roleNames = filterEntry.Value.Split(',');
+                exclusiveAssignment.Clear();
+                foreach (var roleName in roleNames)
+                {
+                    var role = RoleInfo.allRoleInfos.FirstOrDefault(x => x.nameKey == roleName);
+                    if (role != null)
+                        exclusiveAssignment.Add(role);
+                }
+            }
+        }
+
+        public string GetValueString()
+        {
+            var roleCount = filters.Count;
+            int[] flags = new int[roleCount];
+            int containedNum = 0, notContainedNum = 0;
+            for (int i = 0; i < roleCount; i++)
+            {
+                var role = filters[i];
+                if (!HelpMenu.CheckSpawnable(role)) continue;
+                var contains = exclusiveAssignment.Contains(role);
+                flags[i] = contains ? 2 : 1;
+                if (contains)
+                    containedNum++;
+                else
+                    notContainedNum++;
+            }
+
+            if (containedNum == 0) return ModTranslation.getString("roleFilterNone");
+            if (notContainedNum == 0) return ModTranslation.getString("roleFilterAll");
+
+            bool showContainedRoles = containedNum <= notContainedNum;
+            int checkNum = showContainedRoles ? 2 : 1;
+            StringBuilder builder = new();
+
+            int n = 0;
+            for (int i = 0; i < roleCount; i++)
+            {
+                if (flags[i] != checkNum) continue;
+                if (n > 0)
+                {
+                    builder.Append(", ");
+                    if (n % 4 == 0)
+                        builder.Append("\n    ");
+                }
+                builder.Append(Helpers.cs(filters[i].color, AdjustFilterRole(filters[i])));
+                n++;
+            }
+            if (!showContainedRoles) return string.Format(ModTranslation.getString("roleFilterExcludes"), builder.ToString());
+            return builder.ToString();
+        }
+
+        public static string AdjustFilterRole(RoleInfo role)
+        {
+            if (role.roleId == RoleId.Godfather)
+                return ModTranslation.getString("mafia");
+            else if (role.roleId == RoleId.BomberA)
+                return ModTranslation.getString("bomber");
+            else if (role.roleId == RoleId.MimicK)
+                return ModTranslation.getString("mimic");
+            else
+                return role.name;
+        }
+
+        static List<RoleInfo> filters { get
+            {
+                var list = RoleInfo.allRoleInfos.Where(x => !x.isModifier && (x.roleId is not RoleId.Sidekick and not RoleId.Immoralist and not RoleId.Impostor and not RoleId.Crewmate
+               and not RoleId.Mafioso and not RoleId.Janitor and not RoleId.MimicA and not RoleId.Pursuer and not RoleId.BomberB));
+                if (TORMapOptions.gameMode == CustomGamemodes.Guesser)
+                    return [.. list.Where(x => x.roleId is not RoleId.NiceGuesser and not RoleId.EvilGuesser)];
+                return [.. list];
+            } }
+
+        public List<RoleInfo> exclusiveAssignment = [];
+        public ConfigEntry<string> filterEntry;
+        public MetaScreen filterScreen = null;
+        private MetaScreen editButtonScreen = null;
+
+        private static readonly TextAttributes RelatedInsideButtonAttr = new(TORGUIContextEngine.API.GetAttribute(AttributeAsset.CenteredBoldFixed)) { Size = new(1.14f, 0.26f), Font = TORGUIContextEngine.API.GetFont(FontAsset.GothicMasked) };
+
+        public void CreateFilter(StringOption optionBehaviour)
+        {
+            var valueBox = optionBehaviour.gameObject.transform.GetChild(5).gameObject;
+            valueBox.SetActive(false);
+            optionBehaviour.ValueText.gameObject.SetActive(false);
+            optionBehaviour.PlusBtn.gameObject.SetActive(false);
+            optionBehaviour.MinusBtn.gameObject.SetActive(false);
+
+            var gui = TORGUIContextEngine.API;
+            var roleMaskedTittleAttr = gui.GetAttribute(AttributeAsset.MetaRoleButton);
+            if (!editButtonScreen) editButtonScreen = MetaScreen.GenerateScreen(new(3f, 1f), optionBehaviour.transform, new(valueBox.transform.localPosition.x, valueBox.transform.localPosition.y, -200f), false, false, false);
+            editButtonScreen.SetContext(new GUIButton(GUIAlignment.Center, roleMaskedTittleAttr, new TranslateTextComponent("filterOptionEdit")) { OnClick = () => OpenFilterScreen() }, new Vector2(0.5f, 0.5f), out _);
+        }
+
+        private void OpenFilterScreen()
+        {
+            var gui = TORGUIContextEngine.API;
+            if (!filterScreen) filterScreen = MetaScreen.GenerateWindow(new Vector2(6.7f, 3.7f), HudManager.Instance.transform, Vector3.zero, true, true);
+            var filteredRole = filters.ToList();
+            bool previewSpawnable = ClientOption.GetValue(ClientOption.ClientOptionType.ShowOnlySpawnableAssignableOnFilter) == 1;
+            if (previewSpawnable) filteredRole = [.. filteredRole.Where(HelpMenu.CheckSpawnable)];
+
+            filterScreen.SetContext(new VerticalContextsHolder(GUIAlignment.Center,
+                new HorizontalContextsHolder(GUIAlignment.Center, new TORGUICheckbox(GUIAlignment.Center, previewSpawnable) { OnValueChanged = val =>
+                {
+                    ClientOption.AllOptions[ClientOption.ClientOptionType.ShowOnlySpawnableAssignableOnFilter].Increment();
+                    OpenFilterScreen();
+                } }, gui.HorizontalMargin(0.2f), gui.LocalizedText(GUIAlignment.Center, gui.GetAttribute(AttributeAsset.OverlayContent), "roleFilterShowOnlySpawnable")),
+                new GUIScrollView(
+                GUIAlignment.Center, new(6.5f, 3.5f), gui.VerticalHolder(GUIAlignment.Center, gui.Arrange(GUIAlignment.Center, filteredRole.Select(x => new GUIButton(GUIAlignment.Center, RelatedInsideButtonAttr, gui.RawTextComponent(
+                        Helpers.cs(x.color, AdjustFilterRole(x)))) { OnClick = () => { ToggleAndShare(x); OpenFilterScreen(); }, Color = exclusiveAssignment.Contains(x) ? Color.white : new(0.14f, 0.14f, 0.14f),
+                    AsMaskedButton = true}), 4)))
+            { ScrollerTag = "FilterScreen", WithMask = true }), out _);
+        }
+
+        private void ToggleAndShare(RoleInfo role)
+        {
+            if (exclusiveAssignment.Contains(role)) {
+                exclusiveAssignment.Remove(role);
+            }
+            else
+                exclusiveAssignment.Add(role);
+
+            filterEntry.Value = string.Join(",", exclusiveAssignment.Select(r => r.nameKey));
+            if (AmongUsClient.Instance?.AmHost == true && PlayerControl.LocalPlayer) {
+                ShareFilterOptionChange((uint)id);
+            }
         }
     }
 
@@ -597,7 +828,8 @@ namespace TheOtherRoles {
         public static void drawTab(LobbyViewSettingsPane __instance, CustomOptionType optionType)
         {
 
-            var relevantOptions = options.Where(x => x.type == optionType || x.type == CustomOption.CustomOptionType.Guesser && optionType == CustomOptionType.General).ToList();
+            var relevantOptions = options.Where(x => x.type == optionType || (x.type == CustomOptionType.Guesser && optionType == CustomOptionType.General)).ToList();
+            relevantOptions.RemoveAll(x => x is CustomFilterOption _);
 
             if ((int)optionType == 99)
             {
@@ -1287,7 +1519,9 @@ namespace TheOtherRoles {
                 stringOption.Value = stringOption.oldValue = option.selection;
                 stringOption.ValueText.text = option.getString();
                 option.optionBehaviour = stringOption;
-                
+
+                if (option is CustomFilterOption filterOption) filterOption.CreateFilter(stringOption);
+
                 optionGroups.LastOrDefault().Options.Add(option);
                 menu.Children.Add(optionBehaviour);
                 optionBehaviour.gameObject.SetActive(true);
@@ -1662,7 +1896,13 @@ namespace TheOtherRoles {
                     } else if ((option == CustomOptionHolder.crewmateRolesCountMax) || (option == CustomOptionHolder.neutralRolesCountMax) || (option == CustomOptionHolder.impostorRolesCountMax) || option == CustomOptionHolder.modifiersCountMax) {
                         continue;
                     } else {
-                        sb.AppendLine($"\n{option.getName().Replace("\n", " ")}: {option.getString()}");
+                        if (option is CustomFilterOption filterOption)
+                        {
+                           sb.AppendLine($"\n{option.getName()}: {filterOption.GetValueString()}");
+                        }
+                        else {
+                            sb.AppendLine($"\n{option.getName().Replace("\n", " ")}: {option.getString()}");
+                        }
                     }
                 }
             }

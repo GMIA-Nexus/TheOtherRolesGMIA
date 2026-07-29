@@ -268,7 +268,7 @@ namespace TheOtherRoles.Modules
                             // Handle role pairings that are blocked, e.g. Vampire Warlock, Cleaner Vulture etc.
                             bool blocked = false;
                             foreach (var blockedRoleId in CustomOptionHolder.blockedRolePairings) {
-                                if (alreadyPicked.Any(x => x.Item1 == blockedRoleId.Key) && blockedRoleId.Value.ToList().Contains((byte)roleInfo.roleId)) {
+                                if (alreadyPicked.Any(x => blockedRoleId.Any(rid => (byte)rid.roleId == x.Item1 && Helpers.isSpecialRoleInfo(rid) == x.Item2)) && blockedRoleId.ToList().Contains(roleInfo)) {
                                     blocked = true;
                                     break;
                                 }

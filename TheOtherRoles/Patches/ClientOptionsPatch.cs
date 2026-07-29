@@ -23,6 +23,7 @@ namespace TheOtherRoles.Patches
             SpoilerAfterDeath,
             ShowRoleSummary,
             PlayLobbyMusic,
+            ShowOnlySpawnableAssignableOnFilter,
             ShowLighterDarker,
             EnableSoundEffects,
             ShowChatNotification,
@@ -55,6 +56,7 @@ namespace TheOtherRoles.Patches
         public string DisplayValue => ModTranslation.getString(selections[configEntry.Value]);
         public int Value => configEntry.Value;
         public Action OnValueChanged;
+        public bool ShowOnClientSetting { get; set; } = true;
 
         public void Increment()
         {
@@ -89,6 +91,7 @@ namespace TheOtherRoles.Patches
                     }
                 }
             };
+            _ = new ClientOption(ClientOptionType.ShowOnlySpawnableAssignableOnFilter, "showOnlySpawnableAssignableOnFilter", simpleSwitch, 0) { ShowOnClientSetting = false };
             _ = new ClientOption(ClientOptionType.ShowLighterDarker, "showLighterDarker", simpleSwitch, 0);
             _ = new ClientOption(ClientOptionType.EnableSoundEffects, "enableSoundEffects", simpleSwitch, 1);
             _ = new ClientOption(ClientOptionType.ShowChatNotification, "showChatNotification", simpleSwitch, 1);
@@ -132,7 +135,7 @@ namespace TheOtherRoles.Patches
             {
                 var buttonAttr = new TextAttribute(TextAttribute.BoldAttr) { Size = new Vector2(2.11f, 0.22f) };
                 MetaContextOld torContext = new();
-                torContext.Append(ClientOption.AllOptions.Values, (option) => new MetaContextOld.Button(() => {
+                torContext.Append(ClientOption.AllOptions.Values.Where(o => o.ShowOnClientSetting), (option) => new MetaContextOld.Button(() => {
                     option.Increment();
                     SetTORContext();
                 }, buttonAttr)

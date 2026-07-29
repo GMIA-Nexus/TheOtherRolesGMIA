@@ -301,6 +301,26 @@
         "13": "\u51cf\u901f\u677f\uff1a\n\u4f60\u5728{0}\u79d2\u5185\u6709\u51cf\u901f\u6548\u679c",
         "14": "\u6e1b\u901f\u677f\uff1a\n\u4f60\u5728{0}\u79d2\u5167\u6709\u6e1b\u901f\u6548\u679c"
     },
+    "exclusiveAssignmentOne": {
+        "0": "Category 1",
+        "13": "\u7c7b\u522b1",
+        "14": "\u985e\u52251"
+    },
+    "exclusiveAssignmentTwo": {
+        "0": "Category 2",
+        "13": "\u7c7b\u522b2",
+        "14": "\u985e\u52252"
+    },
+    "exclusiveAssignmentThree": {
+        "0": "Category 3",
+        "13": "\u7c7b\u522b3",
+        "14": "\u985e\u52253"
+    },
+    "blockedRolePairingHeader": {
+        "0": "Blocked Role Pairings",
+        "13": "\u804c\u4e1a\u5206\u914d\u9650\u5236",
+        "14": "\u8077\u696d\u5206\u914d\u9650\u5236"
+    },
     "vanillaOptionsHeader": {
         "0": "Among Us",
         "13": "Among Us"
@@ -324,6 +344,31 @@
         "0": "Task Settings",
         "13": "\u4efb\u52a1\u9009\u9879",
         "14": "\u4efb\u52d9\u9078\u9805"
+    },
+    "roleFilterShowOnlySpawnable": {
+        "0": "Only Show Spawnable Roles",
+        "13": "\u53ea\u663e\u793a\u53ef\u751f\u6210\u804c\u4e1a",
+        "14": "\u53ea\u986f\u793a\u53ef\u751f\u6210\u8077\u696d"
+    },
+    "filterOptionEdit": {
+        "0": "Edit",
+        "13": "\u7f16\u8f91",
+        "14": "\u7de8\u8f2f"
+    },
+    "roleFilterNone": {
+        "0": "None",
+        "13": "\u65e0",
+        "14": "\u7121"
+    },
+    "roleFilterAll": {
+        "0": "All",
+        "13": "\u6240\u6709\u804c\u4e1a",
+        "14": "\u6240\u6709\u8077\u696d"
+    },
+    "roleFilterExcludes": {
+        "0": "All Except For {0}",
+        "13": "\u9664{0}\u4ee5\u5916\u6240\u6709\u804c\u4e1a",
+        "14": "\u9664{0}\u4ee5\u5916\u6240\u6709\u8077\u696d"
     },
     "mapSkeld": {
         "0": "The Skeld",
