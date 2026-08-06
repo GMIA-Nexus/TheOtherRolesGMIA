@@ -281,7 +281,7 @@ namespace TheOtherRoles.Modules
                         if (current["content_type"].ToString().Equals("application/x-msdownload") &&
                             browser_download_url.EndsWith(".dll"))
                         {
-                            downloadURI = (Helpers.isChinese() ? "https://ghproxy.amongusclub.cn/" : "") + browser_download_url;
+                            downloadURI = (Helpers.isChinese() ? "https://cdn.gh-proxy.org/" : "") + browser_download_url;
                             break;
                         }
                     }

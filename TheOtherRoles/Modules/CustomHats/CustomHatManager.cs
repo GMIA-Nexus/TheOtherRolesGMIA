@@ -21,7 +21,7 @@ namespace TheOtherRoles.Modules.CustomHats
             get
             {
                 var (owner, repository) = Repository;
-                return (Helpers.isChinese() ? "https://github.proxy.amongusclub.cn/" : "") + $"https://raw.githubusercontent.com/{owner}/{repository}/master";
+                return (Helpers.isChinese() ? "https://cdn.gh-proxy.org/" : "") + $"https://raw.githubusercontent.com/{owner}/{repository}/master";
             }
         }
 

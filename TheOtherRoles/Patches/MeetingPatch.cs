@@ -668,6 +668,7 @@ namespace TheOtherRoles.Patches
                 if (roleInfo.isModifier || (roleInfo.roleId == RoleId.EvilGuesser && PlayerControl.LocalPlayer.isRole(RoleId.EvilGuesser)) || (roleInfo.roleId == RoleId.NiceGuesser && PlayerControl.LocalPlayer.isRole(RoleId.NiceGuesser))
                     || (!HandleGuesser.evilGuesserCanGuessSpy && PlayerControl.LocalPlayer.isRole(RoleId.EvilGuesser) && roleInfo.roleId == RoleId.Spy && !HandleGuesser.isGuesserGm)) continue; // Not guessable roles & modifier
                 if (HandleGuesser.isGuesserGm && (roleInfo.roleId == RoleId.NiceGuesser || roleInfo.roleId == RoleId.EvilGuesser)) continue; // remove Guesser for guesser game mode
+                if (!HandleGuesser.guessableRoles.Contains(roleInfo)) continue;
                 if (HandleGuesser.isGuesserGm && PlayerControl.LocalPlayer.Data.Role.IsImpostor && !HandleGuesser.evilGuesserCanGuessSpy && roleInfo.roleId == RoleId.Spy) continue;
                 // remove all roles that cannot spawn due to the settings from the ui.
                 if (roleData.neutralSettings.ContainsKey((byte)roleInfo.roleId) && roleData.neutralSettings[(byte)roleInfo.roleId].rate == 0) continue;
@@ -701,7 +702,6 @@ namespace TheOtherRoles.Patches
                 if (roleInfo.roleId == RoleId.Immoralist && (!CustomOptionHolder.foxCanCreateImmoralist.getBool() || CustomOptionHolder.foxSpawnRate.getSelection() == 0)) continue;
                 if (roleInfo.roleId == RoleId.Spy && roleData.impostors.Count <= 1) continue;
                 if (roleInfo.roleId == RoleId.BomberB) continue;
-                if (roleInfo.roleId == RoleId.Bait && !Bait.canBeGuessed) continue;
                 //if (roleInfo.roleId == RoleId.Prosecutor && (CustomOptionHolder.lawyerIsProsecutorChance.getSelection() == 0 || CustomOptionHolder.lawyerSpawnRate.getSelection() == 0)) continue;
                 //if (roleInfo.roleId == RoleId.Lawyer && CustomOptionHolder.lawyerSpawnRate.getSelection() == 0) continue;
                 if (Snitch.exists && HandleGuesser.guesserCantGuessSnitch) {

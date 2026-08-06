@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using TheOtherRoles.CustomGameModes;
 using TheOtherRoles.Roles;
@@ -15,6 +16,9 @@ namespace TheOtherRoles.Utilities {
         public static bool guesserCantGuessSnitch = false;
         public static bool guesserCantGuessFortuneTeller = true;
         public static int tasksToUnlock = Mathf.RoundToInt(CustomOptionHolder.guesserGamemodeCrewGuesserNumberOfTasks.getFloat());
+        public static List<RoleInfo> guessableRoleFilter => [.. RoleInfo.allRoleInfos.Where(x => !x.isModifier)];
+        public static List<RoleInfo> guesserGMRoleFilter => [.. RoleInfo.allRoleInfos.Where(x => !x.isModifier && x.roleId is not RoleId.NiceGuesser and not RoleId.EvilGuesser)];
+        public static List<RoleInfo> guessableRoles = [];
 
         public static Sprite getTargetSprite() {
             if (targetSprite) return targetSprite;
@@ -43,12 +47,14 @@ namespace TheOtherRoles.Utilities {
                 killsThroughShield = CustomOptionHolder.guesserGamemodeKillsThroughShield.getBool();
                 evilGuesserCanGuessSpy = CustomOptionHolder.guesserGamemodeEvilCanKillSpy.getBool();
                 tasksToUnlock = Mathf.RoundToInt(CustomOptionHolder.guesserGamemodeCrewGuesserNumberOfTasks.getFloat());
+                guessableRoles = CustomOptionHolder.guesserGamemodeGuessableRoles.filterSelection;
             } else {
                 guesserCantGuessSnitch = CustomOptionHolder.guesserCantGuessSnitchIfTaksDone.getBool();
                 guesserCantGuessFortuneTeller = CustomOptionHolder.guesserCantGuessFortuneTeller.getBool();
                 hasMultipleShotsPerMeeting = CustomOptionHolder.guesserHasMultipleShotsPerMeeting.getBool();
                 killsThroughShield = CustomOptionHolder.guesserKillsThroughShield.getBool();
                 evilGuesserCanGuessSpy = CustomOptionHolder.guesserEvilCanKillSpy.getBool();
+                guessableRoles = CustomOptionHolder.guesserGuessableRoles.filterSelection;
             }
 
         }

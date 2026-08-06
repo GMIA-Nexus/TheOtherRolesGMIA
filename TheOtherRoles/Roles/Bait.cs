@@ -138,7 +138,6 @@ namespace TheOtherRoles.Roles
         public static bool highlightAllVents { get { return CustomOptionHolder.baitHighlightAllVents.getBool(); } }
         public float reportDelay = 0f;
         public static bool showKillFlash = true;
-        public static bool canBeGuessed = true;
         public static float cooldown = 30f;
         public int numUses = 5;
 
@@ -170,7 +169,6 @@ namespace TheOtherRoles.Roles
         public static void clearAndReload()
         {
             showKillFlash = CustomOptionHolder.baitShowKillFlash.getBool();
-            canBeGuessed = CustomOptionHolder.baitCanBeGuessed.getBool();
             players = [];
         }
     }

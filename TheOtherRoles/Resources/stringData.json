@@ -370,6 +370,26 @@
         "13": "\u9664{0}\u4ee5\u5916\u6240\u6709\u804c\u4e1a",
         "14": "\u9664{0}\u4ee5\u5916\u6240\u6709\u8077\u696d"
     },
+    "filterRolesAllButton": {
+        "0": "All",
+        "13": "\u6240\u6709",
+        "14": "\u6240\u6709"
+    },
+    "filterImpostorButton": {
+        "0": "Impostor",
+        "13": "\u5185\u9b3c",
+        "14": "\u5167\u9b3c"
+    },
+    "filterCrewmateButton": {
+        "0": "Crewmate",
+        "13": "\u8239\u5458",
+        "14": "\u8239\u54e1"
+    },
+    "filterNeutralButton": {
+        "0": "Neutral",
+        "13": "\u4e2d\u7acb",
+        "14": "\u4e2d\u7acb"
+    },
     "mapSkeld": {
         "0": "The Skeld",
         "13": "The Skeld",
@@ -493,6 +513,11 @@
         "0": "Guesser Can't Guess Fortune Teller After Divination",
         "13": "\u8d4c\u602a\u65e0\u6cd5\u731c\u6d4b\u4f7f\u7528\u6280\u80fd\u7684\u5360\u535c\u5e08",
         "14": "\u8ced\u602a\u7121\u6cd5\u731c\u6e2c\u4f7f\u7528\u6280\u80fd\u7684\u5360\u535c\u5e2b"
+    },
+    "guesserGamemodeGuessableRoles": {
+        "0": "Guessable Roles",
+        "13": "\u53ef\u88ab\u731c\u6d4b\u7684\u804c\u4e1a",
+        "14": "\u53ef\u88ab\u731c\u6e2c\u7684\u8077\u696d"
     },
     "guesserGamemodeEnableLastImpostor": {
         "0": "Enable Last Impostor",
@@ -1380,6 +1405,11 @@
         "11": "\u30a4\u30d3\u30eb\u3068\u30ca\u30a4\u30b9\u4e21\u65b9\u306e\u30b2\u30c3\u30b5\u30fc\u304c\u51fa\u308b\u78ba\u7387",
         "13": "\u540c\u65f6\u751f\u6210\u6b63\u4e49\u4e0e\u90aa\u6076\u8d4c\u602a\u7684\u6982\u7387",
         "14": "\u5169\u500b\u8ced\u602a\u751f\u6210\u6a5f\u7387"
+    },
+    "guesserGuessableRoles": {
+        "0": "Guessable Roles",
+        "13": "\u53ef\u88ab\u731c\u6d4b\u7684\u804c\u4e1a",
+        "14": "\u53ef\u88ab\u731c\u6e2c\u7684\u8077\u696d"
     },
     "guesserCantGuessSnitchIfTaksDone": {
         "0": "Guesser Can't Guess Snitch When Tasks Completed",

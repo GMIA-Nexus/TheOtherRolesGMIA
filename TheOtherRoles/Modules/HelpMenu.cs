@@ -367,7 +367,7 @@ public static class HelpMenu
     public static string optionToString(CustomOption option)
     {
         if (option == null) return "";
-        return $"{option.getName().Replace("- ", "")}: {option.getString()}";
+        return $"{option.getName().Replace("- ", "")}: {(option is CustomFilterOption filterOption ? filterOption.GetValueString(6, "\n        ") : option.getString())}";
     }
 
     public static string optionsToString(CustomOption option, bool skipFirst = false)
