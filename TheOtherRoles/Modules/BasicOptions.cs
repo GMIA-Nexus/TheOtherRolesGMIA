@@ -10,7 +10,8 @@ namespace TheOtherRoles
     {
         public static void Save(Dictionary<int, string> optionTable, StreamWriter sw)
         {
-            var optionData = GetOptions();
+            var optionData = AmongUsClient.Instance.AmHost ? GameOptionsManager.Instance.currentNormalGameOptions : GameOptionsManager.Instance.normalGameHostOptions;
+
             if (optionData == null)
             {
                 TheOtherRolesPlugin.Logger.LogWarning("BasicOptions.Save: no normal game options available, skipping vanilla options.");
@@ -40,63 +41,51 @@ namespace TheOtherRoles
             Save(isDefaults.id, optionData.IsDefaults, optionTable, sw);
         }
 
-        // 取当前原版选项（currentNormalGameOptions 在部分场景（主菜单）可能为 null，做回退；都拿不到就跳过原版设置）
-        static NormalGameOptionsV10 GetOptions()
-        {
-            if (GameOptionsManager.Instance == null) return null;
-            var o = GameOptionsManager.Instance.currentNormalGameOptions;
-            if (o == null) o = GameOptionsManager.Instance.normalGameHostOptions;
-            return o;
-        }
-
         public static void Load(Dictionary<int, string> optionTable)
         {
             if (optionTable == null) return;
 
-            var optionData = GetOptions();
-            if (optionData == null) return;
-
             // Generic options
             if (optionTable.TryGetValue(mapId.id, out string s) && byte.TryParse(s, out var mapId_))
-                optionData.MapId = mapId_;
+                GameOptionsManager.Instance.currentNormalGameOptions.MapId = mapId_;
             if (optionTable.TryGetValue(playerSpeedMod.id, out s) && float.TryParse(s, out var playerSpeedMod_))
-                optionData.PlayerSpeedMod = playerSpeedMod_;
+                GameOptionsManager.Instance.currentNormalGameOptions.PlayerSpeedMod = playerSpeedMod_;
             if (optionTable.TryGetValue(crewLightMod.id, out s) && float.TryParse(s, out var crewLightMod_))
-                optionData.CrewLightMod = crewLightMod_;
+                GameOptionsManager.Instance.currentNormalGameOptions.CrewLightMod = crewLightMod_;
             if (optionTable.TryGetValue(impostorLightMod.id, out s) && float.TryParse(s, out var impostorLightMod_))
-                optionData.ImpostorLightMod = impostorLightMod_;
+                GameOptionsManager.Instance.currentNormalGameOptions.ImpostorLightMod = impostorLightMod_;
             if (optionTable.TryGetValue(killCooldown.id, out s) && float.TryParse(s, out var killCooldown_))
-                optionData.KillCooldown = killCooldown_;
+                GameOptionsManager.Instance.currentNormalGameOptions.KillCooldown = killCooldown_;
             if (optionTable.TryGetValue(numCommonTasks.id, out s) && int.TryParse(s, out var numCommonTasks_))
-                optionData.NumCommonTasks = numCommonTasks_;
+                GameOptionsManager.Instance.currentNormalGameOptions.NumCommonTasks = numCommonTasks_;
             if (optionTable.TryGetValue(numLongTasks.id, out s) && int.TryParse(s, out var numLongTasks_))
-                optionData.NumLongTasks = numLongTasks_;
+                GameOptionsManager.Instance.currentNormalGameOptions.NumLongTasks = numLongTasks_;
             if (optionTable.TryGetValue(numShortTasks.id, out s) && int.TryParse(s, out var numShortTasks_))
-                optionData.NumShortTasks = numShortTasks_;
+                GameOptionsManager.Instance.currentNormalGameOptions.NumShortTasks = numShortTasks_;
             if (optionTable.TryGetValue(numEmergencyMeetings.id, out s) && int.TryParse(s, out var numEmergencyMeetings_))
-                optionData.NumEmergencyMeetings = numEmergencyMeetings_;
+                GameOptionsManager.Instance.currentNormalGameOptions.NumEmergencyMeetings = numEmergencyMeetings_;
             if (optionTable.TryGetValue(emergencyCooldown.id, out s) && int.TryParse(s, out var emergencyCooldown_))
-                optionData.EmergencyCooldown = emergencyCooldown_;
+                GameOptionsManager.Instance.currentNormalGameOptions.EmergencyCooldown = emergencyCooldown_;
             if (optionTable.TryGetValue(numImpostors.id, out s) && int.TryParse(s, out var numImpostors_))
-                optionData.NumImpostors = numImpostors_;
+                GameOptionsManager.Instance.currentNormalGameOptions.NumImpostors = numImpostors_;
             if (optionTable.TryGetValue(ghostsDoTasks.id, out s) && bool.TryParse(s, out var ghostsDoTasks_))
-                optionData.GhostsDoTasks = ghostsDoTasks_;
+                GameOptionsManager.Instance.currentNormalGameOptions.GhostsDoTasks = ghostsDoTasks_;
             if (optionTable.TryGetValue(killDistance.id, out s) && int.TryParse(s, out var killDistance_))
-                optionData.KillDistance = killDistance_;
+                GameOptionsManager.Instance.currentNormalGameOptions.KillDistance = killDistance_;
             if (optionTable.TryGetValue(discussionTime.id, out s) && int.TryParse(s, out var discussionTime_))
-                optionData.DiscussionTime = discussionTime_;
+                GameOptionsManager.Instance.currentNormalGameOptions.DiscussionTime = discussionTime_;
             if (optionTable.TryGetValue(votingTime.id, out s) && int.TryParse(s, out var votingTime_))
-                optionData.VotingTime = votingTime_;
+                GameOptionsManager.Instance.currentNormalGameOptions.VotingTime = votingTime_;
             if (optionTable.TryGetValue(confirmImpostor.id, out s) && bool.TryParse(s, out var confirmImpostor_))
-                optionData.ConfirmImpostor = confirmImpostor_;
+                GameOptionsManager.Instance.currentNormalGameOptions.ConfirmImpostor = confirmImpostor_;
             if (optionTable.TryGetValue(visualTasks.id, out s) && bool.TryParse(s, out var visualTasks_))
-                optionData.VisualTasks = visualTasks_;
+                GameOptionsManager.Instance.currentNormalGameOptions.VisualTasks = visualTasks_;
             if (optionTable.TryGetValue(anonymousVotes.id, out s) && bool.TryParse(s, out var anonymousVotes_))
-                optionData.AnonymousVotes = anonymousVotes_;
+                GameOptionsManager.Instance.currentNormalGameOptions.AnonymousVotes = anonymousVotes_;
             if (optionTable.TryGetValue(taskBarMode.id, out s) && Enum.TryParse<TaskBarMode>(s, out var taskBarMode_))
-                optionData.TaskBarMode = (AmongUs.GameOptions.TaskBarMode)taskBarMode_;
+                GameOptionsManager.Instance.currentNormalGameOptions.TaskBarMode = (AmongUs.GameOptions.TaskBarMode)taskBarMode_;
             if (optionTable.TryGetValue(isDefaults.id, out s) && bool.TryParse(s, out var isDefaults_))
-                optionData.IsDefaults = isDefaults_;
+                GameOptionsManager.Instance.currentNormalGameOptions.IsDefaults = isDefaults_;
         }
 
         public static void Inherit(string section, Dictionary<ConfigDefinition, string> orphanedEntries, StreamWriter sw)
