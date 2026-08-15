@@ -717,17 +717,14 @@ namespace TheOtherRoles
                 var filterOpt = CustomOption.options.OfType<CustomFilterOption>().FirstOrDefault(o => o.id == (int)optionId);
                 if (filterOpt == null) continue;
 
-                filterOpt.filterSelection.Clear();
+                filterOpt.exclusiveAssignment.Clear();
                 if (!string.IsNullOrWhiteSpace(filterText))
                 {
                     var names = filterText.Split(',').Where(s => !string.IsNullOrWhiteSpace(s));
                     foreach (var name in names)
                     {
-                        if (byte.TryParse(name, out byte index))
-                        {
-                            var role = RoleInfo.allRoleInfos.FirstOrDefault(r => r.roleIndex == index);
-                            if (role != null) filterOpt.filterSelection.Add(role);
-                        }
+                        var role = RoleInfo.allRoleInfos.FirstOrDefault(r => r.nameKey == name);
+                        if (role != null) filterOpt.exclusiveAssignment.Add(role);
                     }
                 }
             }

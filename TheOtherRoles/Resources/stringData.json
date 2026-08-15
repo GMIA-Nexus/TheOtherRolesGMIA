@@ -23,6 +23,114 @@
         "13": "\u9884\u8bbe",
         "14": "\u9810\u8a2d"
     },
+    "preset3": {
+        "0": "Preset 3",
+        "11": "\u30d7\u30ea\u30bb\u30c3\u30c83",
+        "13": "\u9884\u8bbe3",
+        "14": "\u9810\u8a2d3"
+    },
+    "preset4": {
+        "0": "Preset 4",
+        "11": "\u30d7\u30ea\u30bb\u30c3\u30c84",
+        "13": "\u9884\u8bbe4",
+        "14": "\u9810\u8a2d4"
+    },
+    "preset5": {
+        "0": "Preset 5",
+        "11": "\u30d7\u30ea\u30bb\u30c3\u30c85",
+        "13": "\u9884\u8bbe5",
+        "14": "\u9810\u8a2d5"
+    },
+    "preset6": {
+        "0": "Preset 6",
+        "11": "\u30d7\u30ea\u30bb\u30c3\u30c86",
+        "13": "\u9884\u8bbe6",
+        "14": "\u9810\u8a2d6"
+    },
+    "presetOpen": {
+        "0": "Custom Presets",
+        "11": "\u30ab\u30b9\u30bf\u30e0\u30d7\u30ea\u30bb\u30c3\u30c8",
+        "13": "\u81ea\u5b9a\u4e49\u9884\u8bbe",
+        "14": "\u81ea\u8a02\u9810\u8a2d"
+    },
+    "presetTitle": {
+        "0": "Presets ({0}/{1})",
+        "11": "\u30d7\u30ea\u30bb\u30c3\u30c8 ({0}/{1})",
+        "13": "\u9884\u8bbe ({0}/{1})",
+        "14": "\u9810\u8a2d ({0}/{1})"
+    },
+    "presetCreate": {
+        "0": "Create New",
+        "11": "\u65b0\u898f\u4f5c\u6210",
+        "13": "\u65b0\u5efa",
+        "14": "\u65b0\u5efa"
+    },
+    "presetLoad": {
+        "0": "Load",
+        "11": "\u8aad\u8fbc",
+        "13": "\u52a0\u8f7d",
+        "14": "\u8f09\u5165"
+    },
+    "presetRename": {
+        "0": "Rename",
+        "11": "\u540d\u524d\u5909\u66f4",
+        "13": "\u91cd\u547d\u540d",
+        "14": "\u91cd\u65b0\u547d\u540d"
+    },
+    "presetDelete": {
+        "0": "Delete",
+        "11": "\u524a\u9664",
+        "13": "\u5220\u9664",
+        "14": "\u522a\u9664"
+    },
+    "presetCreateTitle": {
+        "0": "Create New Preset",
+        "11": "\u65b0\u3057\u3044\u30d7\u30ea\u30bb\u30c3\u30c8\u3092\u4f5c\u6210",
+        "13": "\u521b\u5efa\u65b0\u9884\u8bbe",
+        "14": "\u5efa\u7acb\u65b0\u9810\u8a2d"
+    },
+    "presetRenameTitle": {
+        "0": "Rename Preset",
+        "11": "\u30d7\u30ea\u30bb\u30c3\u30c8\u540d\u3092\u5909\u66f4",
+        "13": "\u91cd\u547d\u540d\u9884\u8bbe",
+        "14": "\u91cd\u65b0\u547d\u540d\u9810\u8a2d"
+    },
+    "presetNamePlaceholder": {
+        "0": "Preset Name",
+        "11": "\u30d7\u30ea\u30bb\u30c3\u30c8\u540d",
+        "13": "\u9884\u8bbe\u540d\u79f0",
+        "14": "\u9810\u8a2d\u540d\u7a31"
+    },
+    "presetIntroductionPlaceholder": {
+        "0": "Introduction (shown on hover)",
+        "11": "\u7d39\u4ecb\uff08\u30db\u30d0\u30fc\u3067\u8868\u793a\uff09",
+        "13": "\u4ecb\u7ecd\uff08\u60ac\u505c\u663e\u793a\uff09",
+        "14": "\u4ecb\u7d39\uff08\u61f8\u505c\u986f\u793a\uff09"
+    },
+    "presetConfirm": {
+        "0": "OK",
+        "11": "\u6c7a\u5b9a",
+        "13": "\u786e\u5b9a",
+        "14": "\u78ba\u5b9a"
+    },
+    "presetCancel": {
+        "0": "Cancel",
+        "11": "\u30ad\u30e3\u30f3\u30bb\u30eb",
+        "13": "\u53d6\u6d88",
+        "14": "\u53d6\u6d88"
+    },
+    "presetNoIntroduction": {
+        "0": "No introduction set.",
+        "11": "\u7d39\u4ecb\u306f\u672a\u8a2d\u5b9a\u3067\u3059\u3002",
+        "13": "\u672a\u8bbe\u7f6e\u4ecb\u7ecd\u3002",
+        "14": "\u672a\u8a2d\u5b9a\u4ecb\u7d39\u3002"
+    },
+    "presetInputBoxMissing": {
+        "0": "Preset input box could not be loaded.",
+        "11": "\u30d7\u30ea\u30bb\u30c3\u30c8\u5165\u529b\u30dc\u30c3\u30af\u30b9\u3092\u8aad\u307f\u8fbc\u3081\u307e\u305b\u3093\u3067\u3057\u305f\u3002",
+        "13": "\u65e0\u6cd5\u52a0\u8f7d\u9884\u8bbe\u8f93\u5165\u6846\u3002",
+        "14": "\u7121\u6cd5\u8f09\u5165\u9810\u8a2d\u8f38\u5165\u6846\u3002"
+    },
     "crewmateRolesCountMin": {
         "0": "Minimum Crewmate Roles",
         "11": "\u30af\u30eb\u30fc\u306e\u6700\u5c0f\u30ed\u30fc\u30eb\u6570",

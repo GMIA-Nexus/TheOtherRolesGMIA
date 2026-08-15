@@ -71,7 +71,6 @@ namespace TheOtherRoles {
         public static CustomOption guesserSpawnBothRate;
         public static CustomOption guesserCantGuessSnitchIfTaksDone;
         public static CustomOption guesserCantGuessFortuneTeller;
-        public static CustomFilterOption guesserGuessableRoles;
 
         public static CustomRoleOption watcherSpawnRate;
         public static CustomOption watcherAssignEqually;
@@ -308,6 +307,7 @@ namespace TheOtherRoles {
         public static CustomOption baitHighlightAllVents;
         public static CustomOption baitReportDelay;
         public static CustomOption baitShowKillFlash;
+        public static CustomOption baitCanBeGuessed;
         public static CustomOption baitEmitCooldown;
         public static CustomOption baitNumberOfEmits;
 
@@ -671,7 +671,6 @@ namespace TheOtherRoles {
         public static CustomOption guesserGamemodeEvilCanKillSpy;
         public static CustomOption guesserGamemodeCantGuessSnitchIfTaksDone;
         public static CustomOption guesserGamemodeCantGuessFortuneTeller;
-        public static CustomFilterOption guesserGamemodeGuessableRoles;
         public static CustomOption guesserGamemodeCrewGuesserNumberOfTasks;
         public static CustomOption guesserGamemodeSidekickIsAlwaysGuesser;
         public static CustomOption guesserGamemodeEnableLastImpostor;
@@ -915,7 +914,6 @@ namespace TheOtherRoles {
             guesserKillsThroughShield  = CustomOption.Create(315, Types.Neutral, "guesserKillsThroughShield", true, guesserSpawnRate);
             guesserEvilCanKillSpy  = CustomOption.Create(316, Types.Neutral, "guesserEvilCanKillSpy", true, guesserSpawnRate);
             guesserSpawnBothRate = CustomOption.Create(317, Types.Neutral, "guesserSpawnBothRate", rates, guesserSpawnRate);
-            guesserGuessableRoles = new CustomFilterOption(309, Types.Neutral, "guesserGuessableRoles", parent: guesserSpawnRate, categoryFilters: Utilities.HandleGuesser.guessableRoleFilter, defaultSelection: Utilities.HandleGuesser.guessableRoleFilter, replaceNames: false) { GroupShare = true };
             guesserCantGuessSnitchIfTaksDone = CustomOption.Create(318, Types.Neutral, "guesserCantGuessSnitchIfTaksDone", true, guesserSpawnRate);
             guesserCantGuessFortuneTeller = CustomOption.Create(319, Types.Neutral, "guesserCantGuessFortuneTeller", true, guesserSpawnRate);
 
@@ -1163,6 +1161,7 @@ namespace TheOtherRoles {
             baitHighlightAllVents = CustomOption.Create(1031, Types.Crewmate, "baitHighlightAllVents", false, baitSpawnRate);
             baitReportDelay = CustomOption.Create(1032, Types.Crewmate, "baitReportDelay", 0f, 0f, 10f, 1f, baitSpawnRate, false, "unitSeconds");
             baitShowKillFlash = CustomOption.Create(1033, Types.Crewmate, "baitShowKillFlash", true, baitSpawnRate);
+            baitCanBeGuessed = CustomOption.Create(1034, Types.Crewmate, "baitCanBeGuessed", true, baitSpawnRate);
             baitEmitCooldown = CustomOption.Create(9035, Types.Crewmate, "baitEmitCooldown", 30f, 1f, 60f, 1f, baitSpawnRate, false, "unitSeconds");
             baitNumberOfEmits = CustomOption.Create(9036, Types.Crewmate, "baitNumberOfEmits", 5f, 1f, 10f, 1f, baitSpawnRate, false, "unitScrews");
 
@@ -1363,7 +1362,6 @@ namespace TheOtherRoles {
             guesserGamemodeEvilCanKillSpy = CustomOption.Create(2009, Types.Guesser, "guesserGamemodeEvilCanKillSpy", true, null);
             guesserGamemodeCantGuessSnitchIfTaksDone = CustomOption.Create(2010, Types.Guesser, "guesserGamemodeCantGuessSnitchIfTaksDone", true, null);
             guesserGamemodeCantGuessFortuneTeller = CustomOption.Create(2021, Types.Guesser, "guesserGamemodeCantGuessFortuneTeller", true, null);
-            guesserGamemodeGuessableRoles = new CustomFilterOption(2020, Types.Guesser, "guesserGamemodeGuessableRoles", categoryFilters: Utilities.HandleGuesser.guesserGMRoleFilter, defaultSelection: Utilities.HandleGuesser.guesserGMRoleFilter, replaceNames: false) { GroupShare = true };
             guesserGamemodeEnableLastImpostor = CustomOption.Create(2017, Types.Guesser, "guesserGamemodeEnableLastImpostor", false, null, true, heading: "headingLastImpostor");
             guesserGamemodeLastImpostorNumKills = CustomOption.Create(2016, Types.Guesser, "guesserGamemodeLastImpostorNumKills", 3f, 0f, 24f, 1f, guesserGamemodeEnableLastImpostor, format: "unitPlayers");
             guesserGamemodeLastImpostorNumShots = CustomOption.Create(2018, Types.Guesser, "guesserGamemodeLastImpostorNumShots", 3f, 1f, 24f, 1f, guesserGamemodeEnableLastImpostor, format: "unitShots");
@@ -1452,9 +1450,9 @@ namespace TheOtherRoles {
             blockedRolePairings.Clear();
             blockedRolePairings.Add([RoleInfo.vampire, RoleInfo.warlock]);
             blockedRolePairings.Add([RoleInfo.cleaner, RoleInfo.vulture]);
-            blockedRolePairings.Add([.. exclusiveAssignmentOne.filterSelection]);
-            blockedRolePairings.Add([.. exclusiveAssignmentTwo.filterSelection]);
-            blockedRolePairings.Add([.. exclusiveAssignmentThree.filterSelection]);
+            blockedRolePairings.Add([.. exclusiveAssignmentOne.exclusiveAssignment]);
+            blockedRolePairings.Add([.. exclusiveAssignmentTwo.exclusiveAssignment]);
+            blockedRolePairings.Add([.. exclusiveAssignmentThree.exclusiveAssignment]);
         }
     }
 }

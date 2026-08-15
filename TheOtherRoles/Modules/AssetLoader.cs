@@ -44,6 +44,7 @@ namespace TheOtherRoles.Modules
                 Trap.place = AssetBundle.LoadAsset<AudioClip>("TrapperPlace.ogg");
 
                 FoxTask.prefab = AssetBundle.LoadAsset<GameObject>("FoxTask.prefab").DontUnload();
+                PresetManager.PresetInputBoxPrefab = AssetBundle.LoadAsset<GameObject>("PresetInputBox.prefab").DontUnload();
                 Shrine.sprite = AssetBundle.LoadAsset<Sprite>("shrine2.png").DontUnload();
                 Helpers.achievementMaterialShader = AssetBundle.LoadAsset<Shader>("Sprites-White.shader").DontUnload();
                 Helpers.achievementProgressShader = AssetBundle.LoadAsset<Shader>("Sprites-Progress.shader").DontUnload();

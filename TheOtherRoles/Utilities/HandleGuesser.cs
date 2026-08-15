@@ -47,14 +47,14 @@ namespace TheOtherRoles.Utilities {
                 killsThroughShield = CustomOptionHolder.guesserGamemodeKillsThroughShield.getBool();
                 evilGuesserCanGuessSpy = CustomOptionHolder.guesserGamemodeEvilCanKillSpy.getBool();
                 tasksToUnlock = Mathf.RoundToInt(CustomOptionHolder.guesserGamemodeCrewGuesserNumberOfTasks.getFloat());
-                guessableRoles = CustomOptionHolder.guesserGamemodeGuessableRoles.filterSelection;
+                guessableRoles = [.. guesserGMRoleFilter];
             } else {
                 guesserCantGuessSnitch = CustomOptionHolder.guesserCantGuessSnitchIfTaksDone.getBool();
                 guesserCantGuessFortuneTeller = CustomOptionHolder.guesserCantGuessFortuneTeller.getBool();
                 hasMultipleShotsPerMeeting = CustomOptionHolder.guesserHasMultipleShotsPerMeeting.getBool();
                 killsThroughShield = CustomOptionHolder.guesserKillsThroughShield.getBool();
                 evilGuesserCanGuessSpy = CustomOptionHolder.guesserEvilCanKillSpy.getBool();
-                guessableRoles = CustomOptionHolder.guesserGuessableRoles.filterSelection;
+                guessableRoles = [.. guessableRoleFilter];
             }
 
         }
