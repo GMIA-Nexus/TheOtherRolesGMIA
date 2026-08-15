@@ -64,15 +64,6 @@ namespace TheOtherRoles.Roles
                 _ = new StaticAchievementToken("lawyer.another1");
         }
 
-        public override void ResetRole(bool isShifted)
-        {
-            if (target != null && player == PlayerControl.LocalPlayer) {
-                Transform playerInfoTransform = target.cosmetics.nameText.transform.parent.FindChild("Info");
-                TMPro.TextMeshPro playerInfo = playerInfoTransform != null ? playerInfoTransform.GetComponent<TMPro.TextMeshPro>() : null;
-                if (playerInfo != null) playerInfo.text = "";
-            }
-        }
-
         public override void HandleDisconnect(PlayerControl player, DisconnectReasons reason)
         {
             if (this.player == player) target = null;

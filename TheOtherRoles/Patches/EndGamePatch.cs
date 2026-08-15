@@ -151,6 +151,36 @@ namespace TheOtherRoles.Patches {
                 bool isTaskMaster = playerControl.isRole(RoleId.TaskMaster);
                 bool isTaskMasterExTasks = isTaskMaster && TaskMaster.isTaskComplete;
                 string roleString = RoleInfo.GetRolesString(playerControl, true, true, false, true, [RoleId.Lover] );
+                var entries = TORGameManager.Instance.RoleHistory.Where(x => x.PlayerId == playerId).ToArray();
+                List<RoleHistory> history = [];
+                foreach (var item in entries)
+                {
+                    if (history.Count == 0)
+                    {
+                        history.Add(item);
+                        continue;
+                    }
+                    var last = history[^1];
+                    if (item.Time - last.Time < 1f) continue;
+                    if (last.RoleInfo.roleId == item.RoleInfo.roleId && Helpers.isSpecialRoleInfo(last.RoleInfo) == Helpers.isSpecialRoleInfo(item.RoleInfo) && last.IsMadmate == item.IsMadmate) continue;
+                    history.Add(item);
+                }
+                string extraInfo = "";
+                if (history.Count < 4)
+                {
+                    for (int i = 0; i < history.Count - 1; i++)
+                    {
+                        var entryRole = history[i].RoleInfo;
+                        extraInfo += Helpers.cs(history[i].IsMadmate ? Palette.ImpostorRed : history[i].Color, history[i].IsMadmate ?
+                            (entryRole.roleId == RoleId.Crewmate ? Madmate.fullName : Madmate.prefix + entryRole.name) : entryRole.name) + " → ";
+                    }
+                }
+                else
+                {
+                    extraInfo = Helpers.cs(history[0].IsMadmate ? Palette.ImpostorRed : history[0].Color, history[0].IsMadmate ?
+                            (history[0].RoleInfo.roleId == RoleId.Crewmate ? Madmate.fullName : Madmate.prefix + history[0].RoleInfo.name) : history[0].RoleInfo.name) + " → ...";
+                }
+                roleString = extraInfo + roleString;
                 AdditionalTempData.playerRoles.Add(new AdditionalTempData.PlayerRoleInfo() { PlayerName = playerControl.Data.PlayerName, Roles = roles, RoleColors = colors, RoleNames = roleString ,TasksTotal = tasksTotal, TasksCompleted = tasksCompleted,
                     ExTasksTotal = isTaskMasterExTasks ? TaskMaster.allExTasks : isTaskMaster ? TaskMasterTaskHelper.GetTaskMasterTasks() : 0,
                     ExTasksCompleted = isTaskMasterExTasks ? TaskMaster.clearExTasks : 0,
@@ -983,7 +1013,9 @@ namespace TheOtherRoles.Patches {
                 var roleSummaryTextMeshRectTransform = roleSummaryTextMesh.GetComponent<RectTransform>();
                 roleSummaryTextMeshRectTransform.anchoredPosition = new Vector2(position.x + 3.5f, position.y - 0.1f);
                 roleSummaryTextMesh.text = roleSummaryText.ToString();
-                Helpers.previousEndGameSummary = $"<size=110%>{roleSummaryText.ToString()}</size>";
+                LastGameHistory.SetHistory(__instance.WinText.font, new MetaContextOld.VariableText(new TextAttribute(TextAttribute.BoldAttr)
+                { Font = __instance.WinText.font, Size = new(8f, 5f), Alignment = TMPro.TextAlignmentOptions.Left }.EditFontSize(1.1f, 1.1f, 1.1f))
+                { RawText = roleSummaryText.ToString() }, textRenderer.text);
             }
 
             if (ClientOption.GetValue(ClientOption.ClientOptionType.ScreenshotOnEnd) == 1)

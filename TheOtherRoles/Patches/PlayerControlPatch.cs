@@ -366,7 +366,13 @@ namespace TheOtherRoles.Patches {
                     playerInfo.text = playerInfoText;
                     playerInfo.gameObject.SetActive(p.Visible);
                     if (meetingInfo != null) meetingInfo.text = MeetingHud.Instance.state == MeetingHud.VoteStates.Results ? "" : meetingInfoText;
-                }                
+                }
+                else
+                {
+                    var playerInfoTransform = p.cosmetics.nameText.transform.parent.FindChild("Info");
+                    var playerInfo = playerInfoTransform?.GetComponent<TMPro.TextMeshPro>();
+                    if (playerInfo != null) playerInfo.text = "";
+                }
             }
         }
 

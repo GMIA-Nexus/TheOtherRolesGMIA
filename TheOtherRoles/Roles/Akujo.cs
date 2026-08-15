@@ -262,29 +262,8 @@ namespace TheOtherRoles.Roles
             }
             if (PlayerControl.LocalPlayer == player)
             {
-                removeInfoText();
                 if (HudManagerStartPatch.akujoTimeRemainingText != null)
                     HudManagerStartPatch.akujoTimeRemainingText.enabled = false;
-            }
-        }
-
-        public void removeInfoText()
-        {
-            if (player == null) return;
-            if (honmei != null)
-            {
-                Transform playerInfoTransform = honmei.cosmetics.nameText.transform.parent.FindChild("Info");
-                TMPro.TextMeshPro playerInfo = playerInfoTransform?.GetComponent<TMPro.TextMeshPro>();
-                if (playerInfo != null) playerInfo.text = "";
-            }
-            if (keeps != null)
-            {
-                foreach (PlayerControl playerControl in keeps)
-                {
-                    Transform playerInfoTransform = playerControl.cosmetics.nameText.transform.parent.FindChild("Info");
-                    TMPro.TextMeshPro playerInfo = playerInfoTransform?.GetComponent<TMPro.TextMeshPro>();
-                    if (playerInfo != null) playerInfo.text = "";
-                }
             }
         }
 
@@ -307,7 +286,6 @@ namespace TheOtherRoles.Roles
             if (isKeep(lover) || isHonmei(lover))
             {
                 var akujo = players.FirstOrDefault(x => x.keeps.Contains(lover) || x.honmei == lover);
-                akujo.removeInfoText();
                 akujo.keeps.Remove(lover);
                 akujo.honmei = null;
             }

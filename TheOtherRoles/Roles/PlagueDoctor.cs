@@ -15,6 +15,7 @@ namespace TheOtherRoles.Roles
         public PlagueDoctor()
         {
             RoleId = roleId = RoleId.PlagueDoctor;
+            syncTimer = 0f;
         }
 
         public static Color color = new Color32(255, 192, 0, byte.MaxValue);
@@ -24,6 +25,7 @@ namespace TheOtherRoles.Roles
         public static Dictionary<int, bool> dead;
         public static TMPro.TMP_Text statusText = null;
         public static bool triggerPlagueDoctorWin = false;
+        public static float syncTimer = 0f;
 
         public static PlayerControl currentTarget;
         public static int numInfections = 0;
@@ -140,6 +142,10 @@ namespace TheOtherRoles.Roles
                 if (canWinDead || !player.Data.IsDead)
                 {
                     List<PlayerControl> newInfected = [];
+                    syncTimer += Time.fixedDeltaTime;
+                    bool canSync = syncTimer >= 0.2f;
+                    if (canSync) syncTimer = 0f;
+
                     foreach (PlayerControl target in PlayerControl.AllPlayerControls)
                     {
                         if (target == player || target.Data.IsDead || infected.ContainsKey(target.PlayerId) || target.inVent) continue;
@@ -157,11 +163,14 @@ namespace TheOtherRoles.Roles
                                 {
                                     progress[target.PlayerId] += Time.fixedDeltaTime;
 
-                                    // 他のクライアントに進行状況を通知する
-                                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.PlagueDoctorUpdateProgress, SendOption.Reliable, -1);
-                                    writer.Write(target.PlayerId);
-                                    writer.Write(progress[target.PlayerId]);
-                                    AmongUsClient.Instance.FinishRpcImmediately(writer);
+                                    if (canSync)
+                                    {
+                                        // 他のクライアントに進行状況を通知する
+                                        MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.PlagueDoctorUpdateProgress, SendOption.Reliable, -1);
+                                        writer.Write(target.PlayerId);
+                                        writer.Write(progress[target.PlayerId]);
+                                        AmongUsClient.Instance.FinishRpcImmediately(writer);
+                                    }
 
                                     // Only update a player's infection once per FixedUpdate
                                     break;
@@ -171,12 +180,12 @@ namespace TheOtherRoles.Roles
 
                         if (progress[target.PlayerId] > infectDuration)
                             newInfected.Add(target);
+                    }
 
-                        foreach (PlayerControl p in newInfected)
-                        {
-                            byte targetId = p.PlayerId;
-                            SetInfected.Invoke(targetId);
-                        }
+                    foreach (PlayerControl p in newInfected)
+                    {
+                        byte targetId = p.PlayerId;
+                        SetInfected.Invoke(targetId);
                     }
                 }
             }
@@ -283,6 +292,7 @@ namespace TheOtherRoles.Roles
             dead = [];
             if (statusText != null) UnityEngine.Object.Destroy(statusText);
             statusText = null;
+            syncTimer = 0f;
             players = [];
         }
     }

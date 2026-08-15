@@ -572,7 +572,7 @@ namespace TheOtherRoles
                     if (Pursuer.blankedList.Contains(p) && !p.Data.IsDead)
                         roleName = Helpers.cs(Pursuer.color, ModTranslation.getString("roleInfoBlanked")) + roleName;
 
-                    if (!MeetingHud.Instance)
+                    if (!MeetingHud.Instance || AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Ended)
                     {
                         if (FortuneTeller.players.Any(x => x.divineTarget == p))
                             roleName = Helpers.cs(FortuneTeller.color, ModTranslation.getString("roleInfoDivined")) + roleName;

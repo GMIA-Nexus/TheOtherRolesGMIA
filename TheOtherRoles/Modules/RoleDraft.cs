@@ -17,6 +17,7 @@ namespace TheOtherRoles.Modules
     {
         public static bool isEnabled => CustomOptionHolder.isDraftMode.getBool() && (TORMapOptions.gameMode == CustomGamemodes.Classic || TORMapOptions.gameMode == CustomGamemodes.Guesser);
         public static bool isRunning = false;
+        public static bool isFinished = false;
 
         public static List<byte> pickOrder = new();
         public static bool picked = false;
@@ -30,6 +31,7 @@ namespace TheOtherRoles.Modules
             if (!isEnabled) yield break;
 
             isRunning = true;
+            isFinished = false;
             SoundEffectsManager.play("GMIATheme", volume: 1f, true, true);
             alreadyPicked.Clear();
             bool playedAlert = false;
@@ -429,6 +431,7 @@ namespace TheOtherRoles.Modules
             __instance.FrontMost.gameObject.SetActive(true);
             GameObject.Find("BackgroundLayer")?.SetActive(true);
             scroller.enabled = false;
+            isFinished = true;
             if (AmongUsClient.Instance.AmHost)
             {
                 RoleManagerSelectRolesPatch.assignRoleTargets(null); // Assign targets for Lawyer & Prosecutor

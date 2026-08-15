@@ -692,6 +692,7 @@ namespace TheOtherRoles
             SurveillanceMinigamePatch.nightVisionOverlays = null;
             EventUtility.clearAndReload();
             RoleDraft.isRunning = false;
+            RoleDraft.isFinished = false;
         }
 
         public static void HandleShareOptions(byte numberOfOptions, MessageReader reader) {            
@@ -924,7 +925,8 @@ namespace TheOtherRoles
                         PlayerControl.LocalPlayer.generateAndAssignTasks(Madmate.commonTasks, Madmate.shortTasks, Madmate.longTasks);
                     }
 
-                    PlayerControl.AllPlayerControls.GetFastEnumerator().DoIf(x => !TORGameManager.Instance.RoleHistory.Any(history => history.PlayerId == x.PlayerId),
+                    if (!RoleDraft.isEnabled || RoleDraft.isFinished)
+                        PlayerControl.AllPlayerControls.GetFastEnumerator().DoIf(x => !TORGameManager.Instance.RoleHistory.Any(history => history.PlayerId == x.PlayerId),
                         x => TORGameManager.Instance.RecordRoleHistory(x));
 
                     ShipStatus.Instance.AllCameras.Do

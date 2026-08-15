@@ -2628,6 +2628,11 @@
         "13": "\u7bad\u5934\u4e0e\u5371\u9669\u6307\u793a\u5668",
         "14": "\u7bad\u982d\u8207\u5371\u96aa\u6307\u793a\u5668"
     },
+    "trackerCanKill": {
+        "0": "Tracker Can Kill",
+        "13": "\u8ffd\u8e2a\u8005\u53ef\u4ee5\u8fdb\u884c\u51fb\u6740",
+        "14": "\u8ffd\u8e2a\u8005\u53ef\u4ee5\u8fdb\u884c\u51fb\u6740"
+    },
     "trackerKillCooldown": {
         "0": "Tracker Kill Cooldown",
         "13": "\u8ffd\u8e2a\u8005\u51fb\u6740\u51b7\u5374",
@@ -5249,6 +5254,11 @@
         "0": "<color=#FF1919FF>Impostor</color> Chat",
         "13": "<color=#FF1919FF>\u5185\u9b3c</color>\u9891\u9053",
         "14": "<color=#FF1919FF>\u5167\u9b3c</color>\u983b\u9053"
+    },
+    "chatChannelLover": {
+        "0": "<color=#EB39B9FF>Lover</color> Chat",
+        "13": "<color=#EB39B9FF>\u604b\u4eba</color>\u9891\u9053",
+        "14": "<color=#EB39B9FF>\u6200\u4eba</color>\u983b\u9053"
     },
     "chatChannelJailor": {
         "0": "<color=#A6A6A6FF>Jailor</color> Chat",

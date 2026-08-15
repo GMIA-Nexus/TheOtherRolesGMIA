@@ -231,7 +231,8 @@ public static class HelpMenu
 
     static private IMetaContextOld GetLastGameContext()
     {
-        var context = new MetaContextOld.VariableText(OptionsAttr) { RawText = Helpers.previousEndGameSummary == "" ? ModTranslation.getString("lastGameResultEmpty") : Helpers.previousEndGameSummary, Alignment = IMetaContextOld.AlignmentOption.Left };
+        IMetaContextOld context = LastGameHistory.LastContext != null ? LastGameHistory.LastContext :
+            new MetaContextOld.VariableText(OptionsAttr) { RawText = ModTranslation.getString("lastGameResultEmpty"), Alignment = IMetaContextOld.AlignmentOption.Left };
         return new MetaContextOld.ScrollView(new(7.4f, HelpHeight), context) { Alignment = IMetaContextOld.AlignmentOption.Left, ScrollerTag = "HelpLastGameResult" };
     }
 
@@ -637,7 +638,7 @@ public static class HelpMenu
         if (!(MapUtilities.CachedShipStatus == null || PlayerControl.LocalPlayer == null || HudManager.Instance == null || FastDestroyableSingleton<HudManager>.Instance.IsIntroDisplayed)) {
             validTabs |= HelpTab.MyInfo;
         }
-        if (LobbyBehaviour.Instance && Helpers.previousEndGameSummary != "") validTabs |= HelpTab.LastGameResult;
+        if (LobbyBehaviour.Instance && LastGameHistory.LastContext != null) validTabs |= HelpTab.LastGameResult;
 
         if ((tab & validTabs) == (HelpTab)0)
         {

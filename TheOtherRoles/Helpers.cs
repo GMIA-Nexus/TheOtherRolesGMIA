@@ -156,10 +156,16 @@ namespace TheOtherRoles
         }
     }
 
+    public class LastGameHistory
+    {
+        public static MetaContextOld LastContext = null;
+
+        public static void SetHistory(TMP_FontAsset font, IMetaContextOld roleContext, string endCondition) =>
+            LastContext = new MetaContextOld(new MetaContextOld.Text(new(TextAttribute.BoldAttrLeft) { Font = font }) { RawText = endCondition }, new MetaContextOld.VerticalMargin(0.15f), roleContext);
+    }
+
     public static class Helpers
     {
-
-        public static string previousEndGameSummary = "";
         public static Dictionary<string, Sprite> CachedSprites = new();
 
         public static Sprite loadSpriteFromResources(string path, float pixelsPerUnit) {
