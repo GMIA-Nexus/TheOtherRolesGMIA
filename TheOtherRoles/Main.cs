@@ -59,7 +59,7 @@ namespace TheOtherRoles
         public static void UpdateRegions() {
             ServerManager serverManager = FastDestroyableSingleton<ServerManager>.Instance;
             var regions = new IRegionInfo[] {
-                new StaticHttpRegionInfo("<color=#ff44ff>GMIA <color=#00ffff>BEIJING</color></color>", StringNames.NoTranslation, "fk.mxyx.club", new Il2CppReferenceArray<ServerInfo>([new ServerInfo("<color=#ff44ff>GMIA <color=#00ffff>BEIJING</color></color>", "https://imp.amongusclub.cn", 443, false)])).CastFast<IRegionInfo>()
+                new StaticHttpRegionInfo("<color=#ff44ff>GMIA <color=#00ffff>BEIJING</color></color>", StringNames.NoTranslation, "imp.amongusclub.cn", new Il2CppReferenceArray<ServerInfo>([new ServerInfo("<color=#ff44ff>GMIA <color=#00ffff>BEIJING</color></color>", "https://imp.amongusclub.cn", 443, false)])).CastFast<IRegionInfo>()
             };
             
             IRegionInfo currentRegion = serverManager.CurrentRegion;
@@ -103,6 +103,8 @@ namespace TheOtherRoles
             Harmony.PatchAll();
             RemoteProcessBase.Load();
 
+            PresetManager.Load();
+            BasicOptions.Init();
             CustomOptionHolder.Load();
             CustomColors.Load();
             AssetLoader.LoadAssets();

@@ -135,6 +135,14 @@ namespace TheOtherRoles.Patches
             {
                 var buttonAttr = new TextAttribute(TextAttribute.BoldAttr) { Size = new Vector2(2.11f, 0.22f) };
                 MetaContextOld torContext = new();
+                torContext.Append(new MetaContextOld.Button(() => { PresetManager.OpenPresetUI(); }, buttonAttr)
+                {
+                    TextMargin = 0.19f,
+                    TranslationKey = "presetOpen",
+                    Color = Color.yellow,
+                    PostBuilder = (_, renderer, _) => renderer.transform.localPosition += new Vector3(1.5f, 0, 0)
+                });
+                torContext.Append(new MetaContextOld.VerticalMargin(0.2f));
                 torContext.Append(ClientOption.AllOptions.Values.Where(o => o.ShowOnClientSetting), (option) => new MetaContextOld.Button(() => {
                     option.Increment();
                     SetTORContext();
