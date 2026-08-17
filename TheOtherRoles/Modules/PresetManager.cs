@@ -283,7 +283,7 @@ namespace TheOtherRoles
                             else
                                 optionValueTable[option.id] = value;
 
-                            sw.Write($"{option.id},{value}");
+                            sw.WriteLine($"{option.id},{value}");
                         }
                         else
                         {
