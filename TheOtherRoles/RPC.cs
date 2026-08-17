@@ -724,11 +724,8 @@ namespace TheOtherRoles
                     var names = filterText.Split(',').Where(s => !string.IsNullOrWhiteSpace(s));
                     foreach (var name in names)
                     {
-                        if (byte.TryParse(name, out byte index))
-                        {
-                            var role = RoleInfo.allRoleInfos.FirstOrDefault(r => r.roleIndex == index);
-                            if (role != null) filterOpt.filterSelection.Add(role);
-                        }
+                        var role = RoleInfo.allRoleInfos.FirstOrDefault(r => r.nameKey == name);
+                        if (role != null) filterOpt.filterSelection.Add(role);
                     }
                 }
             }

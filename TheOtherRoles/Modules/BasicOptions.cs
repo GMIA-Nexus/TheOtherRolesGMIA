@@ -44,9 +44,7 @@ namespace TheOtherRoles
         static NormalGameOptionsV10 GetOptions()
         {
             if (GameOptionsManager.Instance == null) return null;
-            var o = GameOptionsManager.Instance.currentNormalGameOptions;
-            if (o == null) o = GameOptionsManager.Instance.normalGameHostOptions;
-            return o;
+            return GameOptionsManager.Instance.currentNormalGameOptions;
         }
 
         public static void Load(Dictionary<int, string> optionTable)

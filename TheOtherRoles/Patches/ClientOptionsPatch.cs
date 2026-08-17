@@ -135,14 +135,6 @@ namespace TheOtherRoles.Patches
             {
                 var buttonAttr = new TextAttribute(TextAttribute.BoldAttr) { Size = new Vector2(2.11f, 0.22f) };
                 MetaContextOld torContext = new();
-                torContext.Append(new MetaContextOld.Button(() => { PresetManager.OpenPresetUI(); }, buttonAttr)
-                {
-                    TextMargin = 0.19f,
-                    TranslationKey = "presetOpen",
-                    Color = Color.yellow,
-                    PostBuilder = (_, renderer, _) => renderer.transform.localPosition += new Vector3(1.5f, 0, 0)
-                });
-                torContext.Append(new MetaContextOld.VerticalMargin(0.2f));
                 torContext.Append(ClientOption.AllOptions.Values.Where(o => o.ShowOnClientSetting), (option) => new MetaContextOld.Button(() => {
                     option.Increment();
                     SetTORContext();
@@ -161,6 +153,27 @@ namespace TheOtherRoles.Patches
                 }, 2, -1, 0, 0.51f);
                 torContext.Append(new MetaContextOld.VerticalMargin(0.2f));
 
+                List<MetaContextOld.Button> bottomButtons = new();
+                void AddBottomButton(string translationKey, Action action)
+                {
+                    bottomButtons.Add(new MetaContextOld.Button(action, buttonAttr)
+                    {
+                        TextMargin = 0.19f,
+                        TranslationKey = translationKey,
+                        Alignment = IMetaContextOld.AlignmentOption.Center,
+                        PostBuilder = (button, _, _) =>
+                        {
+                            var detail = ModTranslation.getString(translationKey + "Detail", tryFind: true);
+                            if (detail != null)
+                            {
+                                button.SetRawOverlay(detail);
+                            }
+                        }
+                    });
+                }
+                if (!AmongUsClient.Instance || AmongUsClient.Instance.GameState != InnerNet.InnerNetClient.GameStates.Started) AddBottomButton("presetOpen", PresetManager.OpenPresetUI);
+
+                torContext.Append(bottomButtons, b => b, 2, -1, 0, 0.44f);
                 torScreen.SetContext(torContext);
             }
 

@@ -65,41 +65,5 @@ namespace TheOtherRoles.CustomGameModes
 
             }
         }
-
-        /*
-         Creates a button in the info pane in the lobby to open the custom preset manager.
-         */
-        /*[HarmonyPatch(typeof(LobbyInfoPane), nameof(LobbyInfoPane.Update))]
-        class LobbyPresetButtonPatch
-        {
-
-            private static GameObject presetButton = null;
-            public static void Postfix(LobbyInfoPane __instance)
-            {
-                if (presetButton != null) { return; }
-
-                var template = GameObject.Find("PRIVATE BUTTON");
-                if (template == null) { return; }
-                presetButton = GameObject.Instantiate(template, template.transform.parent);
-                presetButton.transform.localPosition = template.transform.localPosition + new Vector3(0f, 1.3f, -2f);
-                presetButton.name = "TOR PresetButton";
-
-                var pButton = presetButton.GetComponent<PassiveButton>();
-                pButton.buttonText.text = ModTranslation.getString("presetOpen");
-                pButton.OnClick.RemoveAllListeners();
-                pButton.OnClick = new ButtonClickedEvent();
-                pButton.OnClick.AddListener((Action)(() => PresetManager.OpenPresetUI()));
-                pButton.OnMouseOut = new UnityEvent();
-                pButton.OnMouseOver = new UnityEvent();
-                pButton.OnMouseOver.AddListener((Action)(() => {
-                    presetButton.transform.GetChild(1).gameObject.SetActive(true);
-                    presetButton.transform.GetChild(2).gameObject.SetActive(false);
-                }));
-                pButton.OnMouseOut.AddListener((Action)(() => {
-                    presetButton.transform.GetChild(1).gameObject.SetActive(false);
-                    presetButton.transform.GetChild(2).gameObject.SetActive(true);
-                }));
-            }
-        }*/ // 报废不用了
     }
 }

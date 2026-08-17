@@ -17,6 +17,7 @@ We are only a team of teenagers, and we may not be able to make this mod like an
 
 | Among Us - Version | Mod Version | Link                                                         |
 | ------------------ | ----------- | ------------------------------------------------------------ |
+| 17.3s            | v1.3.8     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.3.8) |
 | 17.3s            | v1.3.7     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.3.7) |
 | 17.1.2s            | v1.3.6     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.3.6) |
 | 17.1s            | v1.3.5     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.3.5) |
@@ -53,6 +54,26 @@ We are only a team of teenagers, and we may not be able to make this mod like an
 
 <details>
   <summary>Click to show the Changelog</summary>
+
+  **Version v1.3.8**
+ - Added new option "Tracker Can Kill"
+ - Added new option "Exclusive Assignment"
+ - Added new option "Guessable Roles"
+ - Added new option "Warlock Can Kill Impostors"
+ - Added new option "Snich Sees Roles"
+ - Added new option "Cleaned Bodies Shown As Missing"
+ - Added new Role Icons to indicate special role messages
+ - Added new information about the role changes to the end game screen
+ - Added a new preset manager, thanks to @FangkuaiYa
+ - Adjusted the way information is displayed during meetings
+ - Fixed a bug where the Nice Watcher cannot kill when witnessing a murder
+ - Fixed a bug where the Plague Doctor results in lag, thanks to @FangkuaiYa & @HayashiUme
+ - Fixed a bug where the kill button text is still rendered under the Sherlock Watch
+ - Fixed a bug where the button cooldowns will not be reset after a meeting on Airship, thanks to @FangkuaiYa
+ - Fixed a bug where the jailee can chat with the Jailor before meetings
+ - Fixed a bug where the Seer will record suicides or Pelican kills
+ - Fixed a bug where the Mini's age will significantly increase after finishing Role Draft
+ - Fixed a bug where the Fortune Teller is still guessable after divining a non-Impostor
 
   **Version v1.3.7**
  - Updated compatibility for Among Us v17.3

@@ -2,14 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Text;
-using AmongUs.GameOptions;
-using BepInEx.Configuration;
-using TMPro;
 using TheOtherRoles.MetaContext;
+using TMPro;
 using UnityEngine;
-using UnityEngine.EventSystems;
+using UnityEngine.UIElements;
 using Object = UnityEngine.Object;
 
 namespace TheOtherRoles
@@ -44,23 +41,11 @@ namespace TheOtherRoles
         // ======== プリセットページ表示 ========
         public static void OpenPresetUI()
         {
-            if (presetScreen) { presetScreen.CloseScreen(); presetScreen = null; }
-
-            var parent = GetUIParent();
-            if (parent == null) return;
+            presetScreen = MetaScreen.GenerateWindow(new(7.4f, 4.6f), HudManager.InstanceExists ? HudManager.Instance.transform : null, Vector3.zero, true, false, background: BackgroundSetting.Modern);
 
             RefreshPresetList();
             RecalcPresetPage();
-
-            presetScreen = MetaScreen.GenerateWindow(new(7.4f, 4.6f), parent, Vector3.zero, true, false);
             UpdatePresetScreen();
-        }
-
-        static Transform GetUIParent()
-        {
-            if (HudManager.Instance) return HudManager.Instance.transform;
-            if (Camera.main) return Camera.main.transform;
-            return null;
         }
 
         static void RecalcPresetPage()
@@ -136,20 +121,10 @@ namespace TheOtherRoles
                     }
                 };
 
-                if (AmongUsClient.Instance.AmHost && AmongUsClient.Instance.GameState != InnerNet.InnerNetClient.GameStates.Started)
-                {
-                    var loadInfo = info;
-                    row.Add(new MetaContextOld.Button(() => loadInfo.Load(), subAttr) { TranslationKey = "presetLoad", Color = Color.yellow });
-                }
-
-                if (AmongUsClient.Instance.GameState != InnerNet.InnerNetClient.GameStates.Started)
-                {
-                    var renameInfo = info;
-                    row.Add(new MetaContextOld.Button(() => OpenInputBox(true, renameInfo), subAttr) { TranslationKey = "presetRename", Color = Color.cyan });
-                }
-
-                var deleteInfo = info;
-                row.Add(new MetaContextOld.Button(() => OnDeletePreset(deleteInfo), subAttr) { TranslationKey = "presetDelete", Color = new Color32(235, 76, 70, 0xff) });
+                if (AmongUsClient.Instance != null && AmongUsClient.Instance.AmHost)
+                    row.Add(new MetaContextOld.Button(info.Load, subAttr) { TranslationKey = "presetLoad" });
+                row.Add(new MetaContextOld.Button(() => OpenInputBox(true, info), subAttr) { TranslationKey = "presetRename" });
+                row.Add(new MetaContextOld.Button(() => OnDeletePreset(info), subAttr) { TranslationKey = "presetDelete" });
 
                 context.Append(new CombinedContextOld(0.5f, row.ToArray()));
                 context.Append(new MetaContextOld.VerticalMargin(0.1f));
@@ -160,12 +135,15 @@ namespace TheOtherRoles
             // 作成・ページ送り
             var bottomAttr = new TextAttribute(TextAttribute.BoldAttr) { Size = new(1.2f, 0.3f) };
             List<IMetaParallelPlacableOld> bottom = new();
-            if (AmongUsClient.Instance.GameState != InnerNet.InnerNetClient.GameStates.Started)
+            if (AmongUsClient.Instance != null && LobbyBehaviour.Instance)
             {
-                bottom.Add(new MetaContextOld.Button(() => OpenInputBox(false, null), bottomAttr) { TranslationKey = "presetCreate", Color = Color.green });
+                bottom.Add(new MetaContextOld.Button(() => OpenInputBox(false, null), bottomAttr) { TranslationKey = "presetCreate" });
             }
-            bottom.Add(new MetaContextOld.Button(() => { if (--presetInfoPageNow <= 0) presetInfoPageNow = presetInfoPageMax; UpdatePresetScreen(); }, bottomAttr) { RawText = "◀", Color = Color.white });
-            bottom.Add(new MetaContextOld.Button(() => { if (++presetInfoPageNow > presetInfoPageMax) presetInfoPageNow = 1; UpdatePresetScreen(); }, bottomAttr) { RawText = "▶", Color = Color.white });
+            if (presetInfoPageMax > 1)
+            {
+                bottom.Add(new MetaContextOld.Button(() => { if (--presetInfoPageNow <= 0) presetInfoPageNow = presetInfoPageMax; UpdatePresetScreen(); }, bottomAttr) { RawText = "◀" });
+                bottom.Add(new MetaContextOld.Button(() => { if (++presetInfoPageNow > presetInfoPageMax) presetInfoPageNow = 1; UpdatePresetScreen(); }, bottomAttr) { RawText = "▶" });
+            }
             context.Append(new CombinedContextOld(0.5f, bottom.ToArray()));
 
             presetScreen.SetContext(context);
@@ -191,98 +169,37 @@ namespace TheOtherRoles
             return gui.VerticalHolder(GUIAlignment.Left, contents);
         }
 
-        // ======== 入力ボックス ========
-        static MetaScreen inputBoxScreen = null;
-        static PresetInputBox activeInputBox = null;
-        static bool inputBoxIsRename = false;
-        static PresetInfo inputBoxTarget = null;
-
         static void OpenInputBox(bool isRename, PresetInfo target)
         {
-            inputBoxIsRename = isRename;
-            inputBoxTarget = target;
-            activeInputBox = null;
-
-            if (inputBoxScreen) { inputBoxScreen.CloseScreen(); inputBoxScreen = null; }
-
-            var parent = GetUIParent();
-            if (parent == null) return;
-
-            inputBoxScreen = MetaScreen.GenerateWindow(new(6.4f, 4.4f), parent, Vector3.zero, true, true);
-
-            MetaContextOld context = new();
-            context.Append(new MetaContextOld.Text(new(TextAttribute.BoldAttr) { Size = new(3.2f, 0.3f) })
+            var window = MetaScreen.GenerateWindow(new(6f, 2.3f), HudManager.InstanceExists ? HudManager.Instance.transform : null, Vector3.zero, true, true, background: BackgroundSetting.Modern);
+            var gui = TORGUIContextEngine.API;
+            var nameTextField = new GUITextField(GUIAlignment.Center, new(4.3f, 0.4f)) { HintText = ModTranslation.getString("presetNamePlaceholder").Color(Color.gray), DefaultText = target?.presetName ?? "", IsSharpField = false, WithMaskMaterial = false };
+            var introTextField = new GUITextField(GUIAlignment.Center, new(4.3f, 0.4f)) { HintText = ModTranslation.getString("presetIntroductionPlaceholder").Color(Color.gray), DefaultText = target?.introduction ?? "", IsSharpField = false, WithMaskMaterial = false };
+            var button = new GUIButton(GUIAlignment.Center, gui.GetAttribute(AttributeAsset.CenteredBoldFixed), new TranslateTextComponent("presetConfirm")) { OnClick = () =>
             {
-                RawText = ModTranslation.getString(isRename ? "presetRenameTitle" : "presetCreateTitle")
-            });
-            context.Append(new MetaContextOld.VerticalMargin(0.15f));
-
-            if (PresetInputBoxPrefab)
-            {
-                context.Append(new MetaContextOld.CustomContext(new(5.8f, 2.8f), IMetaContextOld.AlignmentOption.Center, (parentTransform, center) =>
-                {
-                    var obj = Object.Instantiate(PresetInputBoxPrefab, parentTransform);
-                    obj.transform.localPosition = new Vector3(center.x, center.y, -0.1f);
-                    obj.transform.localScale = Vector3.one;
-                    SetLayerRecursively(obj.transform, LayerMask.NameToLayer("UI"));
-
-                    activeInputBox = obj.GetComponent<PresetInputBox>();
-                    if (!activeInputBox) activeInputBox = obj.AddComponent<PresetInputBox>();
-                    activeInputBox.CenterContent(center);
-
-                    if (isRename && target != null) activeInputBox.SetText(target.presetName, target.introduction);
-                    activeInputBox.SetTitle(ModTranslation.getString(isRename ? "presetRenameTitle" : "presetCreateTitle"));
-                    activeInputBox.SetPlaceholder(ModTranslation.getString("presetNamePlaceholder"), ModTranslation.getString("presetIntroductionPlaceholder"));
-                    activeInputBox.SetCharacterLimit(18, 200);
-                }));
-            }
-            else
-            {
-                context.Append(new MetaContextOld.Text(new(TextAttribute.ContentAttr) { Size = new(5.4f, 0.8f) })
-                {
-                    RawText = ModTranslation.getString("presetInputBoxMissing")
-                });
-            }
-
-            context.Append(new MetaContextOld.VerticalMargin(0.15f));
-
-            var buttonAttr = new TextAttribute(TextAttribute.BoldAttr) { Size = new(1.2f, 0.3f) };
-            context.Append(new CombinedContextOld(0.5f,
-                new MetaContextOld.Button(() => OnInputBoxConfirm(), buttonAttr) { TranslationKey = "presetConfirm", Color = Color.green },
-                new MetaContextOld.Button(() => CloseInputBox(), buttonAttr) { TranslationKey = "presetCancel", Color = Color.red }
-            ));
-
-            inputBoxScreen.SetContext(context);
-        }
-
-        static void OnInputBoxConfirm()
-        {
-            if (activeInputBox != null)
-            {
-                string name = activeInputBox.NameText;
-                string intro = activeInputBox.IntroductionText;
-                if (inputBoxIsRename && inputBoxTarget != null)
-                    inputBoxTarget.Rename(name, intro);
+                var nameText = nameTextField.Artifact.FirstOrDefault()?.Text ?? "";
+                var introText = introTextField.Artifact.FirstOrDefault()?.Text ?? "";
+                if (isRename && target != null)
+                    target.Rename(nameText, introText);
                 else
-                    CreateNewPreset(name, intro);
-            }
-            CloseInputBox();
-            UpdatePresetScreen();
-        }
+                    CreateNewPreset(nameText, introText);
 
-        static void CloseInputBox()
-        {
-            if (inputBoxScreen) { inputBoxScreen.CloseScreen(); inputBoxScreen = null; }
-            activeInputBox = null;
-            inputBoxTarget = null;
+                window.CloseScreen();
+                UpdatePresetScreen();
+            }
+            };
+            window.SetContext(gui.VerticalHolder(GUIAlignment.Center, nameTextField, introTextField, gui.VerticalMargin(0.2f), button), new Vector2(0.5f, 0.5f), out var size);
+            nameTextField.Artifact.Do(field => field.GainFocus());
         }
 
         static void CreateNewPreset(string name, string introduction)
         {
             long registTime = DateTime.Now.Ticks;
-            var presetInfo = new PresetInfo(name);
-            presetInfo.introduction = introduction ?? "";
-            presetInfo.registTime = registTime;
+            var presetInfo = new PresetInfo(name)
+            {
+                introduction = introduction ?? "",
+                registTime = registTime
+            };
             presetInfo.Save();
             RefreshPresetList();
             presetInfoPageNow = presetInfoPageMax = ((presetInfoList.Count - 1) / PresetInfoOnePageViewMax) + 1;
@@ -298,7 +215,7 @@ namespace TheOtherRoles
         // ======== プリセット情報 ========
         public class PresetInfo
         {
-            public string presetName;
+            public string presetName = "";
             public string introduction = "";
             public long registTime = 0;
             public string filePath;
@@ -358,12 +275,26 @@ namespace TheOtherRoles
                     foreach (CustomOption option in CustomOption.options)
                     {
                         if (option.id == 0) continue;
-                        int value = option.selection;
-                        if (optionValueTable.TryGetValue(option.id, out string v))
-                            int.TryParse(v, out value);
+                        if (option is CustomFilterOption filterOption)
+                        {
+                            string value = string.Join(";", filterOption.filterSelection.Select(x => x.nameKey));
+                            if (optionValueTable.TryGetValue(option.id, out var v))
+                                value = v;
+                            else
+                                optionValueTable[option.id] = value;
+
+                            sw.Write($"{option.id},{value}");
+                        }
                         else
-                            optionValueTable[option.id] = value.ToString();
-                        sw.WriteLine(string.Format("{0},{1}", option.id, value));
+                        {
+                            int value = option.selection;
+                            if (optionValueTable.TryGetValue(option.id, out string v))
+                                _ = int.TryParse(v, out value);
+                            else
+                                optionValueTable[option.id] = value.ToString();
+
+                            sw.WriteLine(string.Format("{0},{1}", option.id, value));
+                        }
                     }
                 }
             }
@@ -373,9 +304,7 @@ namespace TheOtherRoles
                 // 只有房主能在房间里加载预设。非房主（大厅/对局内）加载改不了房主设置，
                 // 而且 ShareOptionSelections 会把自定义选项广播给全房造成不同步。
                 // 主菜单（NotJoined，尚未加入房间）允许加载，因为那是在设置自己的主机选项。
-                if (AmongUsClient.Instance != null
-                    && AmongUsClient.Instance.GameState != InnerNet.InnerNetClient.GameStates.NotJoined
-                    && !AmongUsClient.Instance.AmHost)
+                if (AmongUsClient.Instance != null && AmongUsClient.Instance.GameState != InnerNet.InnerNetClient.GameStates.NotJoined && !AmongUsClient.Instance.AmHost)
                 {
                     TheOtherRolesPlugin.Logger.LogWarning("PresetManager: only the host can load a preset in the lobby.");
                     return;
@@ -392,10 +321,29 @@ namespace TheOtherRoles
                 foreach (CustomOption option in CustomOption.options)
                 {
                     if (option.id == 0) continue;
-                    int v = option.defaultSelection;
-                    if (optionValueTable.TryGetValue(option.id, out string value))
-                        int.TryParse(value, out v);
-                    option.updateSelection(v, false);
+                    if (option is CustomFilterOption filterOption)
+                    {
+                        string v = string.Join(";", filterOption.defaultFilterSelection.Select(x => x.nameKey));
+                        if (optionValueTable.TryGetValue(option.id, out string value))
+                            v = value;
+                        var roleNames = v.Split(';');
+                        filterOption.filterSelection.Clear();
+                        foreach (var roleName in roleNames)
+                        {
+                            var role = RoleInfo.allRoleInfos.FirstOrDefault(x => x.nameKey == roleName);
+                            if (role != null)
+                                filterOption.filterSelection.Add(role);
+                        }
+                        filterOption.filterEntry.Value = string.Join(",", filterOption.filterSelection.Select(r => r.nameKey));
+                        CustomOption.ShareFilterOptionChange((uint)option.id);
+                    }
+                    else
+                    {
+                        int v = option.defaultSelection;
+                        if (optionValueTable.TryGetValue(option.id, out string value))
+                            _ = int.TryParse(value, out v);
+                        option.updateSelection(v, false);
+                    }
                 }
                 CustomOption.ShareOptionSelections();
                 if (PlayerControl.LocalPlayer)
@@ -446,199 +394,6 @@ namespace TheOtherRoles
                 foreach (char c in name)
                     sb.Append(invalid.Contains(c) ? '_' : c);
                 return sb.ToString();
-            }
-        }
-
-        // ======== PresetInputBox.prefab 用コンポーネント ========
-        public class PresetInputBox : MonoBehaviour
-        {
-            static PresetInputBox() => ClassInjector.RegisterTypeInIl2Cpp<PresetInputBox>();
-            public PresetInputBox(System.IntPtr ptr) : base(ptr) { }
-            public PresetInputBox() : base(ClassInjector.DerivedConstructorPointer<PresetInputBox>()) { ClassInjector.DerivedConstructorBody(this); }
-
-            private TMP_InputField nameField = null;
-            private TMP_InputField introductionField = null;
-            private TextMeshProUGUI titleLabel = null;
-
-            // 待应用的值缓存：即使字段还没找到也先存起来，找到后立即应用
-            private string pendingTitle = null;
-            private string pendingName = null;
-            private string pendingIntroduction = null;
-            private string pendingNamePlaceholder = null;
-            private string pendingIntroductionPlaceholder = null;
-            private int pendingNameLimit = -1;
-            private int pendingIntroductionLimit = -1;
-            private bool didLogFields = false;
-            private bool lastFocusedName = false;
-            private bool lastFocusedIntro = false;
-
-            public string NameText => nameField ? nameField.text : "";
-            public string IntroductionText => introductionField ? introductionField.text : "";
-
-            public void Awake()
-            {
-                EnsureInitialized();
-            }
-
-            void Update()
-            {
-                EnsureInitialized();
-                if (!nameField && !introductionField) return;
-
-                // 参考 HaomingMenu：TMP_InputField 原生负责输入与焦点切换（点击哪个框就聚焦哪个框，
-                // 输入法/光标也跟过去），这里不再劫持 Input.inputString（之前劫持导致写错框/打不了字）。
-                // 只补两点：1) Tab/回车 在名字、介绍之间切换焦点；2) 打印焦点变化便于确认 TMP 原生是否生效。
-                bool nf = nameField.isFocused;
-                bool inf = introductionField.isFocused;
-                if (nf != lastFocusedName || inf != lastFocusedIntro)
-                {
-                    lastFocusedName = nf;
-                    lastFocusedIntro = inf;
-                    TheOtherRolesPlugin.Logger.LogMessage($"PresetInputBox focus: name={nf} intro={inf}");
-                }
-
-                if (Input.GetKeyDown(KeyCode.Tab))
-                {
-                    FocusField(nf && !inf ? introductionField : nameField);
-                }
-                else if (Input.GetKeyDown(KeyCode.Return) || Input.GetKeyDown(KeyCode.KeypadEnter))
-                {
-                    if (nf && !inf) FocusField(introductionField);
-                }
-            }
-
-            // Tab/回车用：主动把焦点给指定输入框。平时点击切换由 TMP 原生处理。
-            void FocusField(TMP_InputField field)
-            {
-                if (field == null) return;
-                try
-                {
-                    field.Select();
-                    field.ActivateInputField();
-                }
-                catch { }
-            }
-
-            void EnsureInitialized()
-            {
-                if (nameField != null && introductionField != null)
-                {
-                    ApplyPending();
-                    return;
-                }
-
-                var allFields = GetComponentsInChildren<TMP_InputField>(true);
-                foreach (var f in allFields)
-                {
-                    if (f.name == "PresetName") nameField = f;
-                    else if (f.name == "PresetIntroduction") introductionField = f;
-                }
-                if (nameField == null && allFields.Length > 0) nameField = allFields[0];
-                if (introductionField == null && allFields.Length > 1) introductionField = allFields[1];
-
-                // 一次性诊断：打印找到了哪些输入框（数量/名字/父物体），排查 prefab 里是否有重复的输入框
-                if (!didLogFields && nameField != null && introductionField != null)
-                {
-                    didLogFields = true;
-                    var sb = new System.Text.StringBuilder($"PresetInputBox fields(count={allFields.Length}):");
-                    for (int i = 0; i < allFields.Length; i++)
-                        sb.Append($" [{i}]'{allFields[i].name}' parent='{allFields[i].transform.parent?.name}'");
-                    TheOtherRolesPlugin.Logger.LogMessage(sb.ToString());
-                }
-
-                if (titleLabel == null)
-                {
-                    // 优先：名字为 "Text" 且父物体名为 "Contents" 的 TMP 文本
-                    foreach (var t in GetComponentsInChildren<TextMeshProUGUI>(true))
-                    {
-                        if (t.name == "Text" && t.transform.parent != null && t.transform.parent.name == "Contents")
-                        {
-                            titleLabel = t;
-                            break;
-                        }
-                    }
-                    // 兜底：第一个既不是输入框文字也不是占位符的 TMP 文本
-                    if (titleLabel == null)
-                    {
-                        var inputRelated = new HashSet<TMP_Text>();
-                        foreach (var f in allFields)
-                        {
-                            if (f.textComponent) inputRelated.Add(f.textComponent);
-                            if (f.placeholder && f.placeholder.TryCast<TextMeshProUGUI>() is TextMeshProUGUI ph) inputRelated.Add(ph);
-                        }
-                        foreach (var t in GetComponentsInChildren<TextMeshProUGUI>(true))
-                        {
-                            if (inputRelated.Contains(t)) continue;
-                            titleLabel = t;
-                            break;
-                        }
-                    }
-                }
-
-                ApplyPending();
-            }
-
-            void ApplyPending()
-            {
-                if (nameField == null || introductionField == null) return;
-
-                if (pendingTitle != null && titleLabel) { titleLabel.text = pendingTitle; pendingTitle = null; }
-                if (pendingName != null && nameField) { nameField.text = pendingName; pendingName = null; }
-                if (pendingIntroduction != null && introductionField) { introductionField.text = pendingIntroduction; pendingIntroduction = null; }
-                if (pendingNamePlaceholder != null && nameField) { SetPlaceholderText(nameField, pendingNamePlaceholder); pendingNamePlaceholder = null; }
-                if (pendingIntroductionPlaceholder != null && introductionField) { SetPlaceholderText(introductionField, pendingIntroductionPlaceholder); pendingIntroductionPlaceholder = null; }
-                if (pendingNameLimit >= 0 && nameField) { nameField.characterLimit = pendingNameLimit; pendingNameLimit = -1; }
-                if (pendingIntroductionLimit >= 0 && introductionField) { introductionField.characterLimit = pendingIntroductionLimit; pendingIntroductionLimit = -1; }
-            }
-
-            public void SetTitle(string title)
-            {
-                pendingTitle = title;
-                EnsureInitialized();
-            }
-
-            public void SetText(string name, string introduction)
-            {
-                pendingName = name ?? "";
-                pendingIntroduction = introduction ?? "";
-                EnsureInitialized();
-            }
-
-            public void SetPlaceholder(string namePlaceholder, string introductionPlaceholder)
-            {
-                pendingNamePlaceholder = namePlaceholder;
-                pendingIntroductionPlaceholder = introductionPlaceholder;
-                EnsureInitialized();
-            }
-
-            static void SetPlaceholderText(TMP_InputField field, string text)
-            {
-                if (field.placeholder && field.placeholder.TryCast<TextMeshProUGUI>() is TextMeshProUGUI tmp)
-                    tmp.text = text;
-            }
-
-            public void SetCharacterLimit(int nameLimit, int introductionLimit)
-            {
-                pendingNameLimit = nameLimit;
-                pendingIntroductionLimit = introductionLimit;
-                EnsureInitialized();
-            }
-
-            // PresetInputBox.prefab 的内容按左下角原点排版，这里整体平移预制体，
-            // 让两个输入框的中点对准窗口中心（不依赖 sizeDelta，避免把内容推飞）。
-            public void CenterContent(Vector2 windowCenter)
-            {
-                EnsureInitialized();
-                if (!nameField || !introductionField) return;
-                var parent = transform.parent;
-                if (parent == null) return;
-                try
-                {
-                    Vector2 mid = (((Vector2)nameField.transform.position) + ((Vector2)introductionField.transform.position)) * 0.5f;
-                    Vector2 target = (Vector2)parent.TransformPoint(windowCenter);
-                    transform.position += (Vector3)(target - mid);
-                }
-                catch { }
             }
         }
     }

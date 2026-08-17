@@ -166,7 +166,7 @@ namespace TheOtherRoles {
             var writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.ShareFilterOptions, SendOption.Reliable, -1);
             writer.Write((byte)1);
             writer.WritePacked(optionId);
-            string dataStr = string.Join(",", filterOpts.filterSelection.Select(r => r.roleIndex));
+            string dataStr = string.Join(",", filterOpts.filterSelection.Select(r => r.nameKey));
             writer.Write(dataStr);
             AmongUsClient.Instance.FinishRpcImmediately(writer);
         }
@@ -195,7 +195,7 @@ namespace TheOtherRoles {
             foreach (var opt in filterOpts)
             {
                 filterWriter.WritePacked((uint)opt.id);
-                string dataStr = string.Join(",", opt.filterSelection.Select(r => r.roleIndex));
+                string dataStr = string.Join(",", opt.filterSelection.Select(r => r.nameKey));
                 filterWriter.Write(dataStr);
             }
             AmongUsClient.Instance.FinishRpcImmediately(filterWriter);
@@ -316,163 +316,6 @@ namespace TheOtherRoles {
                 ShareOptionSelections();// Share all selections
             }
         }
-
-        public static byte[] serializeOptions() {
-            using (MemoryStream memoryStream = new()) {
-                using (BinaryWriter binaryWriter = new(memoryStream)) {
-                    int lastId = -1;
-                    foreach (var option in CustomOption.options.OrderBy(x => x.id)) {
-                        if (option.id == 0) continue;
-                        bool consecutive = lastId + 1 == option.id;
-                        lastId = option.id;
-
-                        binaryWriter.Write((byte)(option.selection + (consecutive ? 128 : 0)));
-                        if (!consecutive) binaryWriter.Write((ushort)option.id);
-                    }
-                    binaryWriter.Flush();
-                    memoryStream.Position = 0L;
-                    return memoryStream.ToArray();
-                }
-            }
-        }
-
-        public static int deserializeOptions(byte[] inputValues) {
-            BinaryReader reader = new(new MemoryStream(inputValues));
-            int lastId = -1;
-            bool somethingApplied = false;
-            int errors = 0;
-            while (reader.BaseStream.Position < inputValues.Length) {
-                try {
-                    int selection = reader.ReadByte();
-                    int id = -1;
-                    bool consecutive = selection >= 128;
-                    if (consecutive) {
-                        selection -= 128;
-                        id = lastId + 1;
-                    } else {
-                        id = reader.ReadUInt16();
-                    }
-                    if (id == 0) continue;
-                    lastId = id;
-                    CustomOption option = options.First(option => option.id == id);
-                    option.entry = TheOtherRolesPlugin.Instance.Config.Bind($"Preset{preset}", option.id.ToString(), option.defaultSelection);
-                    option.selection = selection;
-                    if (option.optionBehaviour != null && option.optionBehaviour is StringOption stringOption)
-                    {
-                        stringOption.oldValue = stringOption.Value = option.selection;
-                        stringOption.ValueText.text = option.getString();
-                    }
-                    somethingApplied = true;
-                } catch (Exception e) {
-                    TheOtherRolesPlugin.Logger.LogWarning($"id:{lastId}:{e}: while deserializing - tried to paste invalid settings!");
-                    errors++;
-                }
-            }
-            return Convert.ToInt32(somethingApplied) + (errors > 0 ? 0 : 1);
-        }
-
-        public static void deserializeFilterOption(byte[] filterBytes)
-        {
-            using var extReader = new BinaryReader(new MemoryStream(filterBytes));
-            int filterCount = extReader.ReadUInt16();
-            for (int i = 0; i < filterCount; i++)
-            {
-                ushort optId = extReader.ReadUInt16();
-                string filterText = extReader.ReadString();
-                var filterOpt = options.OfType<CustomFilterOption>().FirstOrDefault(x => x.id == optId);
-                if (filterOpt == null) continue;
-
-                filterOpt.filterSelection.Clear();
-                filterOpt.filterEntry = TheOtherRolesPlugin.Instance.Config.Bind($"Preset{preset}", optId.ToString() + "_RoleFilter", string.Join(",", filterOpt.defaultFilterSelection.Select(x => x.roleIndex)));
-                filterOpt.filterEntry.Value = filterText;
-                if (!string.IsNullOrWhiteSpace(filterText))
-                {
-                    var names = filterText.Split(',').Where(s => !string.IsNullOrWhiteSpace(s));
-                    foreach (var name in names)
-                    {
-                        if (byte.TryParse(name, out var index))
-                        {
-                            var role = RoleInfo.allRoleInfos.FirstOrDefault(r => r.roleIndex == index);
-                            if (role != null)
-                                filterOpt.filterSelection.Add(role);
-                        }
-                    }
-                }
-            }
-        }
-
-        // Copy to or paste from clipboard (as string)
-        public static void copyToClipboard() {
-            byte[] torRawBinary = serializeOptions();
-            using var filterMs = new MemoryStream();
-            using var filterWriter = new BinaryWriter(filterMs);
-            var filterOpts = options.OfType<CustomFilterOption>().OrderBy(o => o.id).ToList();
-            filterWriter.Write((ushort)filterOpts.Count);
-            foreach (var opt in filterOpts)
-            {
-                filterWriter.Write((ushort)opt.id);
-                string saveStr = string.Join(",", opt.filterSelection.Select(r => r.roleIndex));
-                filterWriter.Write(saveStr);
-            }
-            byte[] filterBinary = filterMs.ToArray();
-
-            string base64Part;
-            if (filterBinary.Length > 0)
-            {
-                string torBase64 = Convert.ToBase64String(torRawBinary);
-                string filterBase64 = Convert.ToBase64String(filterBinary);
-                base64Part = $"{torBase64}|{filterBase64}";
-            }
-            else {
-                base64Part = Convert.ToBase64String(torRawBinary);
-            }
-            GUIUtility.systemCopyBuffer = $"{TheOtherRolesPlugin.VersionString}!{base64Part}!{vanillaSettings.Value}";
-        }
-
-        public static int pasteFromClipboard() {
-            string allSettings = GUIUtility.systemCopyBuffer;
-            int torOptionsFine = 0;
-            bool vanillaOptionsFine = false;
-            try {
-                var settingsSplit = allSettings.Split("!");
-                Version versionInfo = Version.Parse(settingsSplit[0]);
-                string torSettings = settingsSplit[1];
-                string vanillaSettingsSub = settingsSplit[2];
-
-                byte[] torBytes;
-                byte[] filterBytes = [];
-                if (torSettings.Contains('|'))
-                {
-                    var parts = torSettings.Split('|', 2);
-                    torBytes = Convert.FromBase64String(parts[0]);
-                    filterBytes = Convert.FromBase64String(parts[1]);
-                }
-                else {
-                    torBytes = Convert.FromBase64String(torSettings);
-                }
-
-                torOptionsFine = deserializeOptions(torBytes);
-                ShareOptionSelections();
-                if (TheOtherRolesPlugin.Version > versionInfo && versionInfo < Version.Parse("1.2.7"))
-                {
-                    vanillaOptionsFine = false;
-                    FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(PlayerControl.LocalPlayer, "Host Info: Pasting vanilla settings failed, TOR Options applied!");
-                }
-                else
-                {
-                    vanillaSettings.Value = vanillaSettingsSub;
-                    vanillaOptionsFine = loadVanillaOptions();
-                }
-                if (filterBytes.Length > 0) deserializeFilterOption(filterBytes);
-
-            } catch (Exception e) {
-                TheOtherRolesPlugin.Logger.LogWarning($"{e}: tried to paste invalid settings!\n{allSettings}");
-                string errorStr = allSettings.Length > 2 ? allSettings.Substring(0, 3) : "(empty clipboard) ";
-                FastDestroyableSingleton<HudManager>.Instance.Chat.AddChat(PlayerControl.LocalPlayer, $"Host Info: You tried to paste invalid settings: \"{errorStr}...\"");
-                SoundEffectsManager.play("fail");
-            }
-            return Convert.ToInt32(vanillaOptionsFine) + torOptionsFine;
-        }
     }
 
     public class CustomRoleOption : CustomOption
@@ -545,19 +388,16 @@ namespace TheOtherRoles {
 
         public void Bind()
         {
-            filterEntry = TheOtherRolesPlugin.Instance.Config.Bind($"Preset{preset}", id.ToString() + "_RoleFilter", string.Join(",", defaultFilterSelection.Select(r => r.roleIndex)));
+            filterEntry = TheOtherRolesPlugin.Instance.Config.Bind($"Preset{preset}", id.ToString() + "_RoleFilter", string.Join(",", defaultFilterSelection.Select(r => r.nameKey)));
             if (filterEntry.Value != string.Empty)
             {
                 var roleNames = filterEntry.Value.Split(',');
                 filterSelection.Clear();
                 foreach (var roleName in roleNames)
                 {
-                    if (byte.TryParse(roleName, out byte index))
-                    {
-                        var role = RoleInfo.allRoleInfos.FirstOrDefault(x => x.roleIndex == index);
-                        if (role != null)
-                            filterSelection.Add(role);
-                    }
+                    var role = RoleInfo.allRoleInfos.FirstOrDefault(x => x.nameKey == roleName);
+                    if (role != null)
+                        filterSelection.Add(role);
                 }
             }
         }
@@ -735,7 +575,7 @@ namespace TheOtherRoles {
 
         private void SetAndShare()
         {
-            filterEntry.Value = string.Join(",", filterSelection.Select(r => r.roleIndex));
+            filterEntry.Value = string.Join(",", filterSelection.Select(r => r.nameKey));
             if (AmongUsClient.Instance?.AmHost == true && PlayerControl.LocalPlayer) {
                 ShareFilterOptionChange((uint)id);
             }
@@ -1489,57 +1329,18 @@ namespace TheOtherRoles {
 
             // create copy to clipboard and paste from clipboard buttons.
             var template = GameObject.Find("PlayerOptionsMenu(Clone)").transform.Find("CloseButton").gameObject;
-            var holderGO = new GameObject("copyPasteButtonParent");
+            var holderGO = new GameObject("customPresetButtonHolder");
             var bgrenderer = holderGO.AddComponent<SpriteRenderer>();
-            bgrenderer.sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.CopyPasteBG.png", 175f);
+            bgrenderer.sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.CustomPreset.png", 225f);
             holderGO.transform.SetParent(template.transform.parent, false);
             holderGO.transform.localPosition = template.transform.localPosition + new Vector3(-8.3f, 0.73f, -2f);
             holderGO.layer = template.layer;
             holderGO.SetActive(true);
-            var copyButton = GameObject.Instantiate(template, holderGO.transform);
-            copyButton.transform.localPosition = new Vector3(-0.3f, 0.02f, -2f);
-            var copyButtonPassive = copyButton.GetComponent<PassiveButton>();
-            var copyButtonRenderer = copyButton.GetComponentInChildren<SpriteRenderer>();
-            var copyButtonActiveRenderer = copyButton.transform.GetChild(1).GetComponent<SpriteRenderer>();
-            copyButtonRenderer.sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Copy.png", 100f);
-            copyButton.transform.GetChild(1).transform.localPosition = Vector3.zero;
-            copyButtonActiveRenderer.sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.CopyActive.png", 100f);
-            copyButtonPassive.OnClick.RemoveAllListeners();
-            copyButtonPassive.OnClick = new UnityEngine.UI.Button.ButtonClickedEvent();
-            copyButtonPassive.OnClick.AddListener((System.Action)(() => {
-                copyToClipboard();
-                copyButtonRenderer.color = Color.green;
-                copyButtonActiveRenderer.color = Color.green;
-                __instance.StartCoroutine(Effects.Lerp(1f, new System.Action<float>((p) => {
-                    if (p > 0.95)
-                    {
-                        copyButtonRenderer.color = Color.white;
-                        copyButtonActiveRenderer.color = Color.white;
-                    }
-                })));
-            }));
-            var pasteButton = GameObject.Instantiate(template, holderGO.transform);
-            pasteButton.transform.localPosition = new Vector3(0.3f, 0.02f, -2f);
-            var pasteButtonPassive = pasteButton.GetComponent<PassiveButton>();
-            var pasteButtonRenderer = pasteButton.GetComponentInChildren<SpriteRenderer>();
-            var pasteButtonActiveRenderer = pasteButton.transform.GetChild(1).GetComponent<SpriteRenderer>();
-            pasteButtonRenderer.sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.Paste.png", 100f);
-            pasteButtonActiveRenderer.sprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.PasteActive.png", 100f);
-            pasteButtonPassive.OnClick.RemoveAllListeners();
-            pasteButtonPassive.OnClick = new UnityEngine.UI.Button.ButtonClickedEvent();
-            pasteButtonPassive.OnClick.AddListener((System.Action)(() => {
-                pasteButtonRenderer.color = Color.yellow;
-                int success = pasteFromClipboard();
-                pasteButtonRenderer.color = success == 3 ? Color.green : success == 0 ? Color.red : Color.yellow;
-                pasteButtonActiveRenderer.color = success == 3 ? Color.green : success == 0 ? Color.red : Color.yellow;
-                __instance.StartCoroutine(Effects.Lerp(1f, new System.Action<float>((p) => {
-                    if (p > 0.95)
-                    {
-                        pasteButtonRenderer.color = Color.white;
-                        pasteButtonActiveRenderer.color = Color.white;
-                    }
-                })));
-            }));
+            var presetButton = holderGO.SetUpButton();
+            var collider = holderGO.AddComponent<CircleCollider2D>();
+            collider.isTrigger = true;
+            collider.radius = 0.25f;
+            presetButton.OnClick.AddListener((Action)PresetManager.OpenPresetUI);
         }
 
         private static void createSettings(GameOptionsMenu menu, List<CustomOption> options)
