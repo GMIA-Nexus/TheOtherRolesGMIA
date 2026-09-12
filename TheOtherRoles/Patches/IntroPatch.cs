@@ -533,7 +533,10 @@ namespace TheOtherRoles.Patches
                     __instance.RoleBlurbText.text += Helpers.cs(Yandere.color, string.Format(ModTranslation.getString("yandereIntroLine"), Yandere.target?.Data?.PlayerName ?? ""));
                 }
 
-                SoundManager.Instance.PlaySound(PlayerControl.LocalPlayer.Data.Role.IntroSound, false, 1f, null);
+                var introSound = PlayerControl.LocalPlayer.Data.Role.IntroSound;
+                var role = Role.allRoles.FirstOrDefault(x => x.player == PlayerControl.LocalPlayer);
+                if (role != null && role?.IntroSound != null) introSound = role.IntroSound;
+                SoundManager.Instance.PlaySound(introSound, false, 1f, null);
                 __instance.YouAreText.gameObject.SetActive(true);
                 __instance.RoleText.gameObject.SetActive(true);
                 __instance.RoleBlurbText.gameObject.SetActive(true);

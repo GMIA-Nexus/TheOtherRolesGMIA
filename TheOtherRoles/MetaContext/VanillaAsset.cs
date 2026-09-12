@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using AmongUs.GameOptions;
 using TheOtherRoles.Objects;
 using TMPro;
 using Twitch;
@@ -120,11 +121,26 @@ public class VanillaAsset
         CloseButtonSprite = Helpers.FindAsset<Sprite>("closeButton")!;
         TextButtonSprite = twitchPopUp.GetChild(2).GetComponent<SpriteRenderer>().sprite;
 
-        StandardTextPrefab = UnityEngine.Object.Instantiate(twitchPopUp.GetChild(1).GetComponent<TMPro.TextMeshPro>(), null);
+        StandardTextPrefab = UnityEngine.Object.Instantiate(twitchPopUp.GetChild(1).GetComponent<TMPro.TextMeshPro>(), (Transform)null);
         StandardTextPrefab.gameObject.hideFlags = HideFlags.HideAndDontSave;
         UnityEngine.Object.Destroy(StandardTextPrefab.spriteAnimator);
         UnityEngine.Object.DontDestroyOnLoad(StandardTextPrefab.gameObject);
     }
+
+    private static AudioClip GetIntroSound(RoleTypes roleType)
+    {
+        return RoleManager.Instance.AllRoles.Find((Il2CppSystem.Predicate<RoleBehaviour>)(role => role.Role == roleType))?.IntroSound;
+    }
+
+    public static AudioClip ScientistIntroSound => GetIntroSound(RoleTypes.Scientist);
+    public static AudioClip EngineerIntroSound => GetIntroSound(RoleTypes.Engineer);
+    public static AudioClip NoisemakerIntroSound => GetIntroSound(RoleTypes.Noisemaker);
+    public static AudioClip TrackerIntroSound => GetIntroSound(RoleTypes.Tracker);
+    public static AudioClip DetectiveIntroSound => GetIntroSound(RoleTypes.Detective);
+    public static AudioClip JudgeIntroSound => GetIntroSound(RoleTypes.Judge);
+    public static AudioClip ShapeshifterIntroSound => GetIntroSound(RoleTypes.Shapeshifter);
+    public static AudioClip PhantomIntroSound => GetIntroSound(RoleTypes.Phantom);
+    public static AudioClip ViperIntroSound => GetIntroSound(RoleTypes.Viper);
 
     public static void PlaySelectSE() => SoundManager.Instance.PlaySound(SelectClip.Clip, false, 0.8f);
     public static void PlayHoverSE() => SoundManager.Instance.PlaySound(HoverClip.Clip, false, 0.8f);

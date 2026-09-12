@@ -18,6 +18,8 @@ namespace TheOtherRoles.Roles
             yield return new(getMorphSprite(), "morphlingMorphHint");
         }
 
+        public override AudioClip IntroSound { get => MetaContext.VanillaAsset.ShapeshifterIntroSound; }
+
         public Morphling()
         {
             RoleId = roleId = RoleId.Morphling;

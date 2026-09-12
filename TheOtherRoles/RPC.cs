@@ -1504,20 +1504,20 @@ namespace TheOtherRoles
             {
                 foreach (PlayerVoteArea pva in MeetingHud.Instance.playerStates)
                 {
-                    if (pva.TargetPlayerId == targetId)
+                    if (pva.PlayerId == targetId)
                     {
-                        pva.SetDead(pva.DidReport, true);
+                        pva.SetDead(true);
                         pva.Overlay.gameObject.SetActive(true);
                         MeetingHudPatch.swapperCheckAndReturnSwap(MeetingHud.Instance, targetId);
                         MeetingHudPatch.yasunaCheckAndReturnSpecialVote(MeetingHud.Instance, targetId);
                     }
 
                     // Give players back their vote if target is shot dead
-                    if (pva.VotedFor != targetId) continue;
+                    if (pva.VotedForId != targetId) continue;
                     pva.UnsetVote();
-                    var voteAreaPlayer = Helpers.playerById(pva.TargetPlayerId);
+                    var voteAreaPlayer = Helpers.playerById(pva.PlayerId);
                     if (!voteAreaPlayer.AmOwner) continue;
-                    MeetingHud.Instance.ClearVote();
+                    MeetingHud.Instance.ClearVote(PlayerControl.LocalPlayer.PlayerId, true);
                 }
 
                 if (AmongUsClient.Instance.AmHost)

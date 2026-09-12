@@ -36,6 +36,7 @@ public class Detective : RoleBase<Detective>
         yield return new("%DUR%", inspectDuration.ToString());
     }
 
+    public override AudioClip IntroSound { get => VanillaAsset.DetectiveIntroSound; }
 
     public Detective()
     {

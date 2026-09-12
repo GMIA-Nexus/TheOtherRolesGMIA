@@ -72,7 +72,7 @@ namespace TheOtherRoles.Patches {
             }
 
             // Activate portals.
-            Portal.meetingEndsUpdate();            
+            Portal.meetingEndsUpdate();
 
             // Witch execute casted spells
             if (Witch.allPlayers.Count > 0) {
@@ -291,7 +291,7 @@ namespace TheOtherRoles.Patches {
                     if (player == null) return;
                     // Exile role text
                     if (id is StringNames.ExileTextPN or StringNames.ExileTextSN or StringNames.ExileTextPP or StringNames.ExileTextSP) {
-                        __result = player.Data.PlayerName + " was The " + String.Join(" ", RoleInfo.getRoleInfoForPlayer(player, false, includeHidden: true).Select(x => x.name).ToArray());
+                        __result = string.Format(ModTranslation.getString("exileRoleMessage"), player.Data.PlayerName, string.Join(" ", RoleInfo.getRoleInfoForPlayer(player, false, includeHidden: true).Select(x => x.name).ToArray()));
                     }
                     // Hide number of remaining impostors on Jester win
                     if (id is StringNames.ImpostorsRemainP or StringNames.ImpostorsRemainS) {
@@ -299,7 +299,6 @@ namespace TheOtherRoles.Patches {
                     }
                     if (Yasuna.specialVoteTargetPlayerId != byte.MaxValue)
                     {
-                        if (CustomOptionHolder.yasunaSpecificMessageMode.getBool()) __result += ModTranslation.getString("yasunaSpecialIndicator");
                         Tiebreaker.isTiebreak = false;
                         Yasuna.specialVoteTargetPlayerId = byte.MaxValue;
                     }

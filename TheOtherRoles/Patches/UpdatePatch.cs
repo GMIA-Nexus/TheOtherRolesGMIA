@@ -55,7 +55,7 @@ namespace TheOtherRoles.Patches {
             {
                 foreach (PlayerVoteArea playerVoteArea in MeetingHud.Instance.playerStates)
                 {
-                    var data = dict[playerVoteArea.TargetPlayerId];
+                    var data = dict[playerVoteArea.PlayerId];
                     var text = playerVoteArea.NameText;
                     text.text = data.name;
                     text.color = data.color;
@@ -67,7 +67,7 @@ namespace TheOtherRoles.Patches {
             p.cosmetics.nameText.color = color.SetAlpha(Chameleon.visibility(p.PlayerId));
             if (MeetingHud.Instance != null)
                 foreach (PlayerVoteArea player in MeetingHud.Instance.playerStates)
-                    if (player.NameText != null && p.PlayerId == player.TargetPlayerId)
+                    if (player.NameText != null && p.PlayerId == player.PlayerId)
                         player.NameText.color = color;
         }
 
@@ -317,12 +317,12 @@ namespace TheOtherRoles.Patches {
                             player.cosmetics.nameText.text = player.Data.PlayerName + $" ({ModTranslation.getString("mafiaJ")})";
                 if (MeetingHud.Instance != null)
                     foreach (PlayerVoteArea player in MeetingHud.Instance.playerStates)
-                        if (Godfather.players.Any(x => x.player.PlayerId == player.TargetPlayerId))
-                            player.NameText.text = Godfather.allPlayers.FirstOrDefault(x => x.PlayerId == player.TargetPlayerId).Data.PlayerName + $" ({ModTranslation.getString("mafiaG")})";
-                        else if (Mafioso.allPlayers.Any(x => x.PlayerId == player.TargetPlayerId))
-                            player.NameText.text = Mafioso.allPlayers.FirstOrDefault(x => x.PlayerId == player.TargetPlayerId).Data.PlayerName + $" ({ModTranslation.getString("mafiaM")})";
-                        else if (Janitor.allPlayers.Any(x => x.PlayerId == player.TargetPlayerId))
-                            player.NameText.text = Janitor.allPlayers.FirstOrDefault(x => x.PlayerId == player.TargetPlayerId).Data.PlayerName + $" ({ModTranslation.getString("mafiaJ")})";
+                        if (Godfather.players.Any(x => x.player.PlayerId == player.PlayerId))
+                            player.NameText.text = Godfather.allPlayers.FirstOrDefault(x => x.PlayerId == player.PlayerId).Data.PlayerName + $" ({ModTranslation.getString("mafiaG")})";
+                        else if (Mafioso.allPlayers.Any(x => x.PlayerId == player.PlayerId))
+                            player.NameText.text = Mafioso.allPlayers.FirstOrDefault(x => x.PlayerId == player.PlayerId).Data.PlayerName + $" ({ModTranslation.getString("mafiaM")})";
+                        else if (Janitor.allPlayers.Any(x => x.PlayerId == player.PlayerId))
+                            player.NameText.text = Janitor.allPlayers.FirstOrDefault(x => x.PlayerId == player.PlayerId).Data.PlayerName + $" ({ModTranslation.getString("mafiaJ")})";
             }
 
             // Lovers
@@ -339,7 +339,7 @@ namespace TheOtherRoles.Patches {
 
                 if (MeetingHud.Instance)
                     foreach (PlayerVoteArea player in MeetingHud.Instance.playerStates)
-                        if (lover1.PlayerId == player.TargetPlayerId || lover2.PlayerId == player.TargetPlayerId)
+                        if (lover1.PlayerId == player.PlayerId || lover2.PlayerId == player.PlayerId)
                             player.NameText.text += suffix;
             }
 
@@ -353,7 +353,7 @@ namespace TheOtherRoles.Patches {
 
                 if (MeetingHud.Instance != null)
                     foreach (PlayerVoteArea player in MeetingHud.Instance.playerStates)
-                        if ((cupid.lovers1 && cupid.lovers1?.PlayerId == player.TargetPlayerId) || (cupid.lovers2 && cupid.lovers2?.PlayerId == player.TargetPlayerId))
+                        if ((cupid.lovers1 && cupid.lovers1?.PlayerId == player.PlayerId) || (cupid.lovers2 && cupid.lovers2?.PlayerId == player.PlayerId))
                             player.NameText.text += suffix;
             }
 
@@ -365,7 +365,7 @@ namespace TheOtherRoles.Patches {
 
                 if (MeetingHud.Instance != null)
                     foreach (PlayerVoteArea player in MeetingHud.Instance.playerStates)
-                        if (Kataomoi.target.PlayerId == player.TargetPlayerId)
+                        if (Kataomoi.target.PlayerId == player.PlayerId)
                             player.NameText.text += suffix;
             }
 
@@ -376,7 +376,7 @@ namespace TheOtherRoles.Patches {
 
                 if (MeetingHud.Instance != null)
                     foreach (PlayerVoteArea player in MeetingHud.Instance.playerStates)
-                        if (Yandere.target.PlayerId == player.TargetPlayerId)
+                        if (Yandere.target.PlayerId == player.PlayerId)
                             player.NameText.text += suffix;
             }
 
@@ -397,9 +397,9 @@ namespace TheOtherRoles.Patches {
                         {
                             foreach (var player in MeetingHud.Instance.playerStates)
                             {
-                                if (player.TargetPlayerId == akujo.honmei?.PlayerId)
+                                if (player.PlayerId == akujo.honmei?.PlayerId)
                                     player.NameText.text += honmeiSuffix;
-                                else if (akujo.keeps.Any(x => x.PlayerId == player.TargetPlayerId))
+                                else if (akujo.keeps.Any(x => x.PlayerId == player.PlayerId))
                                     player.NameText.text += keepSuffix;
                             }
                         }
@@ -409,7 +409,7 @@ namespace TheOtherRoles.Patches {
                         akujo.player.cosmetics.nameText.text += honmeiSuffix;
                         if (MeetingHud.Instance)
                             foreach (PlayerVoteArea player in MeetingHud.Instance.playerStates)
-                                if (player.TargetPlayerId == akujo.player?.PlayerId)
+                                if (player.PlayerId == akujo.player?.PlayerId)
                                     player.NameText.text += honmeiSuffix;
                     }
                 }
@@ -427,7 +427,7 @@ namespace TheOtherRoles.Patches {
 
                 if (MeetingHud.Instance != null)
                     foreach (PlayerVoteArea player in MeetingHud.Instance.playerStates)
-                        if (player.TargetPlayerId == target.PlayerId)
+                        if (player.PlayerId == target.PlayerId)
                             player.NameText.text += suffix;
             }
 
@@ -438,7 +438,7 @@ namespace TheOtherRoles.Patches {
                     formerThief.cosmetics.nameText.text += suffix;
                 if (MeetingHud.Instance != null)
                     foreach (PlayerVoteArea player in MeetingHud.Instance.playerStates)
-                        if (Thief.formerThief.Any(x => x.PlayerId == player.TargetPlayerId))
+                        if (Thief.formerThief.Any(x => x.PlayerId == player.PlayerId))
                             player.NameText.text += suffix;
             }
 
@@ -446,7 +446,7 @@ namespace TheOtherRoles.Patches {
             foreach (var medic in Medic.players) {
                 if (MeetingHud.Instance != null && Medic.shieldVisible(medic.shielded)) {
                     foreach (PlayerVoteArea player in MeetingHud.Instance.playerStates)
-                        if (player.TargetPlayerId == medic.shielded.PlayerId)
+                        if (player.PlayerId == medic.shielded.PlayerId)
                             player.NameText.text = Helpers.cs(Medic.color, "[") + player.NameText.text + Helpers.cs(Medic.color, "]");
                 }
             }
@@ -483,7 +483,7 @@ namespace TheOtherRoles.Patches {
             if (!(Mini.mini.isRole(RoleId.MimicK) && MimicK.victim != null)) Mini.mini.cosmetics.nameText.text += suffix;
             if (MeetingHud.Instance != null) {
                 foreach (PlayerVoteArea player in MeetingHud.Instance.playerStates)
-                    if (player.NameText != null && Mini.mini.PlayerId == player.TargetPlayerId)
+                    if (player.NameText != null && Mini.mini.PlayerId == player.PlayerId)
                         player.NameText.text += suffix;
             }
 

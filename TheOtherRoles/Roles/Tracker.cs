@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Reactor.Utilities.Extensions;
-using TheOtherRoles.MetaContext;
 using TheOtherRoles.Modules;
 using TheOtherRoles.Objects;
 using UnityEngine;
@@ -16,6 +15,8 @@ namespace TheOtherRoles.Roles
         public List<Arrow> localArrows = [];
         public int numShots = 0;
         public static bool canKill { get { return CustomOptionHolder.trackerCanKill.getBool(); } }
+
+        public override AudioClip IntroSound { get => MetaContext.VanillaAsset.TrackerIntroSound; }
 
         public Tracker()
         {

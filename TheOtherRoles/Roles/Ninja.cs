@@ -31,6 +31,8 @@ namespace TheOtherRoles.Roles
             yield return new(getButtonSprite(), "ninjaStealthHint");
         }
 
+        public override AudioClip IntroSound { get => MetaContext.VanillaAsset.PhantomIntroSound; }
+
         static public IEnumerable<DocumentReplacement> GetReplacementPart() => [new("%KP%", killPenalty.ToString())];
 
         public static RemoteProcess<(byte playerId, bool stealthed)> Stealth = new("NinjaStealth", (message, _) =>

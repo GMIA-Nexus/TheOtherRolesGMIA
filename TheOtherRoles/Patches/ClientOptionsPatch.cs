@@ -179,7 +179,7 @@ namespace TheOtherRoles.Patches
 
             SetTORContext();
 
-            tabs[^1] = Object.Instantiate(tabs[1], null);
+            tabs[^1] = Object.Instantiate(tabs[1], (Transform)null);
             var torButton = tabs[^1];
             torButton.gameObject.name = "TORButton";
             torButton.transform.SetParent(tabs[0].transform.parent);

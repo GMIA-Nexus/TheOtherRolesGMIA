@@ -31,6 +31,8 @@ namespace TheOtherRoles.Roles
 
         public static HideAndSeekDeathPopup killPopup = null;
 
+        public override AudioClip IntroSound { get => VanillaAsset.DetectiveIntroSound; }
+
         static public IEnumerable<HelpSprite> GetHelpSprites()
         {
             yield return new(getDetectIcon(), "sherlockDetectHint");

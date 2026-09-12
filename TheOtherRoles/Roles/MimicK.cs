@@ -27,6 +27,8 @@ namespace TheOtherRoles.Roles
             victim = null;
         }
 
+        public override AudioClip IntroSound { get => MetaContext.VanillaAsset.ShapeshifterIntroSound; }
+
         public override void OnMeetingStart()
         {
             if (!hasAlivePlayers) return;

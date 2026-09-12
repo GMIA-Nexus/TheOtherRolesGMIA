@@ -162,7 +162,8 @@ namespace TheOtherRoles.Patches {
                     }
                     var last = history[^1];
                     if (item.Time - last.Time < 1f) continue;
-                    if (last.RoleInfo.roleId == item.RoleInfo.roleId && Helpers.isSpecialRoleInfo(last.RoleInfo) == Helpers.isSpecialRoleInfo(item.RoleInfo) && last.IsMadmate == item.IsMadmate) continue;
+                    if (last.RoleInfo.roleId == item.RoleInfo.roleId && Helpers.isSpecialRoleInfo(last.RoleInfo) == Helpers.isSpecialRoleInfo(item.RoleInfo)
+                        && last.IsMadmate == item.IsMadmate && last.Color.rgba == item.Color.rgba) continue;
                     history.Add(item);
                 }
                 string extraInfo = "";

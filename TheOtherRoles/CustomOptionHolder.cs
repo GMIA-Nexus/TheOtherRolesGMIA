@@ -244,6 +244,8 @@ namespace TheOtherRoles {
         public static CustomOption timeMasterCooldown;
         public static CustomOption timeMasterRewindTime;
         public static CustomOption timeMasterShieldDuration;
+        public static CustomOption timeMasterCanRewindIndependently;
+        public static CustomOption timeMasterNumberOfRewind;
         public static CustomOption timeMasterReviveDuringRewind;
 
         public static CustomRoleOption medicSpawnRate;
@@ -528,7 +530,6 @@ namespace TheOtherRoles {
         public static CustomRoleOption yasunaSpawnRate;
         public static CustomOption yasunaIsImpYasunaRate;
         public static CustomOption yasunaNumberOfSpecialVotes;
-        public static CustomOption yasunaSpecificMessageMode;
 
         public static CustomRoleOption thiefSpawnRate;
         public static CustomOption thiefCooldown;
@@ -937,7 +938,6 @@ namespace TheOtherRoles {
             yasunaSpawnRate = new CustomRoleOption(6040, Types.Neutral, "yasuna", Yasuna.color, 1);
             yasunaIsImpYasunaRate = CustomOption.Create(6041, Types.Neutral, "yasunaIsImpYasunaRate", rates, yasunaSpawnRate);
             yasunaNumberOfSpecialVotes = CustomOption.Create(6042, Types.Neutral, "yasunaNumberOfSpecialVotes", 1f, 1f, 15f, 1f, yasunaSpawnRate, false, "unitShots");
-            yasunaSpecificMessageMode = CustomOption.Create(6043, Types.Neutral, "yasunaSpecificMessageMode", true, yasunaSpawnRate);
 
             jesterSpawnRate = new CustomRoleOption(60, Types.Neutral, "jester", Jester.color);
             jesterCanCallEmergency = CustomOption.Create(61, Types.Neutral, "jesterCanCallEmergency", true, jesterSpawnRate);
@@ -1116,6 +1116,8 @@ namespace TheOtherRoles {
             timeMasterCooldown = CustomOption.Create(131, Types.Crewmate, "timeMasterCooldown", 30f, 10f, 120f, 2.5f, timeMasterSpawnRate, false, "unitSeconds");
             timeMasterRewindTime = CustomOption.Create(132, Types.Crewmate, "timeMasterRewindTime", 3f, 1f, 10f, 1f, timeMasterSpawnRate, false, "unitSeconds");
             timeMasterShieldDuration = CustomOption.Create(133, Types.Crewmate, "timeMasterShieldDuration", 3f, 1f, 20f, 1f, timeMasterSpawnRate, false, "unitSeconds");
+            timeMasterCanRewindIndependently = CustomOption.Create(134, Types.Crewmate, "timeMasterCanRewindIndependently", true, timeMasterSpawnRate);
+            timeMasterNumberOfRewind = CustomOption.Create(136, Types.Crewmate, "timeMasterNumberOfRewind", 1f, 1f, 10f, 1f, timeMasterSpawnRate, false, "unitScrews");
             timeMasterReviveDuringRewind = CustomOption.Create(135, Types.Crewmate, "timeMasterRewindDuringRewind", false, timeMasterSpawnRate);
 
             medicSpawnRate = new CustomRoleOption(140, Types.Crewmate, "medic", Medic.color);

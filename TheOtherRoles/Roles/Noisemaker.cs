@@ -21,6 +21,8 @@ namespace TheOtherRoles.Roles
             numSound = Mathf.RoundToInt(CustomOptionHolder.noisemakerSoundNumber.getFloat());
         }
 
+        public override AudioClip IntroSound { get => MetaContext.VanillaAsset.NoisemakerIntroSound; }
+
         public static RemoteProcess<(byte playerId, byte noisemakerId)> SetSounded = new("NoisemakerSetSounded", (message, _) =>
         {
             PlayerControl player = Helpers.playerById(message.playerId);

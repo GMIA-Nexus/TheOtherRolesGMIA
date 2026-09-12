@@ -725,8 +725,8 @@ namespace TheOtherRoles
             get
             {
                 return MeetingHud.Instance?.state is not
-                    MeetingHud.VoteStates.Animating and not MeetingHud.VoteStates.Results
-                    and not MeetingHud.VoteStates.Proceeding;
+                    MeetingHud.MeetingStates.Animating and not MeetingHud.MeetingStates.Results
+                    and not MeetingHud.MeetingStates.Proceeding;
             }
         }
 

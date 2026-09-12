@@ -7,7 +7,6 @@ using BepInEx.Unity.IL2CPP.Utils;
 using BepInEx.Unity.IL2CPP.Utils.Collections;
 using HarmonyLib;
 using Hazel;
-using Il2CppSystem.Runtime.Remoting.Messaging;
 using Reactor.Utilities;
 using TheOtherRoles.CustomGameModes;
 using TheOtherRoles.MetaContext;
@@ -30,6 +29,7 @@ namespace TheOtherRoles
         public static CustomButton sheriffKillButton;
         private static CustomButton deputyHandcuffButton;
         private static CustomButton timeMasterShieldButton;
+        private static CustomButton timeMasterRewindButton;
         private static CustomButton medicShieldButton;
         private static CustomButton shifterShiftButton;
         private static CustomButton morphlingButton;
@@ -141,6 +141,7 @@ namespace TheOtherRoles
         public static Dictionary<byte, List<CustomButton>> deputyHandcuffedButtons = null;
         public static PoolablePlayer targetDisplay;
 
+        public static TMPro.TMP_Text timeMasterUsesText;
         public static TMPro.TMP_Text securityGuardButtonScrewsText;
         public static TMPro.TMP_Text securityGuardChargesText;
         public static TMPro.TMP_Text deputyButtonHandcuffsText;
@@ -194,6 +195,7 @@ namespace TheOtherRoles
             sheriffKillButton.MaxTimer = Sheriff.cooldown;
             deputyHandcuffButton.MaxTimer = Deputy.handcuffCooldown;
             timeMasterShieldButton.MaxTimer = TimeMaster.cooldown;
+            timeMasterRewindButton.MaxTimer = TimeMaster.cooldown;
             medicShieldButton.MaxTimer = 0f;
             shifterShiftButton.MaxTimer = 0f;
             morphlingButton.MaxTimer = Morphling.cooldown;
@@ -359,6 +361,7 @@ namespace TheOtherRoles
             timeMasterShieldButton.Timer = timeMasterShieldButton.MaxTimer;
             timeMasterShieldButton.isEffectActive = false;
             timeMasterShieldButton.actionButton.cooldownTimerText.color = Palette.EnabledColor;
+            timeMasterRewindButton.Timer = timeMasterRewindButton.MaxTimer;
             SoundEffectsManager.stop("timemasterShield");
         }
 
@@ -664,6 +667,37 @@ namespace TheOtherRoles
                 buttonText: ModTranslation.getString("TimeShieldText"),
                 abilityTexture: CustomButton.ButtonLabelType.UseButton
             );
+
+            timeMasterRewindButton = new CustomButton(
+                () => {
+                    timeMasterRewindButton.Timer = timeMasterRewindButton.MaxTimer;
+                    resetTimeMasterButton();
+                    TimeMaster.local.numRewinds--;
+                    _ = new StaticAchievementToken("timeMaster.challenge");
+                    _ = new StaticAchievementToken("timeMaster.challenge2");
+
+                    MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.TimeMasterRewindTime, Hazel.SendOption.Reliable, -1);
+                    writer.Write(PlayerControl.LocalPlayer.PlayerId);
+                    AmongUsClient.Instance.FinishRpcImmediately(writer);
+                    RPCProcedure.timeMasterRewindTime(PlayerControl.LocalPlayer.PlayerId);
+                },
+                () => { return PlayerControl.LocalPlayer.isRole(RoleId.TimeMaster) && TimeMaster.rewindIndependently && TimeMaster.local.numRewinds > 0 && !PlayerControl.LocalPlayer.Data.IsDead; },
+                () =>
+                {
+                    if (timeMasterUsesText != null) timeMasterUsesText.text = TimeMaster.local.numRewinds.ToString();
+                    return PlayerControl.LocalPlayer.CanMove;
+                },
+                () => {
+                    timeMasterRewindButton.Timer = timeMasterRewindButton.MaxTimer;
+                },
+                TimeMaster.getRewindSprite(),
+                CustomButton.ButtonPositions.upperRowRight,
+                __instance,
+                KeyCode.G,
+                buttonText: ModTranslation.getString("TimeRewindText"),
+                abilityTexture: CustomButton.ButtonLabelType.UseButton
+            );
+            timeMasterUsesText = timeMasterRewindButton.ShowUsesIcon(3);
 
             // Medic Shield
             medicShieldButton = new CustomButton(

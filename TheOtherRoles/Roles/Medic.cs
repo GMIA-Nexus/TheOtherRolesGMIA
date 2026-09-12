@@ -36,6 +36,8 @@ namespace TheOtherRoles.Roles
             acTokenChallenge = null;
         }
 
+        public override AudioClip IntroSound { get => MetaContext.VanillaAsset.ScientistIntroSound; }
+
         public static RemoteProcess<(byte shieldedId, byte medicId)> Shield = new("MedicSetShielded", (message, _) =>
         {
             var medic = getRole(Helpers.playerById(message.medicId));

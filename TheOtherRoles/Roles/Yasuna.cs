@@ -19,6 +19,8 @@ namespace TheOtherRoles.Roles
 
         public static AchievementToken<(byte targetId, bool cleared)> yasunaAcTokenChallenge = null;
 
+        public override AudioClip IntroSound { get => VanillaAsset.JudgeIntroSound; }
+
         public override void PostInit()
         {
             if (PlayerControl.LocalPlayer == player)
@@ -92,6 +94,15 @@ namespace TheOtherRoles.Roles
                 if (EvilYasuna.allPlayers.Count > 0) return EvilYasuna.allPlayers.FirstOrDefault();
                 else if (NiceYasuna.allPlayers.Count > 0) return NiceYasuna.allPlayers.FirstOrDefault();
                 return null;
+            }
+        }
+
+        public static byte ForcePlayerId
+        {
+            get
+            {
+                if (YasunaPlayer == null || YasunaPlayer?.Data?.IsDead == true) return byte.MaxValue;
+                return specialVoteTargetPlayerId;
             }
         }
 

@@ -26,6 +26,48 @@ namespace TheOtherRoles.Modules
         private static TMPro.TextMeshPro feedText;
         private static Scroller scroller;
         public static List<(byte, bool)> alreadyPicked = new();
+
+        static private Sprite crewCard;
+        static private Sprite impCard;
+        static private Sprite neutralCard;
+        static private Sprite randomCard;
+        static private Sprite blankCard;
+
+        static public Sprite getCrewCard()
+        {
+            if (crewCard == null)
+                crewCard = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.RoleDraft.DraftRoleCardCrew.png", 250f);
+            return crewCard;
+        }
+
+        static public Sprite getImpCard()
+        {
+            if (impCard == null)
+                impCard = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.RoleDraft.DraftRoleCardImpostor.png", 250f);
+            return impCard;
+        }
+
+        static public Sprite getNeutralCard()
+        {
+            if (neutralCard == null)
+                neutralCard = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.RoleDraft.DraftRoleCardNeutral.png", 250f);
+            return neutralCard;
+        }
+
+        static public Sprite getRandomCard()
+        {
+            if (randomCard == null)
+                randomCard = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.RoleDraft.DraftRoleCardRandom.png", 250f);
+            return randomCard;
+        }
+
+        static public Sprite getBlankCard()
+        {
+            if (blankCard == null)
+                blankCard = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.RoleDraft.DraftRoleCardEmpty.png", 250f);
+            return blankCard;
+        }
+
         public static IEnumerator CoSelectRoles(IntroCutscene __instance)
         {
             if (!isEnabled) yield break;
@@ -340,7 +382,7 @@ namespace TheOtherRoles.Modules
                             int lastRow = count / buttonsPerRow;
                             int buttonsInLastRow = count % buttonsPerRow;
 
-                            ActionButton createButton(string textToDisplay, Color color, float row, float col)
+                            ActionButton createButton(string textToDisplay, Color color, float row, float col, Sprite cardSprite, Sprite illustration = null)
                             {
                                 if (buttonsInLastRow != 0 && row == lastRow) {
                                     col += (buttonsPerRow - buttonsInLastRow) / 2f;
@@ -351,18 +393,51 @@ namespace TheOtherRoles.Modules
                                 ActionButton actionButton = UnityEngine.Object.Instantiate(HudManager.Instance.KillButton, __instance.TeamTitle.transform);
                                 actionButton.gameObject.SetActive(true);
                                 actionButton.gameObject.name = "RoleButton";
-                                actionButton.transform.localPosition = new Vector3(-14.4f + col * 8f, -9f - row * 3f);
+                                actionButton.transform.localPosition = new Vector3(-14.4f + col * 8f, -6f - row * 5.5f);
                                 actionButton.transform.localScale = new Vector3(2f, 2f);
                                 actionButton.SetCoolDown(0, 0);
+
+                                GameObject buttonSprite = new("buttonSprite");
+                                var sprite = buttonSprite.AddComponent<SpriteRenderer>();
+                                sprite.sprite = cardSprite;
+                                buttonSprite.layer = actionButton.gameObject.layer;
+                                buttonSprite.transform.SetParent(actionButton.transform, false);
+                                buttonSprite.transform.localPosition = new Vector3(0, 0.025f, -1f);
+
+                                if (illustration != null)
+                                {
+                                    sprite.sprite = getBlankCard();
+                                    var illustrationButton = new GameObject("illustrationButton");
+                                    var illustrationSprite = illustrationButton.AddComponent<SpriteRenderer>();
+                                    illustrationSprite.sprite = illustration;
+
+                                    float originalWidth = illustrationSprite.sprite.bounds.size.x;
+                                    float originalHeight = illustrationSprite.sprite.bounds.size.y;
+                                    float scaleX = 1.8f / originalWidth;
+                                    float scaleY = 1.8f / originalHeight;
+                                    illustrationSprite.transform.localScale = new Vector3(scaleX, scaleY, 1f);
+
+                                    illustrationButton.layer = actionButton.gameObject.layer;
+                                    illustrationButton.transform.SetParent(actionButton.transform, false);
+                                    illustrationButton.transform.localPosition = new Vector3(0, 0.2f, -3f);
+                                    illustrationSprite.sortingOrder = 1;
+                                }
+
                                 GameObject textHolder = new("textHolder");
                                 var text = textHolder.AddComponent<TMPro.TextMeshPro>();
-                                text.text = textToDisplay.Replace(" ", "\n");
+                                text.text = textToDisplay.Bold();
                                 text.horizontalAlignment = TMPro.HorizontalAlignmentOptions.Center;
-                                text.fontSize = 5;
+                                text.enableAutoSizing = true;
+                                text.fontSizeMin = 2f;
+                                text.fontSizeMax = 4f;
+                                text.rectTransform.sizeDelta = new(1.8f, 0.5f);
+                                text.rectTransform.anchorMin = new Vector2(0.5f, 0f);
+                                text.rectTransform.anchorMax = new Vector2(0.5f, 0f);
+                                text.rectTransform.pivot = new Vector2(0.5f, 0f);
                                 textHolder.layer = actionButton.gameObject.layer;
                                 text.color = color;
-                                textHolder.transform.SetParent(actionButton.transform, false);
-                                textHolder.transform.localPosition = new Vector3(0, text.text.Contains("\n") ? -1.975f : -2.2f, -1);
+                                textHolder.transform.SetParent(buttonSprite.transform, false);
+                                textHolder.transform.localPosition = new(0, -1.2f, -1f);
 
                                 HudManager.Instance.StartCoroutine(Effects.Lerp(0.5f, new Action<float>((p) => {
                                     actionButton.OverrideText("");
@@ -376,7 +451,8 @@ namespace TheOtherRoles.Modules
                                 float row = i / buttonsPerRow;
                                 float col = i % buttonsPerRow;
 
-                                var actionButton = createButton(roleInfo.name.Replace(" ", "\n"), roleInfo.color, row, col);
+                                var actionButton = createButton(roleInfo.name, roleInfo.color, row, col, roleInfo.isOrgImpostor ? getImpCard() : (
+                                    roleInfo.isOrgNeutral ? getNeutralCard() : getCrewCard()), TheOtherRoles.RoleHelpers.GetIllustration(roleInfo.roleId).GetSprite());
 
                                 PassiveButton button = actionButton.GetComponent<PassiveButton>();
                                 button.OnClick = new Button.ButtonClickedEvent();
@@ -397,7 +473,7 @@ namespace TheOtherRoles.Modules
                                 float row = i / buttonsPerRow;
                                 float col = i % buttonsPerRow;
 
-                                var actionButton = createButton(ModTranslation.getString("roleDraftRandom"), Color.green, row, col);
+                                var actionButton = createButton(ModTranslation.getString("roleDraftRandom"), Color.green, row, col, getRandomCard());
                                 PassiveButton button = actionButton.GetComponent<PassiveButton>();
                                 button.OnClick = new Button.ButtonClickedEvent();
                                 button.OnClick.AddListener((Action)(() => {

@@ -280,7 +280,7 @@ namespace TheOtherRoles.Patches {
             foreach (PlayerControl p in PlayerControl.AllPlayerControls) {
                 
                 // Colorblind Text in Meeting
-                PlayerVoteArea playerVoteArea = MeetingHud.Instance?.playerStates?.FirstOrDefault(x => x.TargetPlayerId == p.PlayerId);
+                PlayerVoteArea playerVoteArea = MeetingHud.Instance?.playerStates?.FirstOrDefault(x => x.PlayerId == p.PlayerId);
                 if (playerVoteArea != null && playerVoteArea.ColorBlindName.gameObject.active) {
                     playerVoteArea.ColorBlindName.transform.localPosition = colorBlindTextMeetingInitialLocalPos + new Vector3(0f, 0.4f, 0f);
                     playerVoteArea.ColorBlindName.transform.localScale = colorBlindTextMeetingInitialLocalScale * 0.8f;
@@ -365,7 +365,7 @@ namespace TheOtherRoles.Patches {
 
                     playerInfo.text = playerInfoText;
                     playerInfo.gameObject.SetActive(p.Visible);
-                    if (meetingInfo != null) meetingInfo.text = MeetingHud.Instance.state == MeetingHud.VoteStates.Results ? "" : meetingInfoText;
+                    if (meetingInfo != null) meetingInfo.text = MeetingHud.Instance.state == MeetingHud.MeetingStates.Results ? "" : meetingInfoText;
                 }
                 else
                 {

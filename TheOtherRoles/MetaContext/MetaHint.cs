@@ -61,7 +61,7 @@ namespace TheOtherRoles.MetaContext
         {
             yield return Effects.Wait(delay);
 
-            var overlay = GameObject.Instantiate(TransitionFade.Instance.overlay, null);
+            var overlay = GameObject.Instantiate(TransitionFade.Instance.overlay, (Transform)null);
             overlay.transform.position = TransitionFade.Instance.overlay.transform.position + new Vector3(0, 0, -100f);
             overlay.color = Color.black;
             overlay.gameObject.layer = LayerMask.NameToLayer("UI");

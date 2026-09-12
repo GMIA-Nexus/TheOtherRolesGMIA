@@ -33,7 +33,7 @@ namespace TheOtherRoles.Patches {
         {
             public static void Postfix(AmongUsClient __instance, ref Il2CppSystem.Collections.IEnumerator __result)
             {
-                var overlay = GameObject.Instantiate(TransitionFade.Instance.overlay, null);
+                var overlay = GameObject.Instantiate(TransitionFade.Instance.overlay, (Transform)null);
                 overlay.transform.position = TransitionFade.Instance.overlay.transform.position;
 
                 System.Collections.IEnumerator CoFadeInIf()

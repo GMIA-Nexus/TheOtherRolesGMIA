@@ -1049,7 +1049,7 @@ namespace TheOtherRoles.MetaContext
                 return null;
             }
 
-            var text = UnityEngine.Object.Instantiate(VanillaAsset.StandardTextPrefab, null);
+            var text = UnityEngine.Object.Instantiate(VanillaAsset.StandardTextPrefab, (Transform)null);
             text.transform.localPosition = new Vector3(0f, 0f, 0f);
 
             ReflectMyAttribute(text, size.Width);
@@ -1118,7 +1118,7 @@ namespace TheOtherRoles.MetaContext
         {
             bool currentValue = defaultValue;
 
-            var backText = UnityEngine.Object.Instantiate(VanillaAsset.StandardTextPrefab, null);
+            var backText = UnityEngine.Object.Instantiate(VanillaAsset.StandardTextPrefab, (Transform)null);
             backText.transform.localPosition = new UnityEngine.Vector3(0f, 0f, 0f);
 
             var text = UnityEngine.Object.Instantiate(VanillaAsset.StandardTextPrefab, backText.transform);

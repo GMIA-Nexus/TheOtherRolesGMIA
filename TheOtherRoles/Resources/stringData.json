@@ -2210,8 +2210,8 @@
     "timeMasterCooldown": {
         "0": "Time Master Cooldown",
         "11": "\u30bf\u30a4\u30e0\u30b7\u30fc\u30eb\u30c9\u30af\u30fc\u30eb\u30c0\u30a6\u30f3",
-        "13": "\u65f6\u95f4\u4e4b\u76fe\u51b7\u5374\u65f6\u95f4",
-        "14": "\u6642\u9593\u4e4b\u76fe\u51b7\u537b\u6642\u9593"
+        "13": "\u65f6\u95f4\u4e4b\u4e3b\u51b7\u5374\u65f6\u95f4",
+        "14": "\u6642\u9593\u4e4b\u4e3b\u51b7\u537b\u6642\u9593"
     },
     "timeMasterRewindTime": {
         "0": "Rewind Time",
@@ -2224,6 +2224,16 @@
         "11": "\u30b7\u30fc\u30eb\u30c9\u6301\u7d9a\u6642\u9593",
         "13": "\u65f6\u95f4\u4e4b\u76fe\u6301\u7eed\u65f6\u95f4",
         "14": "\u6642\u9593\u4e4b\u76fe\u6301\u7e8c\u6642\u9593"
+    },
+    "timeMasterCanRewindIndependently": {
+        "0": "Can Rewind Independently",
+        "13": "\u53ef\u4ee5\u4e3b\u52a8\u56de\u6eaf\u65f6\u95f4",
+        "14": "\u53ef\u4ee5\u4e3b\u52d5\u56de\u6eaf\u6642\u9593"
+    },
+    "timeMasterNumberOfRewind": {
+        "0": "Number Of Rewinds",
+        "13": "\u65f6\u95f4\u4e4b\u4e3b\u56de\u6eaf\u6570\u91cf",
+        "14": "\u6642\u9593\u4e4b\u4e3b\u56de\u6eaf\u6578\u91cf"
     },
     "timeMasterRewindDuringRewind": {
         "0": "Revive During Rewind",
@@ -5334,6 +5344,11 @@
         "13": " - <color=#FF0000FF>(\u51fb\u6740\u6570: {0})</color>",
         "14": " - <color=#FF0000FF>(\u64ca\u6bba\u6578: {0})</color>"
     },
+    "exileRoleMessage": {
+        "0": "{0} was The {1}",
+        "13": "{0} \u7684\u804c\u4e1a\u662f {1}",
+        "14": "{0} \u7684\u8077\u696d\u662f {1}"
+    },
     "chatChannelDefault": {
         "0": "Public Chat",
         "13": "\u516c\u5171\u9891\u9053",
@@ -6296,12 +6311,6 @@
         "13": "\u5f3a\u5236\u9a71\u9010\u806a\u660e\u7684\u8239\u5458",
         "14": "\u5f37\u5236\u9a45\u9010\u8070\u660e\u7684\u8239\u54e1"
     },
-    "yasunaSpecialIndicator": {
-        "0": " (Yasuna)",
-        "11": "(\u30e4\u30b9\u30ca)",
-        "13": " (\u88c1\u51b3\u8005)",
-        "14": "(\u88c1\u6c7a\u8005)"
-    },
     "yasunaIsImpYasunaRate": {
         "0": "Chance That The Yasuna Is An Impostor",
         "11": "\u30a4\u30f3\u30dd\u30b9\u30bf\u30fc\u306b\u306a\u308b\u78ba\u7387",
@@ -6314,11 +6323,10 @@
         "13": "\u88c1\u51b3\u8005\u5f3a\u51fa\u6570\u91cf",
         "14": "\u88c1\u6c7a\u8005\u5f37\u5236\u9a45\u9010\u6578\u91cf"
     },
-    "yasunaSpecificMessageMode": {
-        "0": "Use Specific Message To Indicate Special Vote",
-        "11": "\u7279\u5225\u6295\u7968\u3067\u3042\u308b\u3053\u3068\u304c\u308f\u304b\u308b\u7279\u5b9a\u306e\u30e1\u30c3\u30bb\u30fc\u30b8\u3092\u4f7f\u7528\u3059\u308b",
-        "13": "\u7528\u7279\u6b8a\u4fe1\u606f\u6807\u8bb0\u5f3a\u51fa",
-        "14": "\u7528\u7279\u6b8a\u8a0a\u606f\u6a19\u8a18\u5f37\u5236\u9a45\u9010"
+    "yasunaForceExileMessage": {
+        "0": "The Yasuna Has Spoken.",
+        "13": "\u88c1\u51b3\u8005\u5df2\u505a\u51fa\u51b3\u5b9a\u3002",
+        "14": "\u88c1\u6c7a\u8005\u5df2\u505a\u51fa\u6c7a\u5b9a\u3002"
     },
     "yasunaSpecialVotes": {
         "0": "Special Votes: {0}",
@@ -8676,10 +8684,15 @@
         "14": "\u5075\u63a2\u53ef\u4ee5\u770b\u898b\u5176\u4ed6\u73a9\u5bb6\u7559\u4e0b\u7684\u8173\u5370\u3002\n\u7576\u5075\u63a2\u5831\u544a\u4e86\u5c4d\u9ad4\u6642\uff0c\u5075\u63a2\u5c07\u6703\u5f97\u5230\u5147\u624b\u7684\u4fe1\u606f\u3002\n\u5f97\u5230\u7684\u7dda\u7d22\u56e0\u5075\u63a2\u5831\u544a\u5c4d\u9ad4\u7684\u6642\u523b\u8207\u6b7b\u4ea1\u6642\u523b\u7684\u6642\u9593\u5dee\u4e0d\u540c\u800c\u4e0d\u540c\u3002\n\u5075\u63a2\u8fd8\u53ef\u4ee5\u900f\u904e\u8ffd\u5147\u767c\u73fe\u5c4d\u9ad4\u5c0d\u61c9\u5147\u624b\u7684\u4f4d\u7f6e\u65b9\u5411\u3002"
     },
     "timeMasterFullDesc": {
-        "0": "The Time Master has a time shield which they can activate.\nThe time shield remains active for <var>%SEC%s</var>.\nIf a player tries to kill the Time Master while the time shield is active, the kill won't happen and the time will rewind for <var>%TIME%s</var>.\nThe kill cooldown of the killer won't be reset, so the Time Master has to make sure that the game won't result in the same situation.\nThe Time Master won't be affected by the rewind.",
+        "0": "The Time Master has a time shield which they can activate.\nThe time shield remains active for <var>%SEC%s</var>.\nIf a player tries to kill the Time Master while the time shield is active, the kill won't happen and the time will rewind for <var>%TIME%s</var>.\nThe kill cooldown of the killer won't be reset, so the Time Master has to make sure that the game won't result in the same situation.<var>%OPT%</var>\nThe Time Master won't be affected by the rewind.",
         "11": "\u30fb\u30ad\u30eb\u3055\u308c\u308b\u524d\u306b\u80fd\u529b\u3092\u4f7f\u3044\u30ad\u30eb\u3055\u308c\u308b\u3068\u6642\u9593\u3092\u6570\u79d2\u9593\u623b\u305b\u308b",
-        "13": "\u65f6\u95f4\u4e4b\u4e3b\u62e5\u6709\u4e3b\u52a8\u6280\u80fd\uff1a\u65f6\u5149\u4e4b\u76fe\u3002\n\u65f6\u5149\u4e4b\u76fe\u88ab\u5f00\u542f\u540e\uff0c\u5c06\u6301\u7eed\u6fc0\u6d3b<var>%SEC%\u79d2</var>\u3002\u5982\u679c\u73a9\u5bb6\u5c1d\u8bd5\u5728\u65f6\u5149\u4e4b\u76fe\u6fc0\u6d3b\u65f6\u51fb\u6740\u65f6\u95f4\u4e4b\u4e3b\uff0c\u90a3\u6b21\u51fb\u6740\u65e0\u6548\uff0c\u5e76\u4e14\u6e38\u620f\u72b6\u51b5\u5c06\u56de\u6eaf\u5230<var>%TIME%\u79d2</var>\u4e4b\u524d\u3002\n\u51f6\u624b\u7684\u51fb\u6740\u51b7\u5374\u4e0d\u4f1a\u56e0\u56de\u6eaf\u800c\u91cd\u7f6e\uff0c\u56e0\u6b64\u65f6\u95f4\u4e4b\u4e3b\u9700\u8981\u786e\u4fdd\u65f6\u95f4\u56de\u6eaf\u540e\u4e0d\u4f1a\u8ba9\u81ea\u5df1\u56de\u5230\u540c\u6837\u7684\u7a98\u5883\u3002\n\u65f6\u95f4\u4e4b\u4e3b\u4e0d\u53d7\u65f6\u95f4\u56de\u6eaf\u7684\u5f71\u54cd\u3002",
-        "14": "\u6642\u9593\u4e4b\u4e3b\u64c1\u6709\u4e3b\u52d5\u6280\u80fd\uff1a\u6642\u5149\u4e4b\u76fe\u3002\n\u6642\u5149\u4e4b\u76fe\u88ab\u958b\u555f\u5f8c\uff0c\u5c07\u6301\u7e8c\u6fc0\u6d3b<var>%SEC%\u79d2</var>\u3002\u5982\u679c\u73a9\u5bb6\u5617\u8a66\u5728\u6642\u5149\u4e4b\u76fe\u6fc0\u6d3b\n\u6642\u64ca\u6bba\u6642\u9593\u4e4b\u4e3b\uff0c\u90a3\u6b21\u64ca\u6bba\u7121\u6548\uff0c\u4f75\u4e14\u904a\u6232\u72c0\u6cc1\u5c07\u56de\u6eaf\u5230<var>%TIME%\u79d2</var>\u4e4b\u524d\u3002\n\u5147\u624b\u7684\u64ca\u6bba\u51b7\u537b\u4e0d\u6703\u56e0\u56de\u6eaf\u800c\u91cd\u7f6e\uff0c\u56e0\u6b64\u6642\u9593\u4e4b\u4e3b\u9700\u8981\u78ba\u4fdd\u6642\u9593\u56de\u6eaf\u5f8c\u4e0d\n\u6703\u8b93\u81ea\u5df1\u56de\u5230\u540c\u6a23\u7684\u7a98\u5883\u3002\u6642\u9593\u4e4b\u4e3b\u4e0d\u53d7\u6642\u9593\u56de\u6eaf\u7684\u5f71\u97ff\u3002"
+        "13": "\u65f6\u95f4\u4e4b\u4e3b\u62e5\u6709\u4e3b\u52a8\u6280\u80fd\uff1a\u65f6\u5149\u4e4b\u76fe\u3002\n\u65f6\u5149\u4e4b\u76fe\u88ab\u5f00\u542f\u540e\uff0c\u5c06\u6301\u7eed\u6fc0\u6d3b<var>%SEC%\u79d2</var>\u3002\u5982\u679c\u73a9\u5bb6\u5c1d\u8bd5\u5728\u65f6\u5149\u4e4b\u76fe\u6fc0\u6d3b\u65f6\u51fb\u6740\u65f6\u95f4\u4e4b\u4e3b\uff0c\u90a3\u6b21\u51fb\u6740\u65e0\u6548\uff0c\u5e76\u4e14\u6e38\u620f\u72b6\u51b5\u5c06\u56de\u6eaf\u5230<var>%TIME%\u79d2</var>\u4e4b\u524d\u3002\n\u51f6\u624b\u7684\u51fb\u6740\u51b7\u5374\u4e0d\u4f1a\u56e0\u56de\u6eaf\u800c\u91cd\u7f6e\uff0c\u56e0\u6b64\u65f6\u95f4\u4e4b\u4e3b\u9700\u8981\u786e\u4fdd\u65f6\u95f4\u56de\u6eaf\u540e\u4e0d\u4f1a\u8ba9\u81ea\u5df1\u56de\u5230\u540c\u6837\u7684\u7a98\u5883\u3002<var>%OPT%</var>\n\u65f6\u95f4\u4e4b\u4e3b\u4e0d\u53d7\u65f6\u95f4\u56de\u6eaf\u7684\u5f71\u54cd\u3002",
+        "14": "\u6642\u9593\u4e4b\u4e3b\u64c1\u6709\u4e3b\u52d5\u6280\u80fd\uff1a\u6642\u5149\u4e4b\u76fe\u3002\n\u6642\u5149\u4e4b\u76fe\u88ab\u958b\u555f\u5f8c\uff0c\u5c07\u6301\u7e8c\u6fc0\u6d3b<var>%SEC%\u79d2</var>\u3002\u5982\u679c\u73a9\u5bb6\u5617\u8a66\u5728\u6642\u5149\u4e4b\u76fe\u6fc0\u6d3b\n\u6642\u64ca\u6bba\u6642\u9593\u4e4b\u4e3b\uff0c\u90a3\u6b21\u64ca\u6bba\u7121\u6548\uff0c\u4f75\u4e14\u904a\u6232\u72c0\u6cc1\u5c07\u56de\u6eaf\u5230<var>%TIME%\u79d2</var>\u4e4b\u524d\u3002\n\u5147\u624b\u7684\u64ca\u6bba\u51b7\u537b\u4e0d\u6703\u56e0\u56de\u6eaf\u800c\u91cd\u7f6e\uff0c\u56e0\u6b64\u6642\u9593\u4e4b\u4e3b\u9700\u8981\u78ba\u4fdd\u6642\u9593\u56de\u6eaf\u5f8c\u4e0d\u6703\u8b93\u81ea\u5df1\u56de\u5230\u540c\u6a23\u7684\u7a98\u5883\u3002<var>%OPT%</var>\u6642\u9593\u4e4b\u4e3b\u4e0d\u53d7\u6642\u9593\u56de\u6eaf\u7684\u5f71\u97ff\u3002"
+    },
+    "timeMasterOPTHint": {
+        "0": "<br>The Time Master can rewind the time on their own.",
+        "13": "<br>\u65f6\u95f4\u4e4b\u4e3b\u53ef\u4ee5\u81ea\u5df1\u9009\u62e9\u56de\u6eaf\u65f6\u95f4\u3002",
+        "14": "<br>\u6642\u9593\u4e4b\u4e3b\u53ef\u4ee5\u81ea\u5df1\u9078\u64c7\u56de\u6eaf\u6642\u9593\u3002"
     },
     "medicFullDesc": {
         "0": "The Medic can shield one player per game, which makes the player unkillable.\nThe shielded player can still be voted out and might also be an Impostor.\nIf set in the options, the shielded player will get a red flash on their screen if someone (Impostor, Sheriff, ...) tried to murder them.\nIf the Medic dies, the shield disappears with them.\nThe Sheriff will not die if they try to kill a shielded Crewmate and won't perform a kill if they try to kill a shielded Impostor.\nThe Medic's other feature shows when they report a corpse: they will see how long ago the player died.\nThey may also view portable vitals and see how players died according to the option.",

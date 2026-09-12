@@ -19,6 +19,8 @@ namespace TheOtherRoles.Roles
             acTokenChallenge = null;
         }
 
+        public override AudioClip IntroSound { get => MetaContext.VanillaAsset.EngineerIntroSound; }
+
         public int remainingFixes = 1;
         public static bool highlightForImpostors = true;
         public static bool highlightForTeamJackal = true;

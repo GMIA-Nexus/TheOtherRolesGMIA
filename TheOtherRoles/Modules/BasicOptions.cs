@@ -41,7 +41,7 @@ namespace TheOtherRoles
         }
 
         // 取当前原版选项（currentNormalGameOptions 在部分场景（主菜单）可能为 null，做回退；都拿不到就跳过原版设置）
-        static NormalGameOptionsV10 GetOptions()
+        static NormalGameOptionsV11 GetOptions()
         {
             if (GameOptionsManager.Instance == null) return null;
             return GameOptionsManager.Instance.currentNormalGameOptions;
@@ -172,7 +172,7 @@ namespace TheOtherRoles
 
         public static void Init()
         {
-            defaultData = new NormalGameOptionsV10(null);
+            defaultData = new NormalGameOptionsV11(null);
 
             // Generic options : 890000000-
             //keywords = new Option<InnerNet.GameKeywords>(890000000, defaultData.Keywords);
@@ -340,6 +340,6 @@ namespace TheOtherRoles
         static Option<TaskBarMode> taskBarMode;
         static Option<bool> isDefaults;
 
-        static NormalGameOptionsV10 defaultData = null;
+        static NormalGameOptionsV11 defaultData = null;
     }
 }

@@ -17,6 +17,16 @@ namespace TheOtherRoles.Roles
         public bool shieldActive = false;
         public static bool isRewinding = false;
         public static bool reviveDuringReweind = false;
+        public static bool rewindIndependently { get { return CustomOptionHolder.timeMasterCanRewindIndependently.getBool(); } }
+        public int numRewinds = 0;
+
+        private static Sprite rewindSprite;
+        public static Sprite getRewindSprite()
+        {
+            if (rewindSprite) return rewindSprite;
+            rewindSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.RewindButton.png", 115f);
+            return rewindSprite;
+        }
 
         private static Sprite buttonSprite;
         public static Sprite getButtonSprite() {
@@ -29,12 +39,14 @@ namespace TheOtherRoles.Roles
         {
             yield return new("%SEC%", shieldDuration.ToString());
             yield return new("%TIME%", rewindTime.ToString());
+            yield return new("%OPT%", rewindIndependently ? ModTranslation.getString("timeMasterOPTHint") : "");
         }
 
         public TimeMaster()
         {
             RoleId = roleId = RoleId.TimeMaster;
             shieldActive = false;
+            numRewinds = Mathf.RoundToInt(CustomOptionHolder.timeMasterNumberOfRewind.getFloat());
         }
 
         public static RemoteProcess<byte> UseShield = RemotePrimitiveProcess.OfByte("TimeMasterShield", (message, _) =>

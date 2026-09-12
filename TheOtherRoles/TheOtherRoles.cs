@@ -289,7 +289,7 @@ namespace TheOtherRoles
                 // remove shoot button from targets for all guessers and close their guesserUI
                 if ((GuesserGM.isGuesser(PlayerControl.LocalPlayer.PlayerId) || PlayerControl.LocalPlayer.isRole(RoleId.Doomsayer)) && !PlayerControl.LocalPlayer.Data.IsDead &&
                     (GuesserGM.remainingShots(PlayerControl.LocalPlayer.PlayerId) > 0 || PlayerControl.LocalPlayer.isRole(RoleId.Doomsayer)) && MeetingHud.Instance) {
-                    MeetingHud.Instance.playerStates.ToList().ForEach(x => { if (x.TargetPlayerId == player.PlayerId && x.transform.FindChild("ShootButton") != null) UnityEngine.Object.Destroy(x.transform.FindChild("ShootButton").gameObject); });
+                    MeetingHud.Instance.playerStates.ToList().ForEach(x => { if (x.PlayerId == player.PlayerId && x.transform.FindChild("ShootButton") != null) UnityEngine.Object.Destroy(x.transform.FindChild("ShootButton").gameObject); });
 
                     if (MeetingHudPatch.guesserUI != null && MeetingHudPatch.guesserUIExitButton != null) {
                         if (MeetingHudPatch.guesserCurrentTarget == player.PlayerId)
@@ -312,6 +312,8 @@ namespace TheOtherRoles
             public PlayerControl player;
             public RoleId roleId;
             public virtual MetaContext.GUIContext ProgressContext { get; set; } = null;
+
+            public virtual AudioClip IntroSound { get; set; } = null;
 
             /// <summary>
             /// On meeting starts

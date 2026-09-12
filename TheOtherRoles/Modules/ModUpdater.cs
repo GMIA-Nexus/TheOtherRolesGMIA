@@ -120,7 +120,7 @@ namespace TheOtherRoles.Modules
             var template = GameObject.Find("ExitGameButton");
             if (!template) return;
 
-            var button = Instantiate(template, null);
+            var button = Instantiate(template, (Transform)null);
             var buttonTransform = button.transform;
             //buttonTransform.localPosition = new Vector3(-2f, -2f);
             button.GetComponent<AspectPosition>().anchorPoint = new Vector2(0.458f, 0.124f);

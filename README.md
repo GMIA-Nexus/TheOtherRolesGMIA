@@ -17,17 +17,18 @@ We are only a team of teenagers, and we may not be able to make this mod like an
 
 | Among Us - Version | Mod Version | Link                                                         |
 | ------------------ | ----------- | ------------------------------------------------------------ |
+| 18s            | v1.3.9     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.3.9) |
 | 17.3s            | v1.3.8     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.3.8) |
 | 17.3s            | v1.3.7     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.3.7) |
 | 17.1.2s            | v1.3.6     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.3.6) |
-| 17.1s            | v1.3.5     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.3.5) |
-| 17.1s            | v1.3.4     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.3.4) |
 
 <details>
   <summary>Click to show older versions</summary>
   
 | Among Us - Version | Mod Version | Link                                                                       |
 | ------------------ | ----------- | ------------------------------------------------------------ |
+| 17.1s            | v1.3.5     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.3.5) |
+| 17.1s            | v1.3.4     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.3.4) |
 | 16.0.0s            | v1.3.3     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.3.3) |
 | 2024.11.26s        | v1.3.2     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.3.2) |
 | 2024.11.26s        | v1.3.1     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.3.1) |
@@ -54,6 +55,15 @@ We are only a team of teenagers, and we may not be able to make this mod like an
 
 <details>
   <summary>Click to show the Changelog</summary>
+
+  **Version v1.3.9**
+ - Updated compatibility for Among Us v18
+ - Added new option "Time Master Can Rewind Independently"
+ - Added the illustrations to the Role Draft
+ - Added new intro sounds to some roles
+ - Added new judge animation to the Yasuna
+ - Fixed a bug where the Preset Menu cannot be opened on Starlight
+ - Fixed a bug where the Fox Shrine sprite and the Shaders cannot be loaded properly
 
   **Version v1.3.8**
  - Added new option "Tracker Can Kill"
@@ -2366,29 +2376,9 @@ For steam users, you have to follow the following steps.
 **5.** Unzip the files and double click on ```Among Us.exe```  
 **6.** The first launch will take a while. When the game has been fully launched, you will be able to enjoy the mod!
 
-If the installation isn't working, you can try using the [TheOtherRolesGMIA-Installer](https://github.com/FangkuaiYa/TheOtherRolesGMIA-Installer/) created by [Fangkuai](https://github.com/FangkuaiYa)
-
 # Roles
-For the functionality of the roles in TheOtherRoles GM IA, please take a look at our [Wiki](https://github.com/dabao40/TheOtherRolesGMIA/wiki)
-
-# The Other Roles GM IA Team
-
-## Developers
-- [Imp11](https://github.com/dabao40)  
-- [Among us](https://github.com/XiezibanWrite)
-- [Fangkuai](https://github.com/FangkuaiYa)
-- [ELinmei](https://github.com/HayashiUme)
-
-## Artists
-- [Fangkuai](https://github.com/FangkuaiYa)
-
-## Translators
-- [LezaiYa](https://github.com/LezaiYa)  
-- [Fangkuai](https://github.com/FangkuaiYa)
-- [NK](https://github.com/endrmen9487)
-- [yuunozikkyou](https://github.com/yuunozikkyou)
-- [unhappyset](https://github.com/unhappyset)
-- [KS](https://github.com/Ks-777)
+For the functionality of the roles in TheOtherRoles GM IA, please take a look at our [Wiki](https://github.com/dabao40/TheOtherRolesGMIA/wiki), or you can take a use the in-game role wiki for the same purpose.\
+Please note that the GitHub wiki is a bit out-dated and may not suit the current version.
 
 # Credits & Resources
 

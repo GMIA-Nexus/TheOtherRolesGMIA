@@ -35,7 +35,7 @@ namespace TheOtherRoles.Roles
 
         public override GUIContext ProgressContext { get => ProgressGUI.Holder(ProgressGUI.OneLineText(ModTranslation.getString("roleInfoDousedLeft")),
             ProgressGUI.Holder(PlayerControl.AllPlayerControls.ToArray().Where(x => x != player && !x.Data.IsDead && !dousedPlayers.Contains(x)).Select(p =>
-            ProgressGUI.OneLineText("-" + p.Data.PlayerName))).Move(new(0.04f, 0f))); }
+            ProgressGUI.OneLineText("-" + Helpers.cs(p.Data.Color, p.Data.PlayerName)))).Move(new(0.04f, 0f))); }
 
         public static float cooldown = 30f;
         public static float duration { get { return CustomOptionHolder.arsonistDuration.getFloat(); } }

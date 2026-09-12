@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TheOtherRoles.MetaContext;
 using TheOtherRoles.Modules;
 using TheOtherRoles.Objects;
 using UnityEngine;
@@ -20,6 +19,8 @@ namespace TheOtherRoles.Roles
             yield return new("%SEC%", CustomOptionHolder.vampireCooldownDecrease.getFloat().ToString());
             yield return new("%GARLIC%", ModTranslation.getString($"vampireGARLIC{(canKillNearGarlics ? "Kill" : "")}Hint"));
         }
+
+        public override AudioClip IntroSound { get => MetaContext.VanillaAsset.ViperIntroSound; }
 
         public Vampire()
         {

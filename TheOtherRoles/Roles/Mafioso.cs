@@ -32,8 +32,8 @@ namespace TheOtherRoles.Roles
         public static void UpdateButton(MeetingHud __instance)
         {
             var skip = __instance.SkipVoteButton;
-            skipMeeting?.gameObject.SetActive(!PlayerControl.LocalPlayer.Data.IsDead && !skip.voteComplete && numUses > 0);
-            skipMeeting?.voteComplete = skip.voteComplete;
+            skipMeeting?.gameObject.SetActive(!PlayerControl.LocalPlayer.Data.IsDead && !skip.VoteComplete && numUses > 0);
+            skipMeeting?.VoteComplete = skip.VoteComplete;
             skipMeeting?.GetComponent<SpriteRenderer>().enabled = skip.GetComponent<SpriteRenderer>().enabled;
             skipMeeting?.GetComponentsInChildren<TextMeshPro>()[0].text = ModTranslation.getString("mafiosoForceSkip");
         }
@@ -43,7 +43,7 @@ namespace TheOtherRoles.Roles
             var skip = __instance.SkipVoteButton;
             skipMeeting = Object.Instantiate(skip, skip.transform.parent);
             skipMeeting.Parent = __instance;
-            skipMeeting.SetTargetPlayerId(251);
+            skipMeeting.SetPlayerId(251);
             skipMeeting.transform.localPosition = skip.transform.localPosition + new Vector3(0f, -0.17f, 0f);
             skip.transform.localPosition += new Vector3(0f, 0.20f, 0f);
             UpdateButton(__instance);
@@ -64,7 +64,7 @@ namespace TheOtherRoles.Roles
         {
             switch (__instance.state)
             {
-                case MeetingHud.VoteStates.Discussion:
+                case MeetingHud.MeetingStates.Discussion:
                     if (__instance.discussionTimer < GameOptionsManager.Instance.currentNormalGameOptions.DiscussionTime)
                     {
                         skipMeeting.SetDisabled();
@@ -162,7 +162,7 @@ namespace TheOtherRoles.Roles
             __instance.playerStates.ToList().ForEach(x => x.gameObject.SetActive(true));
 
             if (AmongUsClient.Instance.AmHost)
-                __instance.RpcVotingComplete(System.Array.Empty<MeetingHud.VoterState>(), null, false);
+                __instance.RpcVotingComplete(System.Array.Empty<MeetingHud.VoterState>(), null, false, false, 0);
 
             yield break;
         }

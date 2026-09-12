@@ -15,6 +15,8 @@ namespace TheOtherRoles.Roles
         public static float camouflageTimer = 0f;
         public static AchievementToken<(int kills, bool cleared)> acTokenChallenge = null;
 
+        public override AudioClip IntroSound { get => MetaContext.VanillaAsset.ShapeshifterIntroSound; }
+
         static public IEnumerable<HelpSprite> GetHelpSprites()
         {
             yield return new(getButtonSprite(), "camouflagerCamoHint");

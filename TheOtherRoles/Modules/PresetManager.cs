@@ -21,14 +21,16 @@ namespace TheOtherRoles
         public static void Load()
         {
             CurrentIndex = 0;
+#if WINDOWS
             string dir = Path.GetDirectoryName(Application.dataPath) + @"\CustomPreset\";
+#else
+            string dir = Path.Combine(Application.persistentDataPath, "CustomPreset");
+#endif
             if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
             RefreshPresetList();
         }
 
         // ======== CSV プリセット ========
-        public static GameObject PresetInputBoxPrefab;
-
         public const string PresetNameTitle = "PresetName,";
         public const string IntroductionTitle = "Introduction,";
 

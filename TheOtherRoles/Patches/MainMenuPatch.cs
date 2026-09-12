@@ -114,6 +114,7 @@ namespace TheOtherRoles.Modules {
         public static void Postfix(MainMenuManager __instance)
         {
             VanillaAsset.LoadAssetAtInitialize();
+            Patches.LobbyJoin.MainMenuManager = __instance;
             var scalerList = __instance.mainMenuUI.GetComponent<SlicedAspectScaler>();
 
             var leftPanel = __instance.mainMenuUI.transform.FindChild("AspectScaler").FindChild("LeftPanel");
