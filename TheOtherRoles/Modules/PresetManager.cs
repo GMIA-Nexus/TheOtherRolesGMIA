@@ -14,19 +14,20 @@ namespace TheOtherRoles
     public static class PresetManager
     {
         // ======== 既存コード（CustomOption / CustomOptionHolder）から参照される Config ベースのプリセット API ========
-        public static int CurrentIndex = 0;
+        public static int CurrentIndex;
         public static string GetCurrentConfigSection() => $"Preset{CurrentIndex}";
         public static string[] GetPresetNames() => ["preset1", "preset2", "preset3", "preset4", "preset5", "preset6"];
+
+
+        public static string PresetFolder => Path.Combine(
+            OperatingSystem.IsAndroid() ? TheOtherRolesPlugin.StarDataFolder : Application.dataPath,
+            "CustomPreset"
+        );
 
         public static void Load()
         {
             CurrentIndex = 0;
-#if WINDOWS
-            string dir = Path.GetDirectoryName(Application.dataPath) + @"\CustomPreset\";
-#else
-            string dir = Path.Combine(Application.persistentDataPath, "CustomPreset");
-#endif
-            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+            if (!Directory.Exists(PresetFolder)) Directory.CreateDirectory(PresetFolder);
             RefreshPresetList();
         }
 
@@ -59,25 +60,22 @@ namespace TheOtherRoles
         static void RefreshPresetList()
         {
             presetInfoList.Clear();
-            string dir = Path.GetDirectoryName(Application.dataPath) + @"\CustomPreset\";
-            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+            if (!Directory.Exists(PresetFolder)) Directory.CreateDirectory(PresetFolder);
 
-            string[] fileNames = Directory.GetFiles(dir, "*.csv");
+            string[] fileNames = Directory.GetFiles(PresetFolder, "*.csv");
             foreach (string path in fileNames)
             {
                 try
                 {
-                    using (var sr = new StreamReader(path, Encoding.UTF8))
+                    using var sr = new StreamReader(path, Encoding.UTF8);
+                    string text = sr.ReadLine();
+                    if (text == "# [CustomPreset]")
                     {
-                        string text = sr.ReadLine();
-                        if (text == "# [CustomPreset]")
+                        string name = sr.ReadLine();
+                        if (name != null && name.Contains(PresetNameTitle))
                         {
-                            string name = sr.ReadLine();
-                            if (name != null && name.Contains(PresetNameTitle))
-                            {
-                                string presetName = name.Substring(name.IndexOf(PresetNameTitle) + PresetNameTitle.Length);
-                                presetInfoList.Add(new PresetInfo(presetName, path));
-                            }
+                            string presetName = name.Substring(name.IndexOf(PresetNameTitle) + PresetNameTitle.Length);
+                            presetInfoList.Add(new PresetInfo(presetName, path));
                         }
                     }
                 }
@@ -263,9 +261,9 @@ namespace TheOtherRoles
                 using (var sw = new StreamWriter(filePath, false, Encoding.UTF8))
                 {
                     sw.WriteLine("# [CustomPreset]");
-                    sw.WriteLine(string.Format("{0},{1}", "PresetName", presetName));
-                    sw.WriteLine(string.Format("{0}{1}", IntroductionTitle, introduction ?? ""));
-                    sw.WriteLine(string.Format("{0},{1}", 0, registTime));
+                    sw.WriteLine($"{"PresetName"},{presetName}");
+                    sw.WriteLine($"{IntroductionTitle}{introduction ?? ""}");
+                    sw.WriteLine($"{0},{registTime}");
                     try
                     {
                         BasicOptions.Save(optionValueTable, sw);
@@ -295,7 +293,7 @@ namespace TheOtherRoles
                             else
                                 optionValueTable[option.id] = value.ToString();
 
-                            sw.WriteLine(string.Format("{0},{1}", option.id, value));
+                            sw.WriteLine($"{option.id},{value}");
                         }
                     }
                 }
@@ -349,7 +347,7 @@ namespace TheOtherRoles
                 }
                 CustomOption.ShareOptionSelections();
                 if (PlayerControl.LocalPlayer)
-                    PlayerControl.LocalPlayer.RpcSyncSettings(GameOptionsManager.Instance.gameOptionsFactory.ToBytes(GameOptionsManager.Instance.currentGameOptions, false));  // TODO Maybe simpler?? 
+                    PlayerControl.LocalPlayer.RpcSyncSettings(GameOptionsManager.Instance.gameOptionsFactory.ToBytes(GameOptionsManager.Instance.currentGameOptions, false));  // TODO Maybe simpler??
             }
 
             public void Rename(string newPresetName, string newIntroduction)
@@ -379,12 +377,11 @@ namespace TheOtherRoles
             // 用预设名作为 CSV 文件名（保留中文，替换 Windows 非法文件名字符，重名加序号）
             static string GetFilePath(string presetName)
             {
-                string dir = Path.GetDirectoryName(Application.dataPath) + @"\CustomPreset\";
                 string safe = SanitizeFileName(presetName);
-                string path = Path.Combine(dir, safe + ".csv");
+                string path = Path.Combine(PresetFolder, safe + ".csv");
                 int i = 1;
                 while (File.Exists(path))
-                    path = Path.Combine(dir, $"{safe} ({i++}).csv");
+                    path = Path.Combine(PresetFolder, $"{safe} ({i++}).csv");
                 return path;
             }
 

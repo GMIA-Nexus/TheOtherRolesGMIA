@@ -39,7 +39,8 @@ namespace TheOtherRoles
 
         public static Version Version = Version.Parse(VersionString);
         internal static BepInEx.Logging.ManualLogSource Logger;
-         
+        public static readonly string StarDataFolder = Environment.GetEnvironmentVariable("STAR_DATA_PATH");
+
         public Harmony Harmony { get; } = new Harmony(Id);
         public static TheOtherRolesPlugin Instance;
 
@@ -61,15 +62,15 @@ namespace TheOtherRoles
             var regions = new IRegionInfo[] {
                 new StaticHttpRegionInfo("<color=#ff44ff>GMIA <color=#00ffff>BEIJING</color></color>", StringNames.NoTranslation, "imp.amongusclub.cn", new Il2CppReferenceArray<ServerInfo>([new ServerInfo("<color=#ff44ff>GMIA <color=#00ffff>BEIJING</color></color>", "https://imp.amongusclub.cn", 443, false)])).CastFast<IRegionInfo>()
             };
-            
+
             IRegionInfo currentRegion = serverManager.CurrentRegion;
             Logger.LogInfo($"Adding {regions.Length} regions");
             foreach (IRegionInfo region in regions) {
-                if (region == null) 
+                if (region == null)
                     Logger.LogError("Could not add region");
                 else {
-                    if (currentRegion != null && region.Name.Equals(currentRegion.Name, StringComparison.OrdinalIgnoreCase)) 
-                        currentRegion = region;               
+                    if (currentRegion != null && region.Name.Equals(currentRegion.Name, StringComparison.OrdinalIgnoreCase))
+                        currentRegion = region;
                     serverManager.AddOrUpdateRegion(region);
                 }
             }
@@ -84,7 +85,7 @@ namespace TheOtherRoles
         public override void Load() {
             Logger = Log;
             Instance = this;
-  
+
             _ = Helpers.checkBeta(); // Exit if running an expired beta
             Patches.CredentialsPatch.MOTD.loadMOTDs();
             ModTranslation.Load();
@@ -153,7 +154,7 @@ namespace TheOtherRoles
             }
         }
     }
-    
+
     // Debugging tools
     [HarmonyPatch(typeof(KeyboardJoystick), nameof(KeyboardJoystick.Update))]
     public static class DebugManager
@@ -183,7 +184,7 @@ namespace TheOtherRoles
                 bots.Add(playerControl);
                 GameData.Instance.AddPlayer(playerControl);
                 AmongUsClient.Instance.Spawn(playerControl, -2, InnerNet.SpawnFlags.None);
-                
+
                 playerControl.transform.position = PlayerControl.LocalPlayer.transform.position;
                 playerControl.GetComponent<DummyBehaviour>().enabled = true;
                 playerControl.NetTransform.enabled = false;
