@@ -18,15 +18,15 @@ namespace TheOtherRoles
         public static string GetCurrentConfigSection() => $"Preset{CurrentIndex}";
         public static string[] GetPresetNames() => ["preset1", "preset2", "preset3", "preset4", "preset5", "preset6"];
 
+        public static string PresetFolder => Path.Combine(
+            OperatingSystem.IsAndroid() ? TheOtherRolesPlugin.StarDataFolder : Path.GetDirectoryName(Application.dataPath),
+            "CustomPreset"
+        );
+
         public static void Load()
         {
             CurrentIndex = 0;
-#if WINDOWS
-            string dir = Path.GetDirectoryName(Application.dataPath) + @"\CustomPreset\";
-#else
-            string dir = Path.Combine(Application.persistentDataPath, "CustomPreset");
-#endif
-            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+            if (!Directory.Exists(PresetFolder)) Directory.CreateDirectory(PresetFolder);
             RefreshPresetList();
         }
 
@@ -59,10 +59,9 @@ namespace TheOtherRoles
         static void RefreshPresetList()
         {
             presetInfoList.Clear();
-            string dir = Path.GetDirectoryName(Application.dataPath) + @"\CustomPreset\";
-            if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
+            if (!Directory.Exists(PresetFolder)) Directory.CreateDirectory(PresetFolder);
 
-            string[] fileNames = Directory.GetFiles(dir, "*.csv");
+            string[] fileNames = Directory.GetFiles(PresetFolder, "*.csv");
             foreach (string path in fileNames)
             {
                 try
@@ -379,12 +378,11 @@ namespace TheOtherRoles
             // 用预设名作为 CSV 文件名（保留中文，替换 Windows 非法文件名字符，重名加序号）
             static string GetFilePath(string presetName)
             {
-                string dir = Path.GetDirectoryName(Application.dataPath) + @"\CustomPreset\";
                 string safe = SanitizeFileName(presetName);
-                string path = Path.Combine(dir, safe + ".csv");
+                string path = Path.Combine(PresetFolder, safe + ".csv");
                 int i = 1;
                 while (File.Exists(path))
-                    path = Path.Combine(dir, $"{safe} ({i++}).csv");
+                    path = Path.Combine(PresetFolder, $"{safe} ({i++}).csv");
                 return path;
             }
 

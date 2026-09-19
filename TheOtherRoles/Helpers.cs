@@ -1945,32 +1945,11 @@ namespace TheOtherRoles
             return newMessage;
         }
 
-        public static PlainShipRoom getPlainShipRoom(PlayerControl p)
+        public static string GetRoomName(PlayerControl player)
         {
-            PlainShipRoom[] array = null;
-            Il2CppReferenceArray<Collider2D> buffer = new Collider2D[10];
-            ContactFilter2D filter = default;
-            filter.layerMask = Constants.PlayersOnlyMask;
-            filter.useLayerMask = true;
-            filter.useTriggers = false;
-            array = MapUtilities.CachedShipStatus?.AllRooms;
-            if (array == null) return null;
-            foreach (PlainShipRoom plainShipRoom in array)
-            {
-                if (plainShipRoom.roomArea)
-                {
-                    int hitCount = plainShipRoom.roomArea.OverlapCollider(filter, buffer);
-                    if (hitCount == 0) continue;
-                    for (int i = 0; i < hitCount; i++)
-                    {
-                        if (buffer[i]?.gameObject == p.gameObject)
-                        {
-                            return plainShipRoom;
-                        }
-                    }
-                }
-            }
-            return null;
+            var room = SystemTypes.Outside;
+            foreach (var entry in ShipStatus.Instance.FastRooms) if (entry.value.roomArea.OverlapPoint(player.GetTruePosition())) room = entry.Key;
+            return FastDestroyableSingleton<TranslationController>.Instance.GetString(room);
         }
 
         public static Vector3 AsVector3(this Vector2 vec, float z)

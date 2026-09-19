@@ -33,11 +33,13 @@ namespace TheOtherRoles
     public class TheOtherRolesPlugin : BasePlugin
     {
         public const string Id = "me.eisbison.theotherroles";
-        public const string VersionString = "1.3.8";
-        public const string SubVersionString = "-Blaze";
+        public const string VersionString = "1.4.0";
+        public const string SubVersionString = "-Aurora";
         public static uint betaDays = 0;  // amount of days for the build to be usable (0 for infinite!)
 
         public static Version Version = Version.Parse(VersionString);
+
+        public static readonly string StarDataFolder = Environment.GetEnvironmentVariable("STAR_DATA_PATH");
         internal static BepInEx.Logging.ManualLogSource Logger;
          
         public Harmony Harmony { get; } = new Harmony(Id);

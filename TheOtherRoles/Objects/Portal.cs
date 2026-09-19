@@ -68,9 +68,7 @@ namespace TheOtherRoles.Objects {
             }
             
             if (!playerControl.Data.IsDead) {
-                var startingRoom = Helpers.getPlainShipRoom(playerControl);
-                teleportedPlayers.Add(new tpLogEntry(playerId, playerNameDisplay, DateTime.UtcNow,
-                    DestroyableSingleton<TranslationController>.Instance.GetString(startingRoom != null ? startingRoom.RoomId : SystemTypes.Outside),
+                teleportedPlayers.Add(new tpLogEntry(playerId, playerNameDisplay, DateTime.UtcNow, Helpers.GetRoomName(playerControl),
                     exit == 2 ? secondPortal.room : findExit(playerControl.transform.position).room));
             }
             

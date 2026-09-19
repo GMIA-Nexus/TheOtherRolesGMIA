@@ -97,6 +97,7 @@ namespace TheOtherRoles.Roles
                 {
                     foreach (var p in impostorPositionText.Values)
                         if (p != null) Object.Destroy(p.gameObject);
+                    impostorPositionText.Clear();
                 }
                 if (targetPositionText != null)
                     Object.Destroy(targetPositionText.gameObject);
@@ -134,7 +135,7 @@ namespace TheOtherRoles.Roles
                         continue;
                     }
                     Arrow arrow;
-                    if (p.Data.Role.IsImpostor && p != PlayerControl.LocalPlayer || p.isRole(RoleId.Spy) || Sidekick.players.Any(x => x.player == p && x.wasTeamRed)
+                    if ((p.Data.Role.IsImpostor && p != PlayerControl.LocalPlayer) || p.isRole(RoleId.Spy) || Sidekick.players.Any(x => x.player == p && x.wasTeamRed)
                         || Jackal.players.Any(x => x.player == p && x.wasTeamRed))
                     {
                         arrow = new Arrow(Palette.ImpostorRed);
@@ -155,12 +156,8 @@ namespace TheOtherRoles.Roles
                             impostorPositionText.Add(p.Data.PlayerName, positionText);
                         }
                         impostorPositionText[p.Data.PlayerName].transform.localPosition = new Vector3(0, -2.0f + 0.25f * count, impostorPositionText[p.Data.PlayerName].transform.localPosition.z);
-                        PlainShipRoom room = Helpers.getPlainShipRoom(p);
                         impostorPositionText[p.Data.PlayerName].gameObject.SetActive(true);
-                        if (room != null)
-                            impostorPositionText[p.Data.PlayerName].text = "<color=#FF1919FF>" + $"{p.Data.PlayerName}(" + FastDestroyableSingleton<TranslationController>.Instance.GetString(room.RoomId) + ")</color>";
-                        else
-                            impostorPositionText[p.Data.PlayerName].text = "";
+                        impostorPositionText[p.Data.PlayerName].text = "<color=#FF1919FF>" + $"{p.Data.PlayerName}(" + Helpers.GetRoomName(p) + ")</color>";
                     }
                 }
 
@@ -183,12 +180,8 @@ namespace TheOtherRoles.Roles
                         targetPositionText = gameObject.GetComponent<TMPro.TMP_Text>();
                         targetPositionText.alpha = 1.0f;
                     }
-                    PlainShipRoom room = Helpers.getPlainShipRoom(target);
                     targetPositionText.gameObject.SetActive(true);
-                    if (room != null)
-                        targetPositionText.text = "<color=#8CFFFFFF>" + $"{target.Data.PlayerName}(" + FastDestroyableSingleton<TranslationController>.Instance.GetString(room.RoomId) + ")</color>";
-                    else
-                        targetPositionText.text = "";
+                    targetPositionText.text = "<color=#8CFFFFFF>" + $"{target.Data.PlayerName}(" + Helpers.GetRoomName(target) + ")</color>";
                 }
                 else
                     if (targetPositionText != null)

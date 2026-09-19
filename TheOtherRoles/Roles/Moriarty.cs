@@ -177,7 +177,6 @@ namespace TheOtherRoles.Roles
                         targetPositionText = gameObject.GetComponent<TMPro.TMP_Text>();
                         targetPositionText.alpha = 1.0f;
                     }
-                    PlainShipRoom room = Helpers.getPlainShipRoom(target);
                     targetPositionText.gameObject.SetActive(true);
                     int nearestPlayer = 0;
                     foreach (var p in PlayerControl.AllPlayerControls)
@@ -188,10 +187,7 @@ namespace TheOtherRoles.Roles
                             if (dist < 7f) nearestPlayer += 1;
                         }
                     }
-                    if (room != null)
-                        targetPositionText.text = "<color=#8CFFFFFF>" + $"{target.Data.PlayerName}({nearestPlayer})(" + DestroyableSingleton<TranslationController>.Instance.GetString(room.RoomId) + ")</color>";
-                    else
-                        targetPositionText.text = "<color=#8CFFFFFF>" + $"{target.Data.PlayerName}({nearestPlayer})</color>";
+                    targetPositionText.text = "<color=#8CFFFFFF>" + $"{target.Data.PlayerName}({nearestPlayer})(" + Helpers.GetRoomName(target) + ")</color>";
                 }
                 else {
                     if (targetPositionText != null)

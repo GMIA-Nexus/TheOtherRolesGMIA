@@ -27,11 +27,10 @@ namespace TheOtherRoles.Modules.CustomHats
 
         internal static readonly string ManifestFileName = "CustomHats.json";
 
-#if WINDOWS
-        internal static string CustomSkinsDirectory => Path.Combine(Path.GetDirectoryName(Application.dataPath)!, ResourcesDirectory);
-#else
-        internal static string CustomSkinsDirectory => Path.Combine(Application.persistentDataPath, ResourcesDirectory);
-#endif
+        internal static string CustomSkinsDirectory => Path.Combine(
+                    OperatingSystem.IsAndroid() ? TheOtherRolesPlugin.StarDataFolder : Path.GetDirectoryName(Application.dataPath),
+                    ResourcesDirectory
+                );
         internal static string HatsDirectory => CustomSkinsDirectory;
 
         internal static List<CustomHat> UnregisteredHats = new();

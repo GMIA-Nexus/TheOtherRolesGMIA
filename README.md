@@ -17,6 +17,7 @@ We are only a team of teenagers, and we may not be able to make this mod like an
 
 | Among Us - Version | Mod Version | Link                                                         |
 | ------------------ | ----------- | ------------------------------------------------------------ |
+| 18s            | v1.4.0     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.4.0) |
 | 18s            | v1.3.9     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.3.9) |
 | 17.3s            | v1.3.8     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.3.8) |
 | 17.3s            | v1.3.7     | [Download](https://github.com/dabao40/TheOtherRolesGMIA/releases/tag/1.3.7) |
@@ -55,6 +56,9 @@ We are only a team of teenagers, and we may not be able to make this mod like an
 
 <details>
   <summary>Click to show the Changelog</summary>
+
+  **Version v1.4.0**
+ - Just a small hotfix for some small changes
 
   **Version v1.3.9**
  - Updated compatibility for Among Us v18
