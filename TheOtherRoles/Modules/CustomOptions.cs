@@ -1095,6 +1095,7 @@ namespace TheOtherRoles {
             int[] maxImpostors = Helpers.MaxImpostors;
             LegacyGameOptions.MaxImpostors = maxImpostors;
             NormalGameOptionsV12.MaxImpostors = maxImpostors;
+            NormalGameOptionsV11.MaxImpostors = maxImpostors;
             NormalGameOptionsV10.MaxImpostors = maxImpostors;
             NormalGameOptionsV09.MaxImpostors = maxImpostors;
             NormalGameOptionsV08.MaxImpostors = maxImpostors;
