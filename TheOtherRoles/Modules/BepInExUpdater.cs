@@ -19,8 +19,8 @@ namespace TheOtherRoles.Modules;
 #if WINDOWS
 public class BepInExUpdater : MonoBehaviour
 {
-    public const string RequiredBepInExVersion = "6.0.0-be.735+5fef3570f212b2fb5fbe9c1d20487c13c2fa90cb";
-    public const string BepInExDownloadURL = "https://builds.bepinex.dev/projects/bepinex_be/735/BepInEx-Unity.IL2CPP-win-x86-6.0.0-be.735%2B5fef357.zip";
+    public const string RequiredBepInExVersion = "6.0.0-be.788+5b766a3b7f6c164d4798924a93f3acf4db769d06";
+    public const string BepInExDownloadURL = "https://builds.bepinex.dev/projects/bepinex_be/788/BepInEx-Unity.IL2CPP-win-x64-6.0.0-be.788%2B5b766a3.zip";
     public static bool UpdateRequired => Paths.BepInExVersion.ToString() != RequiredBepInExVersion;
 
     public void Awake()
@@ -36,7 +36,7 @@ public class BepInExUpdater : MonoBehaviour
     {
         Task.Run(() => MessageBox(GetForegroundWindow(), "Required BepInEx update is downloading, please wait...","The Other Roles", 0));
         UnityWebRequest www = UnityWebRequest.Get(BepInExDownloadURL);
-        yield return www.Send();        
+        yield return www.Send();
         if (www.isNetworkError || www.isHttpError)
         {
             TheOtherRolesPlugin.Logger.LogError(www.error);
@@ -46,17 +46,17 @@ public class BepInExUpdater : MonoBehaviour
         var zipPath = Path.Combine(Paths.GameRootPath, ".bepinex_update");
         File.WriteAllBytes(zipPath, www.downloadHandler.GetUnstrippedData());
 
-        
+
         var tempPath = Path.Combine(Path.GetTempPath(), "TheOtherUpdater.exe");
         var asm = Assembly.GetExecutingAssembly();
         var exeName = asm.GetManifestResourceNames().FirstOrDefault(n => n.EndsWith("TheOtherUpdater.exe"));
-        
+
         using(var resource = asm.GetManifestResourceStream(exeName))
         {
             using(var file = new FileStream(tempPath, FileMode.OpenOrCreate, FileAccess.Write))
             {
                 resource!.CopyTo(file);
-            } 
+            }
         }
 
         var startInfo = new ProcessStartInfo(tempPath, $"--game-path \"{Paths.GameRootPath}\" --zip \"{zipPath}\"")

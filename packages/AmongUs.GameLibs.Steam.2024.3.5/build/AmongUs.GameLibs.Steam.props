@@ -1,6 +1,0 @@
-
-<Project>
-    <ItemGroup>
-        <Unhollow Include="AmongUs.GameLibs.Steam" Version="2024.3.5" DummyDirectory="$(MSBuildThisFileDirectory)" UnityVersion="2020.3.45" />
-    </ItemGroup>
-</Project>

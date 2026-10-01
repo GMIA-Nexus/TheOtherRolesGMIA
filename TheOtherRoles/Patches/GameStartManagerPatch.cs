@@ -25,6 +25,11 @@ namespace TheOtherRoles.Patches {
                     Helpers.shareGameVersion();
                 }
                 GameStartManagerUpdatePatch.sendGamemode = true;
+
+                if (PlayerControl.LocalPlayer != null && AmongUsClient.Instance.AmHost) {
+                    GameManager.Instance.LogicOptions.SyncOptions();
+                    CustomOption.ShareOptionSelections();
+                }
             }
         }
 
@@ -91,7 +96,7 @@ namespace TheOtherRoles.Patches {
                 // Trigger version refresh
                 versionSent = false;
                 // Reset lobby countdown timer
-                timer = 600f; 
+                timer = 600f;
                 // Reset kicking timer
                 kickingTimer = 0f;
                 // Copy lobby code
@@ -309,12 +314,12 @@ namespace TheOtherRoles.Patches {
                         var dummyComponent = client.Character.GetComponent<DummyBehaviour>();
                         if (dummyComponent != null && dummyComponent.enabled)
                             continue;
-                        
+
                         if (!playerVersions.ContainsKey(client.Id)) {
                             continueStart = false;
                             break;
                         }
-                        
+
                         PlayerVersion PV = playerVersions[client.Id];
                         int diff = TheOtherRolesPlugin.Version.CompareTo(PV.version);
                         if (diff != 0 || !PV.GuidMatches()) {
@@ -329,7 +334,7 @@ namespace TheOtherRoles.Patches {
                         writer.Write(mapId);
                         AmongUsClient.Instance.FinishRpcImmediately(writer);
                         RPCProcedure.dynamicMapOption(mapId);
-                    }            
+                    }
                     else if (CustomOptionHolder.dynamicMap.getBool() && continueStart) {
                         // 0 = Skeld
                         // 1 = Mira HQ
@@ -375,7 +380,7 @@ namespace TheOtherRoles.Patches {
                             CustomOptionHolder.presetSelection.updateSelection(chosenMapId + 2);
                         }
                         if (chosenMapId >= 3) chosenMapId++;  // Skip dlekS
-                                                              
+
                         MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.DynamicMapOption, Hazel.SendOption.Reliable, -1);
                         writer.Write(chosenMapId);
                         AmongUsClient.Instance.FinishRpcImmediately(writer);
