@@ -213,6 +213,9 @@ namespace TheOtherRoles.Patches
     class IntroPatch {
         public static IEnumerator CoBegin(IntroCutscene __instance)
         {
+            if (DestroyableSingleton<HudManager>.Instance.MatchInfoButton != null)
+                DestroyableSingleton<HudManager>.Instance.MatchInfoButton.gameObject.SetActive(false);
+
             SoundManager.Instance.PlaySound(__instance.IntroStinger, false, 1f, null);
             if (GameManager.Instance.IsNormal())
             {
@@ -441,7 +444,7 @@ namespace TheOtherRoles.Patches
             __instance.RoleText.gameObject.SetActive(false);
             __instance.RoleBlurbText.gameObject.SetActive(false);
             __instance.ourCrewmate.gameObject.SetActive(false);
-           
+
         }
 
         [HarmonyPatch(typeof(IntroCutscene), nameof(IntroCutscene.CreatePlayer))]
