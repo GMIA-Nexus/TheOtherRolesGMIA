@@ -631,7 +631,7 @@ namespace TheOtherRoles {
             {
                 pbutton.SelectButton(false);
             }
-            if (tabNum > 20) // StringNames are in the range of 3000+ 
+            if (tabNum > 20) // StringNames are in the range of 3000+
                 return;
             __instance.taskTabButton.SelectButton(false);
 
@@ -1094,6 +1094,7 @@ namespace TheOtherRoles {
             // Set MaxImpostors values
             int[] maxImpostors = Helpers.MaxImpostors;
             LegacyGameOptions.MaxImpostors = maxImpostors;
+            NormalGameOptionsV12.MaxImpostors = maxImpostors;
             NormalGameOptionsV11.MaxImpostors = maxImpostors;
             NormalGameOptionsV10.MaxImpostors = maxImpostors;
             NormalGameOptionsV09.MaxImpostors = maxImpostors;
@@ -1103,6 +1104,7 @@ namespace TheOtherRoles {
             // Set RecommendedImpostors values
             int[] recommendedImpostors = Helpers.RecommendedImpostors;
             LegacyGameOptions.RecommendedImpostors = recommendedImpostors;
+            NormalGameOptionsV12.RecommendedImpostors = recommendedImpostors;
             NormalGameOptionsV11.RecommendedImpostors = recommendedImpostors;
             NormalGameOptionsV10.RecommendedImpostors = recommendedImpostors;
             NormalGameOptionsV09.RecommendedImpostors = recommendedImpostors;
@@ -1112,6 +1114,7 @@ namespace TheOtherRoles {
             // Set RecommendedKillCooldown values
             int[] recommendedKillCooldown = Helpers.RecommendedKillCooldown;
             LegacyGameOptions.RecommendedKillCooldown = recommendedKillCooldown;
+            NormalGameOptionsV12.RecommendedKillCooldown = recommendedKillCooldown;
             NormalGameOptionsV11.RecommendedKillCooldown = recommendedKillCooldown;
             NormalGameOptionsV10.RecommendedKillCooldown = recommendedKillCooldown;
             NormalGameOptionsV09.RecommendedKillCooldown = recommendedKillCooldown;
@@ -1121,7 +1124,7 @@ namespace TheOtherRoles {
             // Set MinPlayers values
             int[] minPlayers = Helpers.MinPlayers;
             LegacyGameOptions.MinPlayers = minPlayers;
-            NormalGameOptionsV11.MinPlayers = minPlayers;
+            NormalGameOptionsV12.MinPlayers = minPlayers;
             NormalGameOptionsV10.MinPlayers = minPlayers;
             NormalGameOptionsV09.MinPlayers = minPlayers;
             NormalGameOptionsV08.MinPlayers = minPlayers;
@@ -1565,7 +1568,7 @@ namespace TheOtherRoles {
             __instance.OnValueChanged = new Action<OptionBehaviour>((o) => {});
             __instance.Value = __instance.oldValue = option.selection;
             __instance.ValueText.text = option.getString();
-            
+
             return false;
         }
     }
@@ -1649,18 +1652,7 @@ namespace TheOtherRoles {
         }
     }
 
-    [HarmonyPatch(typeof(PlayerPhysics._CoSpawnPlayer_d__42), "MoveNext")]
-    public class AmongUsClientOnPlayerJoinedPatch {
-        public static void Postfix() {
-            if (PlayerControl.LocalPlayer != null && AmongUsClient.Instance.AmHost) {
-                    GameManager.Instance.LogicOptions.SyncOptions();
-                    CustomOption.ShareOptionSelections();
-            }
-        }
-    }
-
-
-    [HarmonyPatch] 
+    [HarmonyPatch]
     class GameOptionsDataPatch
     {
         /*private static IEnumerable<MethodBase> TargetMethods() {
@@ -1691,7 +1683,7 @@ namespace TheOtherRoles {
                     options = CustomOption.options.Where(o => o.type == type || o.type == CustomOption.CustomOptionType.Guesser);
                 List<int> remove = new() { 308, 310, 311, 312, 313, 314, 315, 316, 317, 318, 319, 7006, 3009 };
                 options = options.Where(x => !remove.Contains(x.id));
-            } else if (TORMapOptions.gameMode == CustomGamemodes.Classic) 
+            } else if (TORMapOptions.gameMode == CustomGamemodes.Classic)
                 options = options.Where(x => !(x.type == CustomOption.CustomOptionType.Guesser || x == CustomOptionHolder.crewmateRolesFill || x.id == 7007));
             else if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek)
                 options = options.Where(x => (x.type == CustomOption.CustomOptionType.HideNSeekMain || x.type == CustomOption.CustomOptionType.HideNSeekRoles));

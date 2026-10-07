@@ -4,9 +4,9 @@
     "net6.0": {
       "AmongUs.GameLibs.Steam": {
         "type": "Direct",
-        "requested": "[2026.8.18, )",
-        "resolved": "2026.8.18",
-        "contentHash": "sSGu2zGYvLboOc83PzPxQ0yGsK1YrhIO/538Tfzc/5FKfEbGCtCQErcKV0wdiYZCHGpCe561RzzfrBtp46jcgQ=="
+        "requested": "[2026.9.29, )",
+        "resolved": "2026.9.29",
+        "contentHash": "LhZAevu5OV03KpFLjqXRb9RP2rrWbm8xemdIyNFQVPOVwV0etInH2BZFpDBBIrSnqGzCWa7qOHBhIaVDIfk/jA=="
       },
       "BepInEx.IL2CPP.MSBuild": {
         "type": "Direct",
@@ -33,9 +33,9 @@
       },
       "Reactor": {
         "type": "Direct",
-        "requested": "[2.5.1-ci.384, )",
-        "resolved": "2.5.1-ci.384",
-        "contentHash": "OtNSjFanbNnphBnJwRrRpANLjk7x/DwG/6RJHLBrJzGwZrhdr3Qgr3YPFCqMTEri3cYSfgytu9rU8pP5HG96Dg==",
+        "requested": "[2.5.1-ci.400, )",
+        "resolved": "2.5.1-ci.400",
+        "contentHash": "TIEkofMDJmpzKlPpapVcQsEL+QUuEDv5s2yCis5xnVGx9H9yLJZ2QlZmOsFgbzqHlrLpqYfWKwe86fMFZS41Gg==",
         "dependencies": {
           "BepInEx.Unity.IL2CPP": "6.0.0-be.735"
         }
