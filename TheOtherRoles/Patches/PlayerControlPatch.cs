@@ -98,7 +98,7 @@ namespace TheOtherRoles.Patches {
                     color = Color.blue;
                 }
 
-                if (PlayerControl.LocalPlayer.Data.IsDead && Armored.armored != null && target == Armored.armored && !Armored.isBrokenArmor && !hasVisibleShield)
+                if (PlayerControl.LocalPlayer.Data.IsDead && target.hasModifier(RoleId.Armored) && !Armored.isBrokenArmor && !hasVisibleShield)
                 {
                     hasVisibleShield = true;
                     color = Color.yellow;
@@ -213,20 +213,29 @@ namespace TheOtherRoles.Patches {
             collider.offset = Mini.defaultColliderOffset * Vector2.down;
 
             // Set adapted player size to Mini and Morphling
-            if (Mini.mini == null || Camouflager.camouflageTimer > 0f || Helpers.MushroomSabotageActive() || Morphling.players.Any(x => x.player == Mini.mini && x.morphTimer > 0f) || (Mini.mini.isRole(RoleId.MimicA) && MimicA.isMorph)) return;
+            if (!Mini.exists || Camouflager.camouflageTimer > 0f || Helpers.MushroomSabotageActive()) return;
 
-            float growingProgress = Mini.growingProgress();
-            float scale = growingProgress * 0.35f + 0.35f;
-            float correctedColliderRadius = Mini.defaultColliderRadius * 0.7f / scale; // scale / 0.7f is the factor by which we decrease the player size, hence we need to increase the collider size by 0.7f / scale
+            foreach (var mini in Mini.allPlayers)
+            {
+                if (Morphling.players.Any(x => x.player == mini && x.morphTimer > 0f)) continue;
+                if (MimicA.allPlayers.Any(x => x == mini) && MimicA.isMorph) continue;
+                if (MimicK.allPlayers.Any(x => x == mini) && MimicK.victim != null) continue;
 
-            if (p == Mini.mini && !(Mini.mini.isRole(RoleId.MimicK) && MimicK.victim != null)) {
-                p.transform.localScale = new Vector3(scale, scale, 1f);
-                collider.radius = correctedColliderRadius;
-            }
-            if (Morphling.players.Any(x => x.morphTarget == Mini.mini && x.morphTimer > 0f) ||
-                (p.isRole(RoleId.MimicA) && MimicA.isMorph && Mini.mini.isRole(RoleId.MimicK))) {
-                p.transform.localScale = new Vector3(scale, scale, 1f);
-                collider.radius = correctedColliderRadius;
+                float growingProgress = Mini.growingProgress();
+                float scale = growingProgress * 0.35f + 0.35f;
+                float correctedColliderRadius = Mini.defaultColliderRadius * 0.7f / scale; // scale / 0.7f is the factor by which we decrease the player size, hence we need to increase the collider size by 0.7f / scale
+
+                if (p == mini || Morphling.players.Any(x => x.morphTarget == mini && x.morphTimer > 0f))
+                {
+                    p.transform.localScale = new Vector3(scale, scale, 1f);
+                    collider.radius = correctedColliderRadius;
+                }
+                if (Morphling.players.Any(x => x.morphTarget.hasModifier(RoleId.Mini) && x.morphTimer > 0f) ||
+                    (p.isRole(RoleId.MimicA) && MimicA.isMorph && MimicK.allPlayers.Any(x => x.hasModifier(RoleId.Mini))))
+                {
+                    p.transform.localScale = new Vector3(scale, scale, 1f);
+                    collider.radius = correctedColliderRadius;
+                }
             }
         }
 
@@ -334,7 +343,7 @@ namespace TheOtherRoles.Patches {
                     if (p == PlayerControl.LocalPlayer) {
                         if (p.Data.IsDead) roleNames = roleText;
                         playerInfoText = $"{roleNames}";
-                        if (p.isRole(RoleId.Swapper)) playerInfoText = $"{roleNames}" + Helpers.cs((p.Data.Role.IsImpostor || Madmate.madmate.Any(x => x.PlayerId == p.PlayerId)) ? Palette.ImpostorRed : Swapper.color, $" ({Swapper.charges})");
+                        if (p.isRole(RoleId.Swapper)) playerInfoText = $"{roleNames}" + Helpers.cs((p.Data.Role.IsImpostor || p.hasModifier(RoleId.Madmate)) ? Palette.ImpostorRed : Swapper.color, $" ({Swapper.charges})");
                         if (HudManager.Instance.TaskPanel != null) {
                             TMPro.TextMeshPro tabText = HudManager.Instance.TaskPanel.tab.transform.FindChild("TabText_TMP").GetComponent<TMPro.TextMeshPro>();
                             tabText.SetText(String.Format("{0} {1}", isTaskMasterExTask ? ModTranslation.getString("taskMasterExTasks") : TranslationController.Instance.GetString(StringNames.Tasks), isTaskMasterExTask ? exTaskInfo : taskInfo));
@@ -372,73 +381,6 @@ namespace TheOtherRoles.Patches {
                     var playerInfoTransform = p.cosmetics.nameText.transform.parent.FindChild("Info");
                     var playerInfo = playerInfoTransform?.GetComponent<TMPro.TextMeshPro>();
                     if (playerInfo != null) playerInfo.text = "";
-                }
-            }
-        }
-
-        private static void multitaskerUpdate()
-        {
-            if (Multitasker.multitasker.Any(x => x.PlayerId == PlayerControl.LocalPlayer.PlayerId))
-            {
-                if (PlayerControl.LocalPlayer.Data.IsDead) return;
-                if (!Minigame.Instance) return;
-
-                var Base = Minigame.Instance as MonoBehaviour;
-                SpriteRenderer[] rends = Base.GetComponentsInChildren<SpriteRenderer>();
-                for (var i = 0; i < rends.Length; i++)
-                {
-                    var oldColor1 = rends[i].color[0];
-                    var oldColor2 = rends[i].color[1];
-                    var oldColor3 = rends[i].color[2];
-                    rends[i].color = new Color(oldColor1, oldColor2, oldColor3, 0.5f);
-                }
-            }
-        }
-
-        private static void radarUpdate()
-        {
-            if (MeetingHud.Instance)
-                return;
-
-            if (PlayerControl.LocalPlayer != Radar.radar || PlayerControl.LocalPlayer.Data.IsDead)
-            {
-                if (Radar.localArrow?.arrow != null)
-                    UnityEngine.Object.Destroy(Radar.localArrow?.arrow);
-                Radar.localArrow = null;
-                return;
-            }
-
-            PlayerControl closestPlayer = null;
-            float closestDistance = float.MaxValue;
-            Vector2 refPosition = PlayerControl.LocalPlayer.GetTruePosition();
-
-            foreach (var player in PlayerControl.AllPlayerControls)
-            {
-                if (player.Data.IsDead || player.PlayerId == PlayerControl.LocalPlayer.PlayerId || !player.Collider.enabled)
-                    continue;
-
-                float distance = Vector2.Distance(refPosition, player.GetTruePosition());
-                if (distance < closestDistance)
-                {
-                    closestDistance = distance;
-                    closestPlayer = player;
-                }
-            }
-
-            if (closestPlayer != null)
-            {
-                if (Radar.localArrow == null)
-                {
-                    Radar.localArrow = new Arrow(Radar.color);
-                    Radar.localArrow.arrow.SetActive(true);
-                }
-                Radar.localArrow.Update(closestPlayer.transform.position);
-            }
-            else
-            {
-                if (Radar.localArrow != null && Radar.localArrow.arrow != null)
-                {
-                    Radar.localArrow.arrow.SetActive(false);
                 }
             }
         }
@@ -487,84 +429,9 @@ namespace TheOtherRoles.Patches {
             }
         }
 
-        static bool mushroomSaboWasActive = false;
-        static void morphlingAndCamouflagerUpdate() {
-            bool mushRoomSaboIsActive = Helpers.MushroomSabotageActive();
-            if (!mushroomSaboWasActive) mushroomSaboWasActive = mushRoomSaboIsActive;
-
-            float oldCamouflageTimer = Camouflager.camouflageTimer;
-            Dictionary<byte, float> oldMorphTimer = new();
-            Camouflager.camouflageTimer = Mathf.Max(0f, Camouflager.camouflageTimer - Time.fixedDeltaTime);
-            foreach (var morphling in Morphling.players) {
-                oldMorphTimer[morphling.player.PlayerId] = morphling.morphTimer;
-                morphling.morphTimer = Mathf.Max(0f, morphling.morphTimer - Time.fixedDeltaTime);
-            }
-
-            if (mushRoomSaboIsActive) return;
-
-            // Camouflage reset and set Morphling look if necessary
-            if (oldCamouflageTimer > 0f && Camouflager.camouflageTimer <= 0f) {
-                Camouflager.resetCamouflage();
-                foreach (var morphling in Morphling.players) {
-                    if (morphling.morphTimer > 0f && morphling.morphTarget != null) {
-                        PlayerControl target = morphling.morphTarget;
-                        morphling.player.setLook(target.Data.PlayerName, target.Data.DefaultOutfit.ColorId, target.Data.DefaultOutfit.HatId, target.Data.DefaultOutfit.VisorId, target.Data.DefaultOutfit.SkinId, target.Data.DefaultOutfit.PetId);
-                    }
-                }
-                if (MimicK.isAlive() && MimicK.victim != null)
-                {
-                    PlayerControl target = MimicK.victim;
-                    foreach (var mimicK in MimicK.allPlayers)
-                        mimicK.setLook(target.Data.PlayerName, target.Data.DefaultOutfit.ColorId, target.Data.DefaultOutfit.HatId, target.Data.DefaultOutfit.VisorId, target.Data.DefaultOutfit.SkinId, target.Data.DefaultOutfit.PetId);
-                }
-                if (MimicA.isAlive() && MimicA.isMorph)
-                {
-                    PlayerControl target = MimicK.allPlayers.FirstOrDefault();
-                    foreach (var mimicA in MimicA.allPlayers)
-                        mimicA.setLook(target.Data.PlayerName, target.Data.DefaultOutfit.ColorId, target.Data.DefaultOutfit.HatId, target.Data.DefaultOutfit.VisorId, target.Data.DefaultOutfit.SkinId, target.Data.DefaultOutfit.PetId);
-                }
-            }
-
-            // If the MushRoomSabotage ends while Morph is still active set the Morphlings look to the target's look
-            if (mushroomSaboWasActive)
-            {
-                foreach (var morphling in Morphling.players) {
-                    if (morphling.morphTimer > 0f && morphling.morphTarget != null) {
-                        PlayerControl target = morphling.morphTarget;
-                        morphling.player.setLook(target.Data.PlayerName, target.Data.DefaultOutfit.ColorId, target.Data.DefaultOutfit.HatId, target.Data.DefaultOutfit.VisorId, target.Data.DefaultOutfit.SkinId, target.Data.DefaultOutfit.PetId);
-                    }
-                }
-                if (MimicK.isAlive() && MimicK.victim != null)
-                {
-                    PlayerControl target = MimicK.victim;
-                    foreach (var mimicK in MimicK.allPlayers)
-                        mimicK.setLook(target.Data.PlayerName, target.Data.DefaultOutfit.ColorId, target.Data.DefaultOutfit.HatId, target.Data.DefaultOutfit.VisorId, target.Data.DefaultOutfit.SkinId, target.Data.DefaultOutfit.PetId);
-                }
-                if (MimicA.isAlive() && MimicA.isMorph)
-                {
-                    PlayerControl target = MimicK.allPlayers.FirstOrDefault();
-                    foreach (var mimicA in MimicA.allPlayers)
-                        mimicA.setLook(target.Data.PlayerName, target.Data.DefaultOutfit.ColorId, target.Data.DefaultOutfit.HatId, target.Data.DefaultOutfit.VisorId, target.Data.DefaultOutfit.SkinId, target.Data.DefaultOutfit.PetId);
-                }
-                if (Camouflager.camouflageTimer > 0)
-                {
-                    foreach (PlayerControl player in PlayerControl.AllPlayerControls)
-                        player.setLook("", 6, "", "", "", "");
-                }
-            }
-
-            // Morphling reset (only if camouflage is inactive)
-            if (Camouflager.camouflageTimer <= 0f) {
-                foreach (var morphling in Morphling.players) {
-                    if (morphling.morphTimer <= 0f && oldMorphTimer.TryGetValue(morphling.player.PlayerId, out float value) && value > 0f) morphling.resetMorph();
-                }
-            }
-            mushroomSaboWasActive = false;
-        }
-
         // Mini set adapted button cooldown for Vampire, Sheriff, Jackal, Sidekick, Warlock, Cleaner
         public static void miniCooldownUpdate() {
-            if (Mini.mini != null && PlayerControl.LocalPlayer == Mini.mini) {
+            if (PlayerControl.LocalPlayer.hasModifier(RoleId.Mini)) {
                 var multiplier = Mini.isGrownUp() ? 0.66f : 2f;
                 HudManagerStartPatch.sheriffKillButton.MaxTimer = Sheriff.cooldown * multiplier;
                 HudManagerStartPatch.vampireKillButton.MaxTimer = Vampire.cooldown * multiplier;
@@ -666,8 +533,6 @@ namespace TheOtherRoles.Patches {
                 Garlic.UpdateAll();
                 // Impostor
                 impostorSetTarget();
-                // Morphling and Camouflager
-                morphlingAndCamouflagerUpdate();
                 // Deputy
                 Deputy.handcuffUpdate();
                 // Assassin
@@ -676,14 +541,10 @@ namespace TheOtherRoles.Patches {
                 // -- MODIFIER--
                 // Chameleon (invis stuff, timers)
                 Chameleon.update();
-                // Multitasker
-                multitaskerUpdate();
                 // mini (for the cooldowns)
                 miniCooldownUpdate();
                 // Yo-yo
                 Silhouette.UpdateAll();
-                // Radar
-                radarUpdate();
 
                 // Props
                 accelTrapUpdate();
@@ -696,6 +557,9 @@ namespace TheOtherRoles.Patches {
             foreach (var role in new List<Role>(Role.allRoles)) {
                 if (role.player == __instance) role.FixedUpdate();
             }
+            foreach (var mod in new List<Modifier>(Modifier.allModifiers)) {
+                if (mod.player == __instance) mod.FixedUpdate();
+            }
         }
     }
 
@@ -703,12 +567,16 @@ namespace TheOtherRoles.Patches {
     class PlayerPhysicsWalkPlayerToPatch {
         private static Vector2 offset = Vector2.zero;
         public static void Prefix(PlayerPhysics __instance) {
-            bool correctOffset = Camouflager.camouflageTimer <= 0f && !Helpers.MushroomSabotageActive() && (__instance.myPlayer == Mini.mini || Morphling.players.Any(x => x.player == __instance.myPlayer && x.morphTimer > 0f && x.morphTarget == Mini.mini)
-                 || (__instance.myPlayer.isRole(RoleId.MimicA) && MimicA.isMorph && Mini.mini.isRole(RoleId.MimicK)));
-            correctOffset = correctOffset && !Morphling.players.Any(x => x.player == Mini.mini && x.morphTimer > 0f) && !(Mini.mini.isRole(RoleId.MimicA) && MimicA.isMorph) && !(Mini.mini.isRole(RoleId.MimicK) && MimicK.victim != null);
-            if (correctOffset) {
-                float currentScaling = (Mini.growingProgress() + 1) * 0.5f;
-                __instance.myPlayer.Collider.offset = currentScaling * Mini.defaultColliderOffset * Vector2.down;
+            foreach (var mini in Mini.allPlayers)
+            {
+                bool correctOffset = Camouflager.camouflageTimer <= 0f && !Helpers.MushroomSabotageActive() && (__instance.myPlayer == mini || Morphling.players.Any(x => x.player == __instance.myPlayer && x.morphTimer > 0f && x.morphTarget == mini)
+                 || (__instance.myPlayer.isRole(RoleId.MimicA) && MimicA.isMorph && MimicK.allPlayers.Any(x => x == mini)));
+                correctOffset = correctOffset && !Morphling.players.Any(x => x.player == mini && x.morphTimer > 0f) && !(mini.isRole(RoleId.MimicA) && MimicA.isMorph) && !(mini.isRole(RoleId.MimicK) && MimicK.victim != null);
+                if (correctOffset)
+                {
+                    float currentScaling = (Mini.growingProgress() + 1) * 0.5f;
+                    __instance.myPlayer.Collider.offset = currentScaling * Mini.defaultColliderOffset * Vector2.down;
+                }
             }
         }
     }
@@ -974,41 +842,8 @@ namespace TheOtherRoles.Patches {
 
             target.OnDeath(__instance);
 
-            // Mini Set Impostor Mini kill timer (Due to mini being a modifier, all "SetKillTimers" must have happened before this!)
-            if (Mini.mini != null && __instance == Mini.mini && __instance == PlayerControl.LocalPlayer) {
-                float multiplier = 1f;
-                if (Mini.mini != null && PlayerControl.LocalPlayer == Mini.mini) multiplier = Mini.isGrownUp() ? 0.66f : 2f;
-                Mini.mini.SetKillTimer(__instance.killTimer * multiplier);
-            }
-
-            if (PlayerControl.LocalPlayer == __instance && Diseased.diseased.Any(x => x.PlayerId == target.PlayerId))
-            {
-                if (Diseased.active.TryGetValue(__instance.PlayerId, out var num)) num++;
-                else num = 1;
-                Diseased.active[__instance.PlayerId] = num;
-
-                RoleHelpers.RoleMessage(RoleId.Diseased, "diseasedKillNotification");
-
-                HudManagerStartPatch.jackalKillButton.MaxTimer *= Diseased.multiplier;
-                HudManagerStartPatch.sheriffKillButton.MaxTimer *= Diseased.multiplier;
-                HudManagerStartPatch.vampireKillButton.MaxTimer *= Diseased.multiplier;
-                HudManagerStartPatch.sidekickKillButton.MaxTimer *= Diseased.multiplier;
-                HudManagerStartPatch.schrodingersCatKillButton.MaxTimer *= Diseased.multiplier;
-                HudManagerStartPatch.pelicanKillButton.MaxTimer *= Diseased.multiplier;
-                HudManagerStartPatch.yandereButton.MaxTimer *= Diseased.multiplier;
-                HudManagerStartPatch.trackerKillButton.MaxTimer *= Diseased.multiplier;
-            }
-
             if (PlayerControl.LocalPlayer == __instance && Diseased.active.ContainsKey(__instance.PlayerId))
                 PlayerControl.LocalPlayer.SetKillTimerUnchecked((float)(__instance.killTimer * Math.Pow(Diseased.multiplier, Diseased.active[__instance.PlayerId])));
-
-            // Add Bloody Modifier
-            if (Bloody.bloody.Any(x => x.PlayerId == target.PlayerId)) {
-                Bloodytrail.StartBloodTrail(__instance, target);
-                if (PlayerControl.LocalPlayer == __instance && Helpers.CurrentMonth == 8 && Helpers.isFungle()) {
-                    _ = new StaticAchievementToken("watermelon");
-                }
-            }
 
             // HideNSeek
             if (HideNSeek.isHideNSeekGM) {
@@ -1060,7 +895,7 @@ namespace TheOtherRoles.Patches {
             if (PlayerControl.LocalPlayer.GetKillCooldown() <= 0f) return false;
             float multiplier = 1f;
             float addition = 0f;
-            if (Mini.mini != null && PlayerControl.LocalPlayer == Mini.mini) multiplier = Mini.isGrownUp() ? 0.66f : 2f;
+            if (PlayerControl.LocalPlayer.hasModifier(RoleId.Mini)) multiplier = Mini.isGrownUp() ? 0.66f : 2f;
             if (PlayerControl.LocalPlayer.isRole(RoleId.BountyHunter)) addition = BountyHunter.punishmentTime;
             if (PlayerControl.LocalPlayer.isRole(RoleId.Trickster)) addition = Trickster.boxKillPenalty;
             if (Ninja.isPenalized(PlayerControl.LocalPlayer)) addition = Ninja.killPenalty;
@@ -1140,7 +975,7 @@ namespace TheOtherRoles.Patches {
     public static class PlayerPhysicsFixedUpdate {
         public static void Postfix(PlayerPhysics __instance)
         {
-            bool shouldInvert = Invert.invert.FindAll(x => x.PlayerId == PlayerControl.LocalPlayer.PlayerId).Count > 0 && Invert.meetings > 0;  // xor. if already invert, eventInvert will turn it off for 10s
+            bool shouldInvert = PlayerControl.LocalPlayer.hasModifier(RoleId.Invert) && Invert.meetings > 0;  // xor. if already invert, eventInvert will turn it off for 10s
             if (__instance.AmOwner &&
                 AmongUsClient.Instance &&
                 AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started &&
@@ -1176,6 +1011,7 @@ namespace TheOtherRoles.Patches {
             if (AmongUsClient.Instance && AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Started) {
                 TORGameManager.Instance?.GameStatistics.RecordEvent(new(GameStatistics.EventVariation.Disconnect, player.PlayerId, 0) { RelatedTag = EventDetail.Disconnect });
                 Role.allRoles.Do(x => x.HandleDisconnect(player, reason));
+                Modifier.allModifiers.Do(x => x.HandleDisconnect(player, reason));
                 Lovers.HandleDisconnect(player, reason);
             }
             if (RoleDraft.isEnabled && RoleDraft.isRunning) {

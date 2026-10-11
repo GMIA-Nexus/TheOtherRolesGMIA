@@ -17,7 +17,7 @@ namespace TheOtherRoles.Patches {
             if (GameOptionsManager.Instance.currentGameOptions.GameMode != GameModes.Normal) return;
             var target = __instance.HauntTarget;
             var roleInfo = RoleInfo.getRoleInfoForPlayer(target, false, includeHidden: true);
-            string roleString = (roleInfo.Count > 0 && ClientOption.GetValue(ClientOption.ClientOptionType.SpoilerAfterDeath) == 1) ? ((Madmate.madmate.Any(x => x.PlayerId == target.PlayerId) || CreatedMadmate.createdMadmate.Any(x => x.PlayerId == target.PlayerId)) ? (roleInfo.Contains(RoleInfo.crewmate) ? Madmate.fullName : Madmate.prefix + roleInfo[0].name) : roleInfo[0].name) : "";
+            string roleString = (roleInfo.Count > 0 && ClientOption.GetValue(ClientOption.ClientOptionType.SpoilerAfterDeath) == 1) ? ((target.hasModifier(RoleId.Madmate) || target.hasModifier(RoleId.CreatedMadmate)) ? (roleInfo.Contains(RoleInfo.crewmate) ? Madmate.fullName : Madmate.prefix + roleInfo[0].name) : roleInfo[0].name) : "";
             if (__instance.HauntTarget.Data.IsDead) {
                 __instance.FilterText.text = string.Format(ModTranslation.getString("hauntMenuGhost"), roleString);
                 return;

@@ -141,7 +141,7 @@ namespace TheOtherRoles.Patches {
                 }
                 var (tasksCompleted, tasksTotal) = TasksHandler.taskInfo(playerControl.Data);
                 bool isGuesser = HandleGuesser.isGuesserGm && HandleGuesser.isGuesser(playerControl.PlayerId);
-                bool isMadmate = Madmate.madmate.Any(x => x.PlayerId ==  playerControl.PlayerId) || CreatedMadmate.createdMadmate.Any(x => x.PlayerId == playerControl.PlayerId);
+                bool isMadmate = playerControl.hasModifier(RoleId.Madmate) || playerControl.hasModifier(RoleId.CreatedMadmate);
                 int? killCount = GameHistory.deadPlayers.FindAll(x => x.killerIfExisting != null && x.killerIfExisting.PlayerId == playerControl.PlayerId).Count;
                 if (killCount == 0 && !(new List<RoleInfo>() { RoleInfo.sheriff, RoleInfo.jackal, RoleInfo.sidekick, RoleInfo.thief, RoleInfo.moriarty, RoleInfo.jekyllAndHyde, RoleInfo.doomsayer,
                 RoleInfo.pelican, RoleInfo.yandere }.Contains(RoleInfo.getRoleInfoForPlayer(playerControl, false).FirstOrDefault()) || playerControl.Data.Role.IsImpostor)) {
@@ -202,9 +202,9 @@ namespace TheOtherRoles.Patches {
                 .. Pursuer.allPlayers,
                 .. Kataomoi.allPlayers,
                 .. JekyllAndHyde.allPlayers,
-                .. Madmate.madmate,
+                .. Madmate.allPlayers,
                 .. SchrodingersCat.allPlayers,
-                .. CreatedMadmate.createdMadmate,
+                .. CreatedMadmate.allPlayers,
                 .. Moriarty.allPlayers,
                 .. Akujo.allPlayers,
                 .. Opportunist.allPlayers,
@@ -232,7 +232,7 @@ namespace TheOtherRoles.Patches {
 
             bool jesterWin = Jester.exists && gameOverReason == (GameOverReason)CustomGameOverReason.JesterWin;
             bool arsonistWin = Arsonist.exists && gameOverReason == (GameOverReason)CustomGameOverReason.ArsonistWin;
-            bool miniLose = Mini.mini != null && gameOverReason == (GameOverReason)CustomGameOverReason.MiniLose;
+            bool miniLose = Mini.exists && gameOverReason == (GameOverReason)CustomGameOverReason.MiniLose;
             bool loversWin = Lovers.anyAlive() && (gameOverReason == (GameOverReason)CustomGameOverReason.LoversWin || (GameManager.Instance.DidHumansWin(gameOverReason) && Lovers.anyNonKillingCouples())); // Either they win if they are among the last 3 players, or they win if they are both Crewmates and both alive and the Crew wins (Team Imp/Jackal Lovers can only win solo wins)
             bool teamJackalWin = gameOverReason == (GameOverReason)CustomGameOverReason.TeamJackalWin;
             /* && ((Jackal.jackal != null && !Jackal.jackal.Data.IsDead) || (Sidekick.sidekick != null && !Sidekick.sidekick.Data.IsDead) ||
@@ -277,11 +277,14 @@ namespace TheOtherRoles.Patches {
             // Mini lose
             if (miniLose) {
                 EndGameResult.CachedWinners = new Il2CppSystem.Collections.Generic.List<CachedPlayerData>();
-                CachedPlayerData wpd = new(Mini.mini.Data)
+                foreach (var mini in Mini.allPlayers)
                 {
-                    IsYou = false // If "no one is the Mini", it will display the Mini, but also show defeat to everyone
-                };
-                EndGameResult.CachedWinners.Add(wpd);
+                    CachedPlayerData wpd = new(mini.Data)
+                    {
+                        IsYou = false // If "no one is the Mini", it will display the Mini, but also show defeat to everyone
+                    };
+                    EndGameResult.CachedWinners.Add(wpd);
+                }
                 AdditionalTempData.winCondition = WinCondition.MiniLose;  
             }
 
@@ -467,7 +470,7 @@ namespace TheOtherRoles.Patches {
                         else if (p.isRole(RoleId.Pursuer) && !p.Data.IsDead)
                             EndGameResult.CachedWinners.Add(new CachedPlayerData(p.Data));
                         else if (!p.isRole(RoleId.Jester) && !p.isRole(RoleId.Jackal) && !p.isRole(RoleId.Sidekick) && !p.isRole(RoleId.Arsonist) && !p.isRole(RoleId.Vulture) && !p.Data.Role.IsImpostor && !p.isRole(RoleId.Moriarty) && !p.isRole(RoleId.Akujo) && !p.isRole(RoleId.JekyllAndHyde)
-                            && !p.isRole(RoleId.Cupid) && !p.isRole(RoleId.PlagueDoctor) && !Madmate.madmate.Contains(p) && !CreatedMadmate.createdMadmate.Contains(p) && !p.isRole(RoleId.Fox) && !p.isRole(RoleId.Immoralist))
+                            && !p.isRole(RoleId.Cupid) && !p.isRole(RoleId.PlagueDoctor) && !p.hasModifier(RoleId.Madmate) && !p.hasModifier(RoleId.CreatedMadmate) && !p.isRole(RoleId.Fox) && !p.isRole(RoleId.Immoralist))
                             EndGameResult.CachedWinners.Add(new CachedPlayerData(p.Data));
                     }
                 }
@@ -597,23 +600,17 @@ namespace TheOtherRoles.Patches {
             // Madmate win with impostors
             if (EndGameResult.CachedWinners.ToArray().Any(x => x.IsImpostor))
             {
-                if (Madmate.madmate != null)
+                foreach (var p in Madmate.allPlayers)
                 {
-                    foreach (var p in Madmate.madmate)
-                    {
-                        if (EndGameResult.CachedWinners.ToArray().Any(x => x.PlayerName == p.Data.PlayerName)) continue;
-                        CachedPlayerData wpd = new(p.Data);
-                        EndGameResult.CachedWinners.Add(wpd);
-                    }
+                    if (EndGameResult.CachedWinners.ToArray().Any(x => x.PlayerName == p.Data.PlayerName)) continue;
+                    CachedPlayerData wpd = new(p.Data);
+                    EndGameResult.CachedWinners.Add(wpd);
                 }
-                if (CreatedMadmate.createdMadmate != null)
+                foreach (var p in CreatedMadmate.allPlayers)
                 {
-                    foreach (var p in CreatedMadmate.createdMadmate)
-                    {
-                        if (EndGameResult.CachedWinners.ToArray().Any(x => x.PlayerName == p.Data.PlayerName)) continue;
-                        CachedPlayerData wpd = new(p.Data);
-                        EndGameResult.CachedWinners.Add(wpd);
-                    }
+                    if (EndGameResult.CachedWinners.ToArray().Any(x => x.PlayerName == p.Data.PlayerName)) continue;
+                    CachedPlayerData wpd = new(p.Data);
+                    EndGameResult.CachedWinners.Add(wpd);
                 }
             }
 
@@ -1411,7 +1408,7 @@ namespace TheOtherRoles.Patches {
 
             TeamJackalAlive = numJackalAlive;
             TeamImpostorsAlive = numImpostorsAlive;
-            TeamSheriffAlive = Sheriff.allPlayers.Where(x => !x.Data.IsDead && !Madmate.madmate.Any(y => y.PlayerId == x.PlayerId)).ToList().Count +
+            TeamSheriffAlive = Sheriff.allPlayers.Where(x => !x.Data.IsDead && !x.hasModifier(RoleId.Madmate)).ToList().Count +
                 (Deputy.stopsGameEnd ? Deputy.livingPlayers.Count : 0);
             TeamMoriartyAlive = numMoriartyAlive;
             TeamJekyllAndHydeAlive = numJekyllAndHydeAlive;

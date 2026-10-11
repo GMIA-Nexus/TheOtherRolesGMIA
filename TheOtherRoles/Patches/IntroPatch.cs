@@ -213,9 +213,6 @@ namespace TheOtherRoles.Patches
     class IntroPatch {
         public static IEnumerator CoBegin(IntroCutscene __instance)
         {
-            if (DestroyableSingleton<HudManager>.Instance.MatchInfoButton != null)
-                DestroyableSingleton<HudManager>.Instance.MatchInfoButton.gameObject.SetActive(false);
-
             SoundManager.Instance.PlaySound(__instance.IntroStinger, false, 1f, null);
             if (GameManager.Instance.IsNormal())
             {
@@ -501,7 +498,7 @@ namespace TheOtherRoles.Patches
                 }
 
                 // Setup Madmate Intro
-                if (Madmate.madmate.Any(x => x.PlayerId == PlayerControl.LocalPlayer.PlayerId))
+                if (PlayerControl.LocalPlayer.hasModifier(RoleId.Madmate))
                 {
                     if (roleInfo == RoleInfo.crewmate) __instance.RoleText.text = ModTranslation.getString("madmate");
                     else __instance.RoleText.text = ModTranslation.getString("madmatePrefix") + __instance.RoleText.text;

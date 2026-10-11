@@ -47,7 +47,7 @@ public class Pelican : RoleBase<Pelican>
     {
         if (PlayerControl.LocalPlayer != player || PlayerControl.LocalPlayer.Data.IsDead) return;
         var untargetablePlayers = new List<PlayerControl>();
-        if (Mini.mini != null && !Mini.isGrownUp()) untargetablePlayers.Add(Mini.mini);
+        if (Mini.exists && !Mini.isGrownUp()) untargetablePlayers.AddRange(Mini.allPlayers);
         currentTarget = setTarget(untargetablePlayers: untargetablePlayers);
         setPlayerOutline(currentTarget, Palette.ImpostorRed);
     }

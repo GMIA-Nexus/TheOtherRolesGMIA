@@ -420,7 +420,7 @@ namespace TheOtherRoles.Modules
                                     illustrationButton.layer = actionButton.gameObject.layer;
                                     illustrationButton.transform.SetParent(actionButton.transform, false);
                                     illustrationButton.transform.localPosition = new Vector3(0, 0.2f, -3f);
-                                    illustrationSprite.sortingOrder = 1;
+                                    illustrationButton.transform.SetAsLastSibling();
                                 }
 
                                 GameObject textHolder = new("textHolder");

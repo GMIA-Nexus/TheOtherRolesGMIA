@@ -127,8 +127,8 @@ namespace TheOtherRoles.Patches
                         Tiebreaker.isTiebreak = false;
                         float maxVoteValue = self.Values.Max();
                         PlayerVoteArea tb = null;
-                        if (Tiebreaker.tiebreaker != null)
-                            tb = __instance.playerStates.ToArray().FirstOrDefault(x => x.PlayerId == Tiebreaker.tiebreaker.PlayerId);
+                        if (Tiebreaker.TiebreakerPlayer != null)
+                            tb = __instance.playerStates.ToArray().FirstOrDefault(x => x.PlayerId == Tiebreaker.TiebreakerPlayer.PlayerId);
                         bool isTiebreakerSkip = tb == null || tb.VotedForId == 253;
                         if (tb != null && tb.AmDead) isTiebreakerSkip = true;
 
@@ -158,7 +158,7 @@ namespace TheOtherRoles.Patches
                             VotedForId = playerVoteArea.VotedForId
                         };
 
-                        if (Tiebreaker.tiebreaker == null || playerVoteArea.PlayerId != Tiebreaker.tiebreaker.PlayerId) continue;
+                        if (Tiebreaker.TiebreakerPlayer == null || playerVoteArea.PlayerId != Tiebreaker.TiebreakerPlayer.PlayerId) continue;
 
                         byte tiebreakerVote = playerVoteArea.VotedForId;
                         if (swapped1 != null && swapped2 != null) {
@@ -1294,6 +1294,7 @@ namespace TheOtherRoles.Patches
                 }
 
                 foreach (var role in new List<Role>(Role.allRoles)) role.OnMeetingStart();
+                foreach (var mod in new List<Modifier>(Modifier.allModifiers)) mod.OnMeetingStart();
 
                 // Save real tasks
                 MapBehaviourPatch.shareRealTasks();

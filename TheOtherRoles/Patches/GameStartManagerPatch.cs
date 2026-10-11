@@ -33,7 +33,7 @@ namespace TheOtherRoles.Patches {
             }
         }
 
-        [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.CoJoinOnlineGameFromCode))]
+        [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.CoFindGameInfoFromCodeAndJoin))]
         public class JoinGameLoadingPatch
         {
             public static void Postfix(AmongUsClient __instance, ref Il2CppSystem.Collections.IEnumerator __result)

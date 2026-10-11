@@ -110,6 +110,7 @@ namespace TheOtherRoles
         Archaeologist,
         SchrodingersCat,
         Madmate,
+        CreatedMadmate,
         Crewmate,
         Impostor,
         // Modifier ---
@@ -431,6 +432,24 @@ namespace TheOtherRoles
             defaultProcessDic[typeof(Vector3)] = ((writer, obj) => { var vec = (Vector3)obj; writer.Write(vec.x); writer.Write(vec.y); writer.Write(vec.z); }, (reader) => new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle()));
             defaultProcessDic[typeof(TranslatableTag)] = ((writer, obj) => writer.Write(((TranslatableTag)obj).Id), (reader) => TranslatableTag.ValueOf(reader.ReadInt32())!);
             defaultProcessDic[typeof(CommunicableTextTag)] = defaultProcessDic[typeof(TranslatableTag)];
+            defaultProcessDic[typeof(Players.OutfitCandidate)] = (
+            (writer, obj) => {
+                var cand = (Players.OutfitCandidate)obj;
+                writer.Write(cand.outfit.PlayerName);
+                writer.Write(cand.outfit.HatId);
+                writer.Write(cand.outfit.SkinId);
+                writer.Write(cand.outfit.VisorId);
+                writer.Write(cand.outfit.PetId);
+                writer.Write(cand.outfit.ColorId);
+                writer.Write(cand.Tag);
+                writer.Write(cand.Priority);
+                writer.Write(cand.SelfAware);
+            },
+            (reader) => {
+                NetworkedPlayerInfo.PlayerOutfit outfit = new() { PlayerName = reader.ReadString(), HatId = reader.ReadString(), SkinId = reader.ReadString(), VisorId = reader.ReadString(), PetId = reader.ReadString(), ColorId = reader.ReadInt32() };
+                return new Players.OutfitCandidate(reader.ReadString(), reader.ReadInt32(), reader.ReadBoolean(), outfit);
+            }
+            );
         }
 
         static public (Action<MessageWriter, object>, Func<MessageReader, object>) GetProcess(Type type)
@@ -791,51 +810,10 @@ namespace TheOtherRoles
         }
 
         public static void setModifier(byte modifierId, byte playerId, byte flag) {
-            PlayerControl player = Helpers.playerById(playerId); 
-            switch ((RoleId)modifierId) {
-                case RoleId.Bloody:
-                    Bloody.bloody.Add(player);
-                    break;
-                case RoleId.AntiTeleport:
-                    AntiTeleport.antiTeleport.Add(player);
-                    break;
-                case RoleId.Tiebreaker:
-                    Tiebreaker.tiebreaker = player;
-                    break;
-                case RoleId.Sunglasses:
-                    Sunglasses.sunglasses.Add(player);
-                    break;
-                case RoleId.Mini:
-                    Mini.mini = player;
-                    break;
-                case RoleId.Vip:
-                    Vip.vip.Add(player);
-                    break;
-                case RoleId.Invert:
-                    Invert.invert.Add(player);
-                    break;
-                case RoleId.Chameleon:
-                    Chameleon.chameleon.Add(player);
-                    break;
-                case RoleId.Armored:
-                    Armored.armored = player;
-                    break;
-                case RoleId.Multitasker:
-                    Multitasker.multitasker.Add(player);
-                    break;
-                case RoleId.Diseased:
-                    Diseased.diseased.Add(player);
-                    break;
-                case RoleId.Radar:
-                    Radar.radar = player;
-                    break;
-                case RoleId.Madmate:
-                    Madmate.madmate.Add(player);
-                    break;
-                //case RoleId.Shifter:
-                    //Shifter.shifter = player;
-                    //break;
-            }
+            PlayerControl.AllPlayerControls.GetFastEnumerator().ToArray().DoIf(
+                x => x.PlayerId == playerId,
+                x => x.addModifier((RoleId)modifierId)
+            );
         }
 
         public static void setLovers(byte playerId1, byte playerId2)
@@ -903,6 +881,14 @@ namespace TheOtherRoles
            GameOptionsManager.Instance.currentNormalGameOptions.MapId = mapId;
         }
 
+        public readonly static RemoteProcess<(byte playerId, Players.OutfitCandidate outfit)> RpcAddOutfit = new(
+        "AddOutfit", (message, _) => TORGameManager.Instance?.GetPlayerOutfit(message.playerId)?.AddOutfit(message.outfit)
+        );
+
+        public readonly static RemoteProcess<(byte playerId, string tag)> RpcRemoveOutfit = new(
+           "RemoveOutfit", (message, _) => TORGameManager.Instance!.GetPlayerOutfit(message.playerId)?.RemoveOutfit(message.tag)
+           );
+
         public static void finishShipStatusBegin()
         {
             HudManager.Instance.StartCoroutine(Effects.Lerp(1f, new Action<float>((p) =>
@@ -910,16 +896,13 @@ namespace TheOtherRoles
                 if (p == 1f)
                 {
                     Role.allRoles.DoIf(x => x.player == PlayerControl.LocalPlayer, x => x.OnFinishShipStatusBegin());
+                    Modifier.allModifiers.DoIf(x => x.player == PlayerControl.LocalPlayer, x => x.OnFinishShipStatusBegin());
                     ShipStatusPatch.commonTasks.Clear();
                     foreach (var task in PlayerControl.LocalPlayer.myTasks) {
                         if (ShipStatus.Instance.CommonTasks.Any(x => x.TaskType == task.TaskType)) {
                             ShipStatusPatch.commonTasks.Add(task.TaskType);
                             TheOtherRolesPlugin.Logger.LogMessage($"Added {task.TaskType.ToString()} for common task");
                         }
-                    }
-
-                    if (Madmate.hasTasks && Madmate.madmate.Any(x => x.PlayerId == PlayerControl.LocalPlayer.PlayerId)) {
-                        PlayerControl.LocalPlayer.generateAndAssignTasks(Madmate.commonTasks, Madmate.shortTasks, Madmate.longTasks);
                     }
 
                     if (!RoleDraft.isEnabled || RoleDraft.isFinished)
@@ -1047,7 +1030,7 @@ namespace TheOtherRoles
             if (PlayerControl.LocalPlayer == oldShifter && Shifter.isNeutral) _ = new StaticAchievementToken("corruptedShifter.common1");
 
             // Suicide (exile) when impostor or impostor variants
-            if (!Shifter.isNeutral && (player.Data.Role.IsImpostor || Helpers.isNeutral(player) || Madmate.madmate.Any(x => x.PlayerId == player.PlayerId) || CreatedMadmate.createdMadmate.Any(x => x.PlayerId == player.PlayerId)))
+            if (!Shifter.isNeutral && (player.Data.Role.IsImpostor || Helpers.isNeutral(player) || player.hasModifier(RoleId.Madmate) || player.hasModifier(RoleId.CreatedMadmate)))
             {
                 if (!oldShifter.Data.IsDead)
                 {
@@ -1095,71 +1078,21 @@ namespace TheOtherRoles
                 }
             }
 
-            if (Madmate.madmate.Any(x => x.PlayerId == player.PlayerId))
+            if (player.hasModifier(RoleId.Madmate))
             {
-                Madmate.madmate.Add(oldShifter);
-                Madmate.madmate.Remove(player);
+                player.eraseModifier(RoleId.Madmate);
+                oldShifter.addModifier(RoleId.Madmate);
             }
-            if (CreatedMadmate.createdMadmate.Any(x => x.PlayerId == player.PlayerId))
+            if (player.hasModifier(RoleId.CreatedMadmate))
             {
-                CreatedMadmate.createdMadmate.Add(oldShifter);
-                CreatedMadmate.createdMadmate.Remove(player);
+                player.eraseModifier(RoleId.CreatedMadmate);
+                oldShifter.addModifier(RoleId.CreatedMadmate);
             }
 
             if (Shifter.shiftModifiers)
             {
                 Lovers.swapLovers(oldShifter, player);
-                // Switch Anti-Teleport
-                if (AntiTeleport.antiTeleport.Any(x => x.PlayerId == player.PlayerId))
-                {
-                    AntiTeleport.antiTeleport.Add(oldShifter);
-                    AntiTeleport.antiTeleport.Remove(player);
-                }
-                // Switch Bloody
-                if (Bloody.bloody.Any(x => x.PlayerId == player.PlayerId))
-                {
-                    Bloody.bloody.Add(oldShifter);
-                    Bloody.bloody.Remove(player);
-                }
-                // Switch Mini
-                if (Mini.mini == player) Mini.mini = oldShifter;
-                // Switch Tiebreaker
-                if (Tiebreaker.tiebreaker == player) Tiebreaker.tiebreaker = oldShifter;
-                // Switch Chameleon
-                if (Chameleon.chameleon.Any(x => x.PlayerId == player.PlayerId))
-                {
-                    Chameleon.chameleon.Add(oldShifter);
-                    Chameleon.chameleon.Remove(player);
-                    Chameleon.removeChameleonFully(player);
-                }
-                // Switch Sunglasses
-                if (Sunglasses.sunglasses.Any(x => x.PlayerId == player.PlayerId))
-                {
-                    Sunglasses.sunglasses.Add(oldShifter);
-                    Sunglasses.sunglasses.Remove(player);
-                }
-                if (Vip.vip.Any(x => x.PlayerId == player.PlayerId))
-                {
-                    Vip.vip.Add(oldShifter);
-                    Vip.vip.Remove(player);
-                }
-                if (Invert.invert.Any(x => x.PlayerId == player.PlayerId))
-                {
-                    Invert.invert.Add(oldShifter);
-                    Invert.invert.Remove(player);
-                }
-                if (Multitasker.multitasker.Any(x => x.PlayerId == player.PlayerId))
-                {
-                    Multitasker.multitasker.Add(oldShifter);
-                    Multitasker.multitasker.Remove(player);
-                }
-                if (Diseased.diseased.Any(x => x.PlayerId == player.PlayerId))
-                {
-                    Diseased.diseased.Add(oldShifter);
-                    Diseased.diseased.Remove(player);
-                }
-                if (Armored.armored == player) Armored.armored = oldShifter;
-                if (Radar.radar == player) Radar.radar = oldShifter;
+                player.swapModifiers(oldShifter);
             }
 
             if ((player.Data.Tasks == null || player.Data.Tasks?.Count == 0 || player.isRole(RoleId.Fox)) && !player.Data.IsDead && PlayerControl.LocalPlayer == player)
@@ -1396,26 +1329,12 @@ namespace TheOtherRoles
             player.eraseAllRoles();
 
             // Always remove the Madmate
-            if (Madmate.madmate.Any(x => x.PlayerId == player.PlayerId)) Madmate.madmate.RemoveAll(x => x.PlayerId == player.PlayerId);
-            if (CreatedMadmate.createdMadmate.Any(x => x.PlayerId == player.PlayerId)) CreatedMadmate.createdMadmate.RemoveAll(x => x.PlayerId == player.PlayerId);
+            if (player.hasModifier(RoleId.Madmate)) player.eraseModifier(RoleId.Madmate);
+            if (player.hasModifier(RoleId.CreatedMadmate)) player.eraseModifier(RoleId.CreatedMadmate);
             if (player == LastImpostor.lastImpostor) LastImpostor.lastImpostor = null;
 
             // Modifier
-            if (!ignoreModifier)
-            {
-                if (Bloody.bloody.Any(x => x.PlayerId == player.PlayerId)) Bloody.bloody.RemoveAll(x => x.PlayerId == player.PlayerId);
-                if (AntiTeleport.antiTeleport.Any(x => x.PlayerId == player.PlayerId)) AntiTeleport.antiTeleport.RemoveAll(x => x.PlayerId == player.PlayerId);
-                if (Sunglasses.sunglasses.Any(x => x.PlayerId == player.PlayerId)) Sunglasses.sunglasses.RemoveAll(x => x.PlayerId == player.PlayerId);
-                if (player == Tiebreaker.tiebreaker) Tiebreaker.clearAndReload();
-                if (player == Mini.mini) Mini.clearAndReload();
-                if (Vip.vip.Any(x => x.PlayerId == player.PlayerId)) Vip.vip.RemoveAll(x => x.PlayerId == player.PlayerId);
-                if (Invert.invert.Any(x => x.PlayerId == player.PlayerId)) Invert.invert.RemoveAll(x => x.PlayerId == player.PlayerId);
-                if (Chameleon.chameleon.Any(x => x.PlayerId == player.PlayerId)) Chameleon.chameleon.RemoveAll(x => x.PlayerId == player.PlayerId);
-                if (player == Armored.armored) Armored.clearAndReload();
-                if (player == Radar.radar) Radar.clearAndReload();
-                if (Multitasker.multitasker.Any(x => x.PlayerId == player.PlayerId)) Multitasker.multitasker.RemoveAll(x => x.PlayerId == player.PlayerId);
-                if (Diseased.diseased.Any(x => x.PlayerId == player.PlayerId)) Diseased.diseased.RemoveAll(x => x.PlayerId == player.PlayerId);
-            }
+            if (!ignoreModifier) player.eraseAllModifiers();
         }
 
         public static RemoteProcess<(int variation, int relatedTag, byte sourceId, int targetMask, float timeLag)> RecordStatistics = new("RecordStatistics", (message, _) =>
@@ -1564,11 +1483,12 @@ namespace TheOtherRoles
 
         public static RemoteProcess BreakArmor = new("BreakArmor", (_) =>
         {
-            if (Armored.armored == null || Armored.isBrokenArmor) return;
+            var armored = Armored.allPlayers.FirstOrDefault();
+            if (armored == null || Armored.isBrokenArmor) return;
             Armored.isBrokenArmor = true;
             if (PlayerControl.LocalPlayer.Data.IsDead)
             {
-                Armored.armored.ShowFailedMurder();
+                armored.ShowFailedMurder();
             }
         });
 

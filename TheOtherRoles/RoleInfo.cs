@@ -370,7 +370,7 @@ namespace TheOtherRoles
             multitasker,
             diseased,
             radar,
-            armored
+            armored,
         };
 
         public static List<RoleInfo> getRoleInfoForPlayer(PlayerControl p, bool showModifier = true, bool includeHidden = false, RoleId[] excludeRoles = null) {
@@ -382,21 +382,20 @@ namespace TheOtherRoles
                 // after dead modifier
                 if (!CustomOptionHolder.modifiersAreHidden.getBool() || PlayerControl.LocalPlayer.Data.IsDead || AmongUsClient.Instance.GameState == InnerNet.InnerNetClient.GameStates.Ended)
                 {
-                    if (Bloody.bloody.Any(x => x.PlayerId == p.PlayerId)) infos.Add(bloody);
-                    if (Vip.vip.Any(x => x.PlayerId == p.PlayerId)) infos.Add(vip);
+                    if (p.hasModifier(RoleId.Bloody)) infos.Add(bloody);
+                    if (p.hasModifier(RoleId.Vip)) infos.Add(vip);
                 }
                 if (p.isLovers()) infos.Add(lover);
-                if (p == Tiebreaker.tiebreaker) infos.Add(tiebreaker);
-                if (AntiTeleport.antiTeleport.Any(x => x.PlayerId == p.PlayerId)) infos.Add(antiTeleport);
-                if (Sunglasses.sunglasses.Any(x => x.PlayerId == p.PlayerId)) infos.Add(sunglasses);
-                if (p == Mini.mini) infos.Add(mini);
-                if (Invert.invert.Any(x => x.PlayerId == p.PlayerId)) infos.Add(invert);
-                if (Chameleon.chameleon.Any(x => x.PlayerId == p.PlayerId)) infos.Add(chameleon);
-                if (p == Armored.armored) infos.Add(armored);
-                if (Multitasker.multitasker.Any(x => x.PlayerId == p.PlayerId)) infos.Add(multitasker);
-                if (Diseased.diseased.Any(x => x.PlayerId == p.PlayerId)) infos.Add(diseased);
-                if (p == Radar.radar) infos.Add(radar);
-                //if (p == Shifter.shifter) infos.Add(shifter);
+                if (p.hasModifier(RoleId.Tiebreaker)) infos.Add(tiebreaker);
+                if (p.hasModifier(RoleId.AntiTeleport)) infos.Add(antiTeleport);
+                if (p.hasModifier(RoleId.Sunglasses)) infos.Add(sunglasses);
+                if (p.hasModifier(RoleId.Mini)) infos.Add(mini);
+                if (p.hasModifier(RoleId.Invert)) infos.Add(invert);
+                if (p.hasModifier(RoleId.Chameleon)) infos.Add(chameleon);
+                if (p.hasModifier(RoleId.Armored)) infos.Add(armored);
+                if (p.hasModifier(RoleId.Multitasker)) infos.Add(multitasker);
+                if (p.hasModifier(RoleId.Diseased)) infos.Add(diseased);
+                if (p.hasModifier(RoleId.Radar)) infos.Add(radar);
             }
 
             int count = infos.Count;  // Save count after modifiers are added so that the role count can be checked
@@ -520,7 +519,7 @@ namespace TheOtherRoles
             string roleName;
             roleName = String.Join(" ", getRoleInfoForPlayer(p, showModifier, includeHidden, excludeRoles).Select(x => useColors ? Helpers.cs(x.color, x.name) : x.name).ToArray());
 
-            if (Madmate.madmate.Any(x => x.PlayerId == p.PlayerId) || CreatedMadmate.createdMadmate.Any(x => x.PlayerId == p.PlayerId))
+            if (p.hasModifier(RoleId.Madmate) || p.hasModifier(RoleId.CreatedMadmate))
             {
                 if (getRoleInfoForPlayer(p, true, includeHidden, excludeRoles).Contains(crewmate))
                 {
@@ -610,7 +609,7 @@ namespace TheOtherRoles
             if (deadPlayer != null && deadPlayer.killerIfExisting != null)
             {
                 killerColor = getRoleInfoForPlayer(deadPlayer.killerIfExisting, false, true).FirstOrDefault().color;
-                if (Madmate.madmate.Any(x => x.PlayerId == deadPlayer.killerIfExisting.PlayerId) || CreatedMadmate.createdMadmate.Any(x => x.PlayerId == deadPlayer.killerIfExisting.PlayerId)) killerColor = Palette.ImpostorRed;
+                if (deadPlayer.killerIfExisting.hasModifier(RoleId.Madmate) || deadPlayer.killerIfExisting.hasModifier(RoleId.CreatedMadmate)) killerColor = Palette.ImpostorRed;
             }
 
             if (deadPlayer != null)

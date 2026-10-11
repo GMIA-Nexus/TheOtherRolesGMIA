@@ -79,7 +79,7 @@ namespace TheOtherRoles.Roles
                 new Silhouette(message.pos, player, 5, true);
                 yoyo.markedLocation = null;
             }
-            if (Chameleon.chameleon.Any(x => x.PlayerId == message.playerId)) // Make the Yoyo visible if chameleon!
+            if (player.hasModifier(RoleId.Chameleon)) // Make the Yoyo visible if chameleon!
                 Chameleon.lastMoved[message.playerId] = Time.time;
         });
 

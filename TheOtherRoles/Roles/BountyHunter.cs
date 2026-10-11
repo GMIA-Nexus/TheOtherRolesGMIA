@@ -61,7 +61,7 @@ namespace TheOtherRoles.Roles
                 bountyUpdateTimer = bountyDuration;
                 var possibleTargets = new List<PlayerControl>();
                 foreach (PlayerControl p in PlayerControl.AllPlayerControls) {
-                    if (!p.Data.IsDead && !p.Data.Disconnected && p != p.Data.Role.IsImpostor && !p.isRole(RoleId.Spy) && !Sidekick.players.Any(x => x.player == p && x.wasTeamRed) && !Jackal.players.Any(x => x.player == p && x.wasTeamRed) && (p != Mini.mini || Mini.isGrownUp()) &&
+                    if (!p.Data.IsDead && !p.Data.Disconnected && p != p.Data.Role.IsImpostor && !p.isRole(RoleId.Spy) && !Sidekick.players.Any(x => x.player == p && x.wasTeamRed) && !Jackal.players.Any(x => x.player == p && x.wasTeamRed) && (!p.hasModifier(RoleId.Mini) || Mini.isGrownUp()) &&
                         !Akujo.players.Any(x => x.player == p && (x.keeps.Contains(player) || x.honmei == player))) possibleTargets.Add(p);
                 }
                 if (possibleTargets.Count == 0) return;

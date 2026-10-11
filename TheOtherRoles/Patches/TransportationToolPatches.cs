@@ -43,21 +43,10 @@ namespace TheOtherRoles.Patches
                 {
                     if (Camouflager.camouflageTimer <= 0 && !Helpers.MushroomSabotageActive())
                     {
-                        foreach (var morphling in Morphling.players)  {
-                            if (player == morphling.player && morphling.morphTimer > 0) {
-                                hand.SetPlayerColor(morphling.morphTarget.CurrentOutfit, PlayerMaterial.MaskType.None, 1f);
-                                // Also set hat color, cause the line destroys it...
-                                player.RawSetHat(morphling.morphTarget.Data.DefaultOutfit.HatId, morphling.morphTarget.Data.DefaultOutfit.ColorId);
-                            }
-                        }
-                        if (player.isRole(RoleId.MimicK) && MimicK.victim != null) {
-                            hand.SetPlayerColor(MimicK.victim.CurrentOutfit, PlayerMaterial.MaskType.None, 1f);
-                            player.RawSetHat(MimicK.victim.Data.DefaultOutfit.HatId, MimicK.victim.Data.DefaultOutfit.ColorId);
-                        } else if (player.isRole(RoleId.MimicA) && MimicA.isMorph) {
-                            var target = MimicK.allPlayers.FirstOrDefault();
-                            hand.SetPlayerColor(target.CurrentOutfit, PlayerMaterial.MaskType.None, 1f);
-                            player.RawSetHat(target.Data.DefaultOutfit.HatId, target.Data.DefaultOutfit.ColorId);
-                        } else if (Ninja.isStealthed(player) || Sprinter.isSprinting(player)
+                        var modInfo = player.GetOutfitInfo();
+                        player.RawSetHat((modInfo?.CurrentOutfit ?? player.CurrentOutfit).HatId, (modInfo?.CurrentOutfit ?? player.CurrentOutfit).ColorId);
+
+                        if (Ninja.isStealthed(player) || Sprinter.isSprinting(player)
                             || (player.isRole(RoleId.Fox) && Fox.stealthed) || (player.isRole(RoleId.Kataomoi) && Kataomoi.isStalking())) {
                             hand.SetPlayerColor(player.CurrentOutfit, PlayerMaterial.MaskType.None, 0f);
                         } else {

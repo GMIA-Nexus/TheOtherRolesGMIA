@@ -541,13 +541,13 @@ namespace TheOtherRoles
 
                     if (murderAttemptResult is MurderAttemptResult.PerformKill or MurderAttemptResult.ReverseKill) {
                         byte targetId = 0;
-                        if (((Sheriff.local.currentTarget.Data.Role.IsImpostor && (Sheriff.local.currentTarget != Mini.mini || Mini.isGrownUp())) ||
+                        if (((Sheriff.local.currentTarget.Data.Role.IsImpostor && (!Sheriff.local.currentTarget.hasModifier(RoleId.Mini) || Mini.isGrownUp())) ||
                             (Sheriff.spyCanDieToSheriff && Sheriff.local.currentTarget.isRole(RoleId.Spy)) ||
                             (Sheriff.canKillNeutrals && Helpers.isNeutral(Sheriff.local.currentTarget)) ||
                             Sheriff.local.currentTarget.isRole(RoleId.Jackal) || Sheriff.local.currentTarget.isRole(RoleId.Sidekick) ||
-                            (CreatedMadmate.createdMadmate.Any(x => x.PlayerId == Sheriff.local.currentTarget.PlayerId) && CreatedMadmate.canDieToSheriff) ||
-                            (Madmate.canDieToSheriff && Madmate.madmate.Any(x => x.PlayerId == Sheriff.local.currentTarget.PlayerId))) &&
-                            !Madmate.madmate.Any(y => y.PlayerId == Sheriff.local.player.PlayerId)) 
+                            (Sheriff.local.currentTarget.hasModifier(RoleId.CreatedMadmate) && CreatedMadmate.canDieToSheriff) ||
+                            (Madmate.canDieToSheriff && Sheriff.local.currentTarget.hasModifier(RoleId.Madmate))) &&
+                            !Sheriff.local.player.hasModifier(RoleId.Madmate)) 
                         {
                             _ = new StaticAchievementToken("sheriff.common1");
                             targetId = Sheriff.local.currentTarget.PlayerId;
@@ -1762,7 +1762,7 @@ namespace TheOtherRoles
                 () => {
                     EventUtility.kickTarget();
                 },
-                () => { return EventUtility.isEnabled && Mini.mini != null && !Mini.mini.Data.IsDead && PlayerControl.LocalPlayer != Mini.mini; },
+                () => { return EventUtility.isEnabled && Mini.livingPlayers.Count > 0 && !PlayerControl.LocalPlayer.hasModifier(RoleId.Mini); },
                 () => { return EventUtility.currentTarget != null; },
                 () => { },
                 EventUtility.getKickButtonSprite(),
@@ -1824,7 +1824,7 @@ namespace TheOtherRoles
                     var sample = Collator.local.currentTarget;
                     var info = RoleInfo.getRoleInfoForPlayer(sample, false, true).FirstOrDefault();
 
-                    if ((Madmate.madmate.Any(x => x.PlayerId == sample.PlayerId) || CreatedMadmate.createdMadmate.Any(x => x.PlayerId == sample.PlayerId)) && !Collator.madmateAsCrew)
+                    if ((sample.hasModifier(RoleId.Madmate) || sample.hasModifier(RoleId.CreatedMadmate)) && !Collator.madmateAsCrew)
                         info = RoleInfo.impostor;
 
                     Collator.local.sampledPlayers.Add((sample, Collator.CheckTeam(info)));
@@ -4130,7 +4130,7 @@ namespace TheOtherRoles
                         PlayerControlFixedUpdatePatch.miniCooldownUpdate();  // Modifies the MaxTimer if the witch is the mini
                         witchSpellButton.Timer = witchSpellButton.MaxTimer;
                         if (Witch.triggerBothCooldowns) {
-                            float multiplier = (Mini.mini != null && PlayerControl.LocalPlayer == Mini.mini) ? (Mini.isGrownUp() ? 0.66f : 2f) : 1f;
+                            float multiplier = PlayerControl.LocalPlayer.hasModifier(RoleId.Mini) ? (Mini.isGrownUp() ? 0.66f : 2f) : 1f;
                             PlayerControl.LocalPlayer.killTimer = GameOptionsManager.Instance.currentNormalGameOptions.KillCooldown * multiplier;
                         }
                     } else {

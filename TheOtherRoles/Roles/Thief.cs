@@ -22,7 +22,7 @@ namespace TheOtherRoles.Roles
         {
             if (player != PlayerControl.LocalPlayer) return;
             List<PlayerControl> untargetables = [];
-            if (Mini.mini != null && !Mini.isGrownUp()) untargetables.Add(Mini.mini);
+            if (Mini.exists && !Mini.isGrownUp()) untargetables.AddRange(Mini.allPlayers);
             currentTarget = setTarget(onlyCrewmates: false, untargetablePlayers: untargetables);
             setPlayerOutline(currentTarget, color);
         }

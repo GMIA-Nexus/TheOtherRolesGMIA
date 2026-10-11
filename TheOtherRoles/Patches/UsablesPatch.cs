@@ -111,7 +111,7 @@ namespace TheOtherRoles.Patches {
             bool couldUse;
             __instance.CanUse(PlayerControl.LocalPlayer.Data, out canUse, out couldUse);
             bool canMoveInVents = !PlayerControl.LocalPlayer.isRole(RoleId.Spy) && !PlayerControl.LocalPlayer.isRole(RoleId.Jester) && !(PlayerControl.LocalPlayer.isRole(RoleId.TaskMaster) && !TaskMaster.isTaskComplete) &&
-                !Madmate.madmate.Any(x => x?.PlayerId == PlayerControl.LocalPlayer.PlayerId) && !CreatedMadmate.createdMadmate.Any(x => x?.PlayerId == PlayerControl.LocalPlayer.PlayerId); //&& !Trapper.playersOnMap.Contains(PlayerControl.LocalPlayer)
+                !PlayerControl.LocalPlayer.hasModifier(RoleId.Madmate) && !PlayerControl.LocalPlayer.hasModifier(RoleId.CreatedMadmate); //&& !Trapper.playersOnMap.Contains(PlayerControl.LocalPlayer)
             if (PlayerControl.LocalPlayer.isRole(RoleId.Engineer)) canMoveInVents = true;
             if (!canUse) return false; // No need to execute the native method as using is disallowed anyways
 
@@ -206,8 +206,8 @@ namespace TheOtherRoles.Patches {
                         HudManagerStartPatch.warlockCurseButton.Timer = HudManagerStartPatch.warlockCurseButton.MaxTimer;
                     else if (PlayerControl.LocalPlayer.isRole(RoleId.Zephyr))
                         HudManagerStartPatch.zephyrButton.Timer = HudManagerStartPatch.zephyrButton.MaxTimer;
-                    else if (PlayerControl.LocalPlayer == Mini.mini && Mini.mini.Data.Role.IsImpostor)
-                        Mini.mini.SetKillTimer(PlayerControl.LocalPlayer.GetKillCooldown() * (Mini.isGrownUp() ? 0.66f : 2f));
+                    else if (PlayerControl.LocalPlayer.hasModifier(RoleId.Mini) && PlayerControl.LocalPlayer.Data.Role.IsImpostor)
+                        PlayerControl.LocalPlayer.SetKillTimer(PlayerControl.LocalPlayer.GetKillCooldown() * (Mini.isGrownUp() ? 0.66f : 2f));
                     else if (PlayerControl.LocalPlayer.isRole(RoleId.Witch))
                         HudManagerStartPatch.witchSpellButton.Timer = HudManagerStartPatch.witchSpellButton.MaxTimer;
                     else if (PlayerControl.LocalPlayer.isRole(RoleId.Assassin))
@@ -312,9 +312,9 @@ namespace TheOtherRoles.Patches {
             canUse = couldUse = false;
             if (PlayerControl.LocalPlayer.isRole(RoleId.Swapper))
                 return !__instance.TaskTypes.Any(x => x is TaskTypes.FixLights or TaskTypes.FixComms);
-            if (Madmate.madmate != null && Madmate.madmate.Any(x => x.PlayerId == PlayerControl.LocalPlayer.PlayerId) && __instance.AllowImpostor)
+            if (PlayerControl.LocalPlayer.hasModifier(RoleId.Madmate) && __instance.AllowImpostor)
                 return !__instance.TaskTypes.Any(x => (!Madmate.canFixComm && x == TaskTypes.FixComms) || x == TaskTypes.FixLights);
-            if (CreatedMadmate.createdMadmate.Any(x => x.PlayerId == PlayerControl.LocalPlayer.PlayerId) && __instance.AllowImpostor)
+            if (PlayerControl.LocalPlayer.hasModifier(RoleId.CreatedMadmate) && __instance.AllowImpostor)
                 return !__instance.TaskTypes.Any(x => (!CreatedMadmate.canFixComm && x == TaskTypes.FixComms) || x == TaskTypes.FixLights);
             if (JekyllAndHyde.players.Any(x => x.player == PlayerControl.LocalPlayer && !x.isJekyll()))
                 return __instance.TaskTypes.Any(x => x is TaskTypes.FixComms or TaskTypes.FixLights or TaskTypes.RestoreOxy or TaskTypes.StopCharles or TaskTypes.ResetSeismic or TaskTypes.ResetReactor);
@@ -332,8 +332,8 @@ namespace TheOtherRoles.Patches {
         static void Postfix(TuneRadioMinigame __instance) {
             // Block Swapper from fixing comms. Still looking for a better way to do this, but deleting the task doesn't seem like a viable option since then the camera, admin table, ... work while comms are out
             if (PlayerControl.LocalPlayer.isRole(RoleId.Swapper) ||
-                (Madmate.madmate.Any(x => x.PlayerId == PlayerControl.LocalPlayer.PlayerId) && !Madmate.canFixComm) ||
-                (CreatedMadmate.createdMadmate.Any(x => x.PlayerId == PlayerControl.LocalPlayer.PlayerId) && !CreatedMadmate.canFixComm)) {
+                (PlayerControl.LocalPlayer.hasModifier(RoleId.Madmate) && !Madmate.canFixComm) ||
+                (PlayerControl.LocalPlayer.hasModifier(RoleId.CreatedMadmate) && !CreatedMadmate.canFixComm)) {
                 __instance.Close();
             }
         }
@@ -344,8 +344,8 @@ namespace TheOtherRoles.Patches {
         static void Postfix(SwitchMinigame __instance) {
             // Block Swapper from fixing lights. One could also just delete the PlayerTask, but I wanted to do it the same way as with coms for now.
             if (PlayerControl.LocalPlayer.isRole(RoleId.Swapper) ||
-                Madmate.madmate.Any(x => x.PlayerId == PlayerControl.LocalPlayer.PlayerId) || 
-                CreatedMadmate.createdMadmate.Any(x => x.PlayerId == PlayerControl.LocalPlayer.PlayerId)) {
+                PlayerControl.LocalPlayer.hasModifier(RoleId.Madmate) || 
+                PlayerControl.LocalPlayer.hasModifier(RoleId.CreatedMadmate)) {
                 __instance.Close();
             }
         }
@@ -1000,7 +1000,7 @@ namespace TheOtherRoles.Patches {
                     if (Assassin.players.Any(x => x.player == pc && x.invisibleTimer > 0f)) {
                         continue;
                     }
-                    pc.setLook("", 11, "", "", "", "", false);
+                    pc.GetOutfitInfo().AddOutfit(new("NightVision", 150, true, new() { ColorId = 11, HatId = "", PetId = "", SkinId = "", PlayerName = "", VisorId = "" }));
                 }
                 foreach (var overlayObject in nightVisionOverlays) {
                     overlayObject.SetActive(true);
@@ -1026,30 +1026,7 @@ namespace TheOtherRoles.Patches {
             if (nightVisionIsActive) {
                 nightVisionIsActive = false;
                 foreach (PlayerControl pc in PlayerControl.AllPlayerControls) {
-                    if (Camouflager.camouflageTimer > 0) {
-                        pc.setLook("", 6, "", "", "", "", false);
-                    } else if (Morphling.players.Any(x => x.player == pc && x.morphTimer > 0f)) {
-                        var morphling = Morphling.getRole(pc);
-                        PlayerControl target = morphling.morphTarget;
-                        pc.setLook(target.Data.PlayerName, target.Data.DefaultOutfit.ColorId, target.Data.DefaultOutfit.HatId, target.Data.DefaultOutfit.VisorId, target.Data.DefaultOutfit.SkinId, target.Data.DefaultOutfit.PetId, false);
-                    }
-                    else if (Assassin.players.Any(x => x.player == pc && x.invisibleTimer > 0f)) {
-                        continue;
-                    }
-                    else if (pc.isRole(RoleId.MimicK) && MimicK.victim != null)
-                    {
-                        var victim = MimicK.victim;
-                        pc.setLook(victim.Data.PlayerName, victim.Data.DefaultOutfit.ColorId, victim.Data.DefaultOutfit.HatId, victim.Data.DefaultOutfit.VisorId, victim.Data.DefaultOutfit.SkinId, victim.Data.DefaultOutfit.PetId, false);
-                    }
-                    else if (pc.isRole(RoleId.MimicA) && MimicA.isMorph)
-                    {
-                        var victim = MimicK.allPlayers.FirstOrDefault();
-                        foreach (var mimicA in MimicA.allPlayers)
-                            mimicA.setLook(victim.Data.PlayerName, victim.Data.DefaultOutfit.ColorId, victim.Data.DefaultOutfit.HatId, victim.Data.DefaultOutfit.VisorId, victim.Data.DefaultOutfit.SkinId, victim.Data.DefaultOutfit.PetId, false);
-                    }
-                    else {
-                        Helpers.setDefaultLook(pc, false);
-                    }
+                    pc.GetOutfitInfo().RemoveOutfit("NightVision");
                     // Dead Bodies
                     foreach (DeadBody deadBody in GameObject.FindObjectsOfType<DeadBody>()) {
                         var colorId = GameData.Instance.GetPlayerById(deadBody.ParentId).Object.Data.DefaultOutfit.ColorId;
@@ -1060,12 +1037,6 @@ namespace TheOtherRoles.Patches {
                 }
             }
 
-        }
-
-        public static void enforceNightVision(PlayerControl player) {
-            if (isLightsOut && nightVisionOverlays != null && nightVisionIsActive) {
-                player.setLook("", 11, "", "", "", "", false);
-            }
         }
 
         [HarmonyPatch(typeof(PlayerControl), nameof(PlayerControl.SetPlayerMaterialColors))]

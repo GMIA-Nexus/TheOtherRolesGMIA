@@ -101,20 +101,9 @@ namespace TheOtherRoles.Objects
                 if (AnonymousFootprints || Camouflager.camouflageTimer > 0 || Helpers.MushroomSabotageActive()) {
                     color = Palette.PlayerColors[6];
                 }
-                else if (Morphling.players.Any(x => x.player == activeFootprint.Owner && x.morphTarget && x.morphTimer > 0 && x.morphTarget.Data != null)) {
-                    color = Palette.PlayerColors[Morphling.getRole(activeFootprint.Owner).morphTarget.Data.DefaultOutfit.ColorId];
-                }
-                else if (activeFootprint.Owner.isRole(RoleId.MimicK) && MimicK.victim != null && MimicK.victim.Data != null)
-                {
-                    color = Palette.PlayerColors[MimicK.victim.Data.DefaultOutfit.ColorId];
-                }
-                else if (activeFootprint.Owner.isRole(RoleId.MimicA) && MimicA.isMorph && MimicK.players.Any(x => x.player != null && x.player.Data != null))
-                {
-                    color = Palette.PlayerColors[MimicK.allPlayers.FirstOrDefault().Data.DefaultOutfit.ColorId];
-                }
                 else
                 {
-                    color = Palette.PlayerColors[activeFootprint.Data.DefaultOutfit.ColorId];
+                    color = Palette.PlayerColors[(activeFootprint.Owner.GetOutfitInfo()?.CurrentOutfit ?? activeFootprint.Data.DefaultOutfit).ColorId];
                 }
 
                 color.a = Math.Clamp(p, 0f, 1f);

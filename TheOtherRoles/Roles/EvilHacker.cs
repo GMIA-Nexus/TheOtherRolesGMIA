@@ -41,7 +41,7 @@ namespace TheOtherRoles.Roles
                 if (CreatedMadmate.hasTasks && player == PlayerControl.LocalPlayer)
                     player.generateAndAssignTasks(0, CreatedMadmate.numTasks, 0);
 
-                CreatedMadmate.createdMadmate.Add(player);
+                player.addModifier(RoleId.CreatedMadmate);
                 if (player.PlayerId == PlayerControl.LocalPlayer.PlayerId) PlayerControl.LocalPlayer.moveable = true;
             }
             evilHackerRole.canCreateMadmate = false;

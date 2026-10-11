@@ -46,7 +46,7 @@ namespace TheOtherRoles.Roles
             if (canCreateSidekickFromImpostor)                 // Only exclude sidekick from beeing targeted if the jackal can create sidekicks from impostors
                 if (getSidekick(player) != null) untargetablePlayers.Add(getSidekick(player).player);
             if (SchrodingersCat.exists && SchrodingersCat.team == SchrodingersCat.Team.Jackal) untargetablePlayers.AddRange(SchrodingersCat.allPlayers);
-            if (Mini.mini != null && !Mini.isGrownUp()) untargetablePlayers.Add(Mini.mini); // Exclude Jackal from targeting the Mini unless it has grown up
+            if (Mini.exists && !Mini.isGrownUp()) untargetablePlayers.AddRange(Mini.allPlayers); // Exclude Jackal from targeting the Mini unless it has grown up
             currentTarget = setTarget(untargetablePlayers: untargetablePlayers);
             setPlayerOutline(currentTarget, Palette.ImpostorRed);
         }

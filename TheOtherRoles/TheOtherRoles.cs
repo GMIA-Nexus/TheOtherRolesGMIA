@@ -4,14 +4,15 @@ using System.Linq;
 using System.Reflection;
 using AmongUs.Data;
 using HarmonyLib;
-using Hazel;
 using TheOtherRoles.CustomGameModes;
 using TheOtherRoles.Modules;
 using TheOtherRoles.Objects;
 using TheOtherRoles.Patches;
+using TheOtherRoles.Players;
 using TheOtherRoles.Roles;
 using TheOtherRoles.Utilities;
 using UnityEngine;
+using static TheOtherRoles.TheOtherRoles;
 
 namespace TheOtherRoles
 {
@@ -122,6 +123,7 @@ namespace TheOtherRoles
             Multitasker.clearAndReload();
             Diseased.clearAndReload();
             Radar.clearAndReload();
+            Modifier.ClearAll();
 
             // Gamemodes
             HandleGuesser.clearAndReload();
@@ -238,6 +240,27 @@ namespace TheOtherRoles
             }
         }
 
+        public static class ModifierData
+        {
+            public static Dictionary<RoleId, Type> allModTypes = new()
+            {
+                { RoleId.CreatedMadmate, typeof(ModifierBase<CreatedMadmate>) },
+                { RoleId.Armored, typeof(ModifierBase<Armored>) },
+                { RoleId.Bloody, typeof(ModifierBase<Bloody>) },
+                { RoleId.AntiTeleport, typeof(ModifierBase<AntiTeleport>) },
+                { RoleId.Tiebreaker, typeof(ModifierBase<Tiebreaker>) },
+                { RoleId.Sunglasses, typeof(ModifierBase<Sunglasses>) },
+                { RoleId.Mini, typeof(ModifierBase<Mini>)  },
+                { RoleId.Vip, typeof(ModifierBase<Vip>) },
+                { RoleId.Invert, typeof(ModifierBase<Invert>) },
+                { RoleId.Chameleon, typeof(ModifierBase<Chameleon>) },
+                { RoleId.Multitasker, typeof(ModifierBase<Multitasker>) },
+                { RoleId.Diseased, typeof(ModifierBase<Diseased>) },
+                { RoleId.Radar, typeof(ModifierBase<Radar>) },
+                { RoleId.Madmate, typeof(ModifierBase<Madmate>) }
+            };
+        }
+
         static internal class RoleHelpers
         {
             static private Dictionary<string, MetaContext.Image> illustrationCache = [];
@@ -274,6 +297,9 @@ namespace TheOtherRoles
             foreach (var role in new List<Role>(Role.allRoles)) {
                 if (role.player == player) role.OnDeath(killer);
             }
+            foreach (var mod in new List<Modifier>(Modifier.allModifiers)) {
+                if (mod.player == player) mod.OnDeath(killer);
+            }
             if (player.isLovers())
                 Lovers.killLovers(player, killer);
             if (Cupid.isCupidLovers(player))
@@ -303,6 +329,9 @@ namespace TheOtherRoles
         {
             foreach (var role in new List<Role>(Role.allRoles)) {
                 if (role.player == player) role.OnKill(target);
+            }
+            foreach (var mod in new List<Modifier>(Modifier.allModifiers)) {
+                if (mod.player == player) mod.OnKill(target);
             }
         }
 
@@ -439,6 +468,121 @@ namespace TheOtherRoles
                     players[index].player = p2;
                     players.DoIf(x => x.player == p2, x => x.PostInit());
                 }
+            }
+        }
+    }
+
+    public abstract class Modifier
+    {
+        public static List<Modifier> allModifiers = new();
+        public PlayerControl player;
+        public RoleId modId;
+
+        public virtual void OnMeetingStart() { }
+        public virtual void OnMeetingEnd() { }
+        public virtual void FixedUpdate() { }
+        public virtual void OnKill(PlayerControl target) { }
+        public virtual void OnDeath(PlayerControl killer = null) { }
+        public virtual void OnFinishShipStatusBegin() { }
+        public virtual void HandleDisconnect(PlayerControl player, DisconnectReasons reason) { }
+        public virtual void ResetModifier() { }
+
+        public static void ClearAll()
+        {
+            allModifiers = new List<Modifier>();
+        }
+    }
+
+    public abstract class ModifierBase<T> : Modifier where T : ModifierBase<T>, new()
+    {
+        public static List<T> players = new();
+        public static RoleId ModType;
+
+        public void Init(PlayerControl player)
+        {
+            this.player = player;
+            players.Add((T)this);
+            allModifiers.Add(this);
+        }
+
+        public static T local
+        {
+            get
+            {
+                return players.FirstOrDefault(x => x.player == PlayerControl.LocalPlayer);
+            }
+        }
+
+        public static List<PlayerControl> allPlayers
+        {
+            get
+            {
+                return players.Select(x => x.player).ToList();
+            }
+        }
+
+        public static List<PlayerControl> livingPlayers
+        {
+            get
+            {
+                return players.Select(x => x.player).Where(x => x != null && !x.Data.IsDead).ToList();
+            }
+        }
+
+        public static List<PlayerControl> deadPlayers
+        {
+            get
+            {
+                return players.Select(x => x.player).Where(x => x != null && x.Data.IsDead).ToList();
+            }
+        }
+
+        public static bool exists
+        {
+            get { return players.Count > 0; }
+        }
+
+        public static T getModifier(PlayerControl player = null)
+        {
+            player ??= CachedPlayer.LocalPlayer.PlayerControl;
+            return players.FirstOrDefault(x => x.player == player);
+        }
+
+        public static bool hasModifier(PlayerControl player)
+        {
+            return players.Any(x => x.player == player);
+        }
+
+        public static T addModifier(PlayerControl player)
+        {
+            T mod = new();
+            mod.Init(player);
+            return mod;
+        }
+
+        public static void eraseModifier(PlayerControl player)
+        {
+            List<T> toRemove = new();
+
+            foreach (var p in players)
+            {
+                if (p.player == player && p.modId == ModType)
+                {
+                    toRemove.Add(p);
+                    p.ResetModifier();
+                }
+            }
+            players.RemoveAll(x => toRemove.Contains(x));
+            allModifiers.RemoveAll(x => toRemove.Contains(x));
+        }
+
+        public static void swapModifier(PlayerControl p1, PlayerControl p2)
+        {
+            var index = players.FindIndex(x => x.player == p1);
+            if (index >= 0)
+            {
+                players.DoIf(x => x.player == p1, x => x.ResetModifier());
+                players[index].player = p2;
             }
         }
     }
@@ -692,10 +836,8 @@ namespace TheOtherRoles
         }
     }
 
-    public static class CreatedMadmate
+    public class CreatedMadmate : ModifierBase<CreatedMadmate>
     {
-        public static List<PlayerControl> createdMadmate = [];
-
         public static bool canEnterVents;
         public static bool hasImpostorVision;
         public static bool canSabotage;
@@ -721,15 +863,20 @@ namespace TheOtherRoles
             return counter >= totalTasks;
         }
 
+        public CreatedMadmate()
+        {
+            ModType = modId = RoleId.CreatedMadmate;
+        }
+
         public static void clearAndReload()
         {
-            createdMadmate = [];
             canEnterVents = CustomOptionHolder.createdMadmateCanEnterVents.getBool();
             canDieToSheriff = CustomOptionHolder.createdMadmateCanDieToSheriff.getBool();
             hasTasks = CustomOptionHolder.createdMadmateAbility.getBool();
             canSabotage = CustomOptionHolder.createdMadmateCanSabotage.getBool();
             canFixComm = CustomOptionHolder.createdMadmateCanFixComm.getBool();
             numTasks = (int)CustomOptionHolder.createdMadmateCommonTasks.getFloat();
+            players = [];
         }
     }
 
@@ -781,71 +928,102 @@ namespace TheOtherRoles
         }
     }
 
-    public static class Armored
+    public class Armored : ModifierBase<Armored>
     {
-        public static PlayerControl armored;
-
         public static bool isBrokenArmor = false;
         public static void clearAndReload()
         {
-            armored = null;
             isBrokenArmor = false;
+            players = [];
+        }
+
+        public Armored()
+        {
+            ModType = modId = RoleId.Armored;
         }
     }
 
-    public static class Bloody {
-        public static List<PlayerControl> bloody = [];
-
+    public class Bloody : ModifierBase<Bloody> {
         public static float duration = 5f;
 
+        public override void OnDeath(PlayerControl killer = null)
+        {
+            if (killer != null)
+            {
+                Bloodytrail.StartBloodTrail(killer, player);
+                if (PlayerControl.LocalPlayer == killer && Helpers.CurrentMonth == 8 && Helpers.isFungle())
+                {
+                    _ = new StaticAchievementToken("watermelon");
+                }
+            }
+        }
+
         public static void clearAndReload() {
-            bloody = [];
             duration = CustomOptionHolder.modifierBloodyDuration.getFloat();
+            players = [];
+        }
+
+        public Bloody()
+        {
+            ModType = modId = RoleId.Bloody;
         }
     }
 
-    public static class AntiTeleport {
-        public static List<PlayerControl> antiTeleport = [];
+    public class AntiTeleport : ModifierBase<AntiTeleport> {
         public static Vector3 position;
 
         public static void clearAndReload() {
-            antiTeleport = [];
             position = Vector3.zero;
+            players = [];
         }
 
         public static void setPosition() {
             if (position == Vector3.zero) return;  // Check if this has been set, otherwise first spawn on submerged will fail
-            if (antiTeleport.FindAll(x => x.PlayerId == PlayerControl.LocalPlayer.PlayerId).Count > 0) {
+            if (hasModifier(PlayerControl.LocalPlayer)) {
                 PlayerControl.LocalPlayer.NetTransform.RpcSnapTo(position);
                 if (SubmergedCompatibility.IsSubmerged) {
                     SubmergedCompatibility.ChangeFloor(position.y > -7);
                 }
             }
         }
+
+        public AntiTeleport()
+        {
+            ModType = modId = RoleId.AntiTeleport;
+        }
     }
 
-    public static class Tiebreaker {
-        public static PlayerControl tiebreaker;
+    public class Tiebreaker : ModifierBase<Tiebreaker> {
+        public static PlayerControl TiebreakerPlayer { get { return allPlayers.FirstOrDefault(); } }
 
         public static bool isTiebreak = false;
 
         public static void clearAndReload() {
-            tiebreaker = null;
             isTiebreak = false;
+            players = [];
+        }
+
+        public Tiebreaker()
+        {
+            ModType = modId = RoleId.Tiebreaker;
         }
     }
 
-    public static class Sunglasses {
-        public static List<PlayerControl> sunglasses = [];
+    public class Sunglasses : ModifierBase<Sunglasses> {
         public static int vision = 1;
 
         public static void clearAndReload() {
-            sunglasses = [];
             vision = CustomOptionHolder.modifierSunglassesVision.getSelection() + 1;
+            players = [];
+        }
+
+        public Sunglasses()
+        {
+            ModType = modId = RoleId.Sunglasses;
         }
     }
-    public static class Mini {
-        public static PlayerControl mini;
+
+    public class Mini : ModifierBase<Mini> {
         public static Color color = Color.yellow;
         public const float defaultColliderRadius = 0.2233912f;
         public const float defaultColliderOffset = 0.3636057f;
@@ -857,12 +1035,17 @@ namespace TheOtherRoles
         public static float ageOnMeetingStart = 0f;
         public static bool triggerMiniLose = false;
 
+        public Mini()
+        {
+            ModType = modId = RoleId.Mini;
+        }
+
         public static void clearAndReload() {
-            mini = null;
             triggerMiniLose = false;
             growingUpDuration = CustomOptionHolder.modifierMiniGrowingUpDuration.getFloat();
             isGrowingUpInMeeting = CustomOptionHolder.modifierMiniGrowingUpInMeeting.getBool();
             timeOfGrowthStart = DateTime.UtcNow;
+            players = [];
         }
 
         public static float growingProgress() {
@@ -874,69 +1057,196 @@ namespace TheOtherRoles
             return growingProgress() == 1f;
         }
 
+        public override void OnKill(PlayerControl target)
+        {
+            if (PlayerControl.LocalPlayer == player && PlayerControl.LocalPlayer.Data.Role.IsImpostor)
+            {
+                float multiplier = 1f;
+                multiplier = isGrownUp() ? 0.66f : 2f;
+                player.SetKillTimer(player.killTimer * multiplier);
+            }
+        }
+
+        public override void OnMeetingEnd()
+        {
+            if (PlayerControl.LocalPlayer == player && PlayerControl.LocalPlayer.Data.Role.IsImpostor)
+            {
+                var multiplier = isGrownUp() ? 0.66f : 2f;
+                PlayerControl.LocalPlayer.SetKillTimer(PlayerControl.LocalPlayer.GetKillCooldown() * multiplier);
+            }
+        }
     }
-    public static class Vip {
-        public static List<PlayerControl> vip = [];
+
+    public class Vip : ModifierBase<Vip> {
         public static bool showColor = true;
 
+        public Vip()
+        {
+            ModType = modId = RoleId.Vip;
+        }
+
         public static void clearAndReload() {
-            vip = [];
             showColor = CustomOptionHolder.modifierVipShowColor.getBool();
+            players = [];
         }
     }
 
-    public static class Invert {
-        public static List<PlayerControl> invert = [];
+    public class Invert : ModifierBase<Invert> {
         public static int meetings = 3;
 
+        public Invert()
+        {
+            ModType = modId = RoleId.Invert;
+        }
+
         public static void clearAndReload() {
-            invert = [];
             meetings = (int) CustomOptionHolder.modifierInvertDuration.getFloat();
+            players = [];
         }
     }
 
-    public static class Diseased
+    public class Diseased : ModifierBase<Diseased>
     {
-        public static List<PlayerControl> diseased = [];
         public static Dictionary<byte, int> active = [];
         public static float multiplier;
 
+        public Diseased()
+        {
+            ModType = modId = RoleId.Diseased;
+        }
+
+        public override void OnDeath(PlayerControl killer = null)
+        {
+            if (killer != null && PlayerControl.LocalPlayer == killer)
+            {
+                if (active.TryGetValue(killer.PlayerId, out var num)) num++;
+                else num = 1;
+                active[killer.PlayerId] = num;
+
+                RoleHelpers.RoleMessage(RoleId.Diseased, "diseasedKillNotification");
+
+                HudManagerStartPatch.jackalKillButton.MaxTimer *= multiplier;
+                HudManagerStartPatch.sheriffKillButton.MaxTimer *= multiplier;
+                HudManagerStartPatch.vampireKillButton.MaxTimer *= multiplier;
+                HudManagerStartPatch.sidekickKillButton.MaxTimer *= multiplier;
+                HudManagerStartPatch.schrodingersCatKillButton.MaxTimer *= multiplier;
+                HudManagerStartPatch.pelicanKillButton.MaxTimer *= multiplier;
+                HudManagerStartPatch.yandereButton.MaxTimer *= multiplier;
+                HudManagerStartPatch.trackerKillButton.MaxTimer *= multiplier;
+            }
+        }
+
         public static void clearAndReload()
         {
-            diseased = [];
             active = [];
             multiplier = CustomOptionHolder.modifierDiseasedMultiplier.getFloat();
+            players = [];
         }
     }
 
-    public static class Radar
+    public class Radar : ModifierBase<Radar>
     {
-        public static PlayerControl radar;
         public static Arrow localArrow;
         public static Color color = new Color32(255, 0, 128, byte.MaxValue);
 
         public static void clearAndReload()
         {
-            radar = null;
             if (localArrow?.arrow != null)
                 UnityEngine.Object.Destroy(localArrow.arrow);
+            players = [];
+        }
+
+        public override void FixedUpdate()
+        {
+            if (PlayerControl.LocalPlayer != player) return;
+            if (MeetingHud.Instance) return;
+            if (PlayerControl.LocalPlayer.Data.IsDead)
+            {
+                if (localArrow?.arrow != null)
+                    UnityEngine.Object.Destroy(localArrow?.arrow);
+                localArrow = null;
+                return;
+            }
+
+            PlayerControl closestPlayer = null;
+            float closestDistance = float.MaxValue;
+            Vector2 refPosition = PlayerControl.LocalPlayer.GetTruePosition();
+
+            foreach (var player in PlayerControl.AllPlayerControls)
+            {
+                if (player.Data.IsDead || player.PlayerId == PlayerControl.LocalPlayer.PlayerId || !player.Collider.enabled)
+                    continue;
+
+                float distance = Vector2.Distance(refPosition, player.GetTruePosition());
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closestPlayer = player;
+                }
+            }
+
+            if (closestPlayer != null)
+            {
+                if (localArrow == null)
+                {
+                    localArrow = new Arrow(color);
+                    localArrow.arrow.SetActive(true);
+                }
+                localArrow.Update(closestPlayer.transform.position);
+            }
+            else
+            {
+                if (localArrow != null && localArrow.arrow != null)
+                {
+                    localArrow.arrow.SetActive(false);
+                }
+            }
+        }
+
+        public override void ResetModifier()
+        {
+            if (localArrow?.arrow != null)
+                UnityEngine.Object.Destroy(localArrow.arrow);
+            localArrow = null;
+        }
+
+        public Radar()
+        {
+            ModType = modId = RoleId.Radar;
         }
     }
 
-    public static class Multitasker
+    public class Multitasker : ModifierBase<Multitasker>
     {
-        public static List<PlayerControl> multitasker = [];
-
         public static void clearAndReload()
         {
-            multitasker = [];
+            players = [];
+        }
+
+        public override void FixedUpdate()
+        {
+            if (PlayerControl.LocalPlayer != player || PlayerControl.LocalPlayer.Data.IsDead || !Minigame.Instance) return;
+
+            var Base = Minigame.Instance as MonoBehaviour;
+            SpriteRenderer[] rends = Base.GetComponentsInChildren<SpriteRenderer>();
+            for (var i = 0; i < rends.Length; i++)
+            {
+                var oldColor1 = rends[i].color[0];
+                var oldColor2 = rends[i].color[1];
+                var oldColor3 = rends[i].color[2];
+                rends[i].color = new Color(oldColor1, oldColor2, oldColor3, 0.5f);
+            }
+        }
+
+        public Multitasker()
+        {
+            ModType = modId = RoleId.Multitasker;
         }
     }
 
-    public static class Madmate
+    public class Madmate : ModifierBase<Madmate>
     {
         public static Color color = Palette.ImpostorRed;
-        public static List<PlayerControl> madmate = [];
         public static bool hasTasks;
         public static bool canDieToSheriff;
         public static bool canVent;
@@ -947,6 +1257,16 @@ namespace TheOtherRoles
         public static int shortTasks;
         public static int longTasks;
         public static RoleId fixedRole;
+
+        public Madmate()
+        {
+            ModType = modId = RoleId.Madmate;
+        }
+
+        public override void OnFinishShipStatusBegin()
+        {
+            if (hasTasks) player.generateAndAssignTasks(commonTasks, shortTasks, longTasks);
+        }
         
         public static string fullName { get { return ModTranslation.getString("madmate"); } }
         public static string prefix { get { return ModTranslation.getString("madmatePrefix"); } }
@@ -997,7 +1317,6 @@ namespace TheOtherRoles
         public static void clearAndReload()
         {
             hasTasks = CustomOptionHolder.madmateAbility.getBool();
-            madmate = [];
             canDieToSheriff = CustomOptionHolder.madmateCanDieToSheriff.getBool();
             canVent = CustomOptionHolder.madmateCanEnterVents.getBool();
             hasImpostorVision = CustomOptionHolder.madmateHasImpostorVision.getBool();
@@ -1009,22 +1328,27 @@ namespace TheOtherRoles
             fixedRole = TORMapOptions.gameMode == CustomGamemodes.Guesser ? validRoles.Where(x => x != RoleId.NiceGuesser).ToList()[
                 CustomOptionHolder.madmateFixedRoleGuesserGamemode.getSelection()] :
                 validRoles[CustomOptionHolder.madmateFixedRole.getSelection()];
+            players = [];
         }
     }
 
-    public static class Chameleon {
-        public static List<PlayerControl> chameleon = [];
+    public class Chameleon : ModifierBase<Chameleon> {
         public static float minVisibility = 0.2f;
         public static float holdDuration = 1f;
         public static float fadeDuration = 0.5f;
         public static Dictionary<byte, float> lastMoved;
 
+        public Chameleon()
+        {
+            ModType = modId = RoleId.Chameleon;
+        }
+
         public static void clearAndReload() {
-            chameleon = [];
             lastMoved = [];
             holdDuration = CustomOptionHolder.modifierChameleonHoldDuration.getFloat();
             fadeDuration = CustomOptionHolder.modifierChameleonFadeDuration.getFloat();
             minVisibility = CustomOptionHolder.modifierChameleonMinVisibility.getSelection() / 10f;
+            players = [];
         }
 
         public static float visibility(byte playerId) {
@@ -1045,7 +1369,7 @@ namespace TheOtherRoles
         }
 
         public static void update() {
-            foreach (var chameleonPlayer in chameleon) {
+            foreach (var chameleonPlayer in allPlayers) {
                 //if (chameleonPlayer == Assassin.assassin && Assassin.isInvisble) continue;  // Dont make Assassin visible...
                 if (Assassin.players.Any(x => x.player == chameleonPlayer && x.isInvisble) || Ninja.isStealthed(chameleonPlayer) || Sprinter.isSprinting(chameleonPlayer) || (chameleonPlayer.isRole(RoleId.Fox) && Fox.stealthed) ||
                     (chameleonPlayer.isRole(RoleId.Kataomoi) && Kataomoi.isStalking())) continue;

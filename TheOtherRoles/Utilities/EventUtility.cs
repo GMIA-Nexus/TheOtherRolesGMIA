@@ -44,7 +44,7 @@ public static class EventUtility
         var untargetablePlayers = new List<PlayerControl>();
         foreach (var player in PlayerControl.AllPlayerControls)
         {
-            if (Mini.mini != player)
+            if (!player.hasModifier(RoleId.Mini))
                 untargetablePlayers.Add(player);
         }
         currentTarget = PlayerControlFixedUpdatePatch.setTarget(untargetablePlayers: untargetablePlayers);
@@ -107,7 +107,7 @@ public static class EventUtility
         if (Mini.growingProgress() * 18 >= CustomOptionHolder.eventHeavyAge.getFloat() || kickCounter > CustomOptionHolder.eventKicksPerRound.getFloat())
         {  // boing flip
             target = source;
-            source = Mini.mini;
+            source = Mini.allPlayers.FirstOrDefault();
         }
 
         SoundEffectsManager.playAtPosition("fail", target.GetTruePosition(), 3, 3);

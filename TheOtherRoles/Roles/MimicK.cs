@@ -32,7 +32,7 @@ namespace TheOtherRoles.Roles
         public override void OnMeetingStart()
         {
             if (!hasAlivePlayers) return;
-            player.setDefaultLook();
+            player.GetOutfitInfo().RemoveOutfit("MimicKiller");
             victim = null;
         }
 
@@ -53,7 +53,7 @@ namespace TheOtherRoles.Roles
         public override void OnDeath(PlayerControl killer = null)
         {
             MimicA.resetMorph();
-            player.setDefaultLook();
+            player.GetOutfitInfo().RemoveOutfit("MimicKiller");
             victim = null;
 
             if (ifOneDiesBothDie)
@@ -87,8 +87,7 @@ namespace TheOtherRoles.Roles
                         array[i].gameObject.active = false;
 
                 // Block Mimic(Killer) from morphing if camo or mushroom is active
-                if (Camouflager.camouflageTimer <= 0f && !Helpers.MushroomSabotageActive())
-                    player.setLook(target.Data.PlayerName, target.Data.DefaultOutfit.ColorId, target.Data.DefaultOutfit.HatId, target.Data.DefaultOutfit.VisorId, target.Data.DefaultOutfit.SkinId, target.Data.DefaultOutfit.PetId);
+                player.GetOutfitInfo().AddOutfit(new("MimicKiller", 40, true, target.GetOutfitInfo().DefaultOutfit));
                 victim = target;
 
                 if (PlayerControl.LocalPlayer == player)
@@ -172,7 +171,7 @@ namespace TheOtherRoles.Roles
         public override void ResetRole(bool isShifted)
         {
             MimicA.resetMorph();
-            player.setDefaultLook();
+            player.GetOutfitInfo().RemoveOutfit("MimicKiller");
             if (arrows != null)
                 foreach (Arrow arrow in arrows)
                     if (arrow?.arrow != null)

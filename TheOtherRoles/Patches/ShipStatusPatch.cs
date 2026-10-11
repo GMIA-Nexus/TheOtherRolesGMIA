@@ -69,7 +69,7 @@ namespace TheOtherRoles.Patches {
             else {
                 __result = GetNeutralLightRadius(__instance, false);
             }
-            if (Sunglasses.sunglasses.FindAll(x => x.PlayerId == player.PlayerId).Count > 0) // Sunglasses
+            if (Sunglasses.allPlayers.Any(x => x != null && x?.PlayerId == player.PlayerId)) // Sunglasses
                 __result *= 1f - Sunglasses.vision * 0.1f;
 
             return false;

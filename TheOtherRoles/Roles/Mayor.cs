@@ -79,8 +79,8 @@ public class Mayor : RoleBase<Mayor>
         if (PlayerControl.LocalPlayer == player && exiled != null)
         {
             acTokenChallenge.Value.cleared |= acTokenChallenge.Value.votedFor == exiled.PlayerId &&
-                ((Helpers.isEvil(ExileController.Instance.initData.networkedPlayer.Object) && !ExileController.Instance.initData.networkedPlayer.Object.isRole(RoleId.Jester)) || Madmate.madmate.Any(x => x.PlayerId == exiled.PlayerId)
-            || CreatedMadmate.createdMadmate.Any(x => x.PlayerId == exiled.PlayerId));
+                ((Helpers.isEvil(ExileController.Instance.initData.networkedPlayer.Object) && !ExileController.Instance.initData.networkedPlayer.Object.isRole(RoleId.Jester)) || exiled.hasModifier(RoleId.Madmate)
+            || exiled.hasModifier(RoleId.CreatedMadmate));
         }
     }
 

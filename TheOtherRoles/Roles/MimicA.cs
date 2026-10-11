@@ -24,16 +24,14 @@ namespace TheOtherRoles.Roles
         {
             PlayerControl mimicA = Helpers.playerById(message.mimicAId);
             PlayerControl mimicB = Helpers.playerById(message.mimicBId);
-            if (Camouflager.camouflageTimer <= 0f)
-                mimicA.setLook(mimicB.Data.PlayerName, mimicB.Data.DefaultOutfit.ColorId, mimicB.Data.DefaultOutfit.HatId, mimicB.Data.DefaultOutfit.VisorId, mimicB.Data.DefaultOutfit.SkinId, mimicB.Data.DefaultOutfit.PetId);
+            mimicA.GetOutfitInfo().AddOutfit(new("MimicAssistant", 40, true, mimicB.GetOutfitInfo().DefaultOutfit));
             isMorph = true;
         });
 
         public static RemoteProcess<byte> ResetMorph = RemotePrimitiveProcess.OfByte("MimicResetMorph", (message, _) =>
         {
             PlayerControl mimicA = Helpers.playerById(message);
-            if (Camouflager.camouflageTimer <= 0f)
-                mimicA.setDefaultLook();
+            mimicA.GetOutfitInfo().RemoveOutfit("MimicAssistant");
             isMorph = false;
         });
 

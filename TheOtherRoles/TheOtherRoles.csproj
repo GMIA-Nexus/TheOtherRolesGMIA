@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <TargetFramework>net6.0</TargetFramework>
-        <Version>1.4.0</Version>
+        <Version>1.4.1</Version>
         <Description>TheOtherRolesGMIA</Description>
         <Authors>Imp11</Authors>
 		<LangVersion>preview</LangVersion>
@@ -28,11 +28,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<Folder Include="Players\" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<PackageReference Include="AmongUs.GameLibs.Android" Version="2026.8.18" Condition="'$(Configuration)' == 'Android'" />
+		<PackageReference Include="AmongUs.GameLibs.Android" Version="2026.9.29" Condition="'$(Configuration)' == 'Android'" />
 		<PackageReference Include="AmongUs.GameLibs.Steam" Version="2026.9.29" Condition="'$(Configuration)' == 'Windows'" />
         <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.735" />
 		<PackageReference Include="BepInEx.IL2CPP.MSBuild" Version="2.1.0-rc.1" />

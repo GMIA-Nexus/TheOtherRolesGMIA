@@ -413,7 +413,7 @@ namespace TheOtherRoles.Roles
             var color = Color.Lerp(Palette.ClearWhite, Palette.White, alpha);
             try
             {
-                if (Chameleon.chameleon.Any(x => x.PlayerId == kataomoi.PlayerId) && Chameleon.visibility(kataomoi.PlayerId) < 1f && !isStalking()) return;
+                if (kataomoi.hasModifier(RoleId.Chameleon) && Chameleon.visibility(kataomoi.PlayerId) < 1f && !isStalking()) return;
                 Helpers.setInvisible(kataomoi, color, alpha);
             }
             catch { }

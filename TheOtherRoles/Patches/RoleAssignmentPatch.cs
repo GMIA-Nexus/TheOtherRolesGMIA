@@ -881,31 +881,9 @@ namespace TheOtherRoles.Patches {
                 case RoleId.Radar:
                     selection = CustomOptionHolder.modifierRadar.getSelection();
                     break;
-                    //case RoleId.Shifter:
-                    //selection = CustomOptionHolder.modifierShifter.getSelection();
-                    //break;
             }
 
             return selection;
-        }
-
-        private static void setRolesAgain()
-        {
-
-            while (playerRoleMap.Any())
-            {
-                byte amount = (byte)Math.Min(playerRoleMap.Count, 20);
-                var writer = AmongUsClient.Instance!.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.WorkaroundSetRoles, SendOption.Reliable, -1);
-                writer.Write(amount);
-                for (int i = 0; i < amount; i++)
-                {
-                    var option = playerRoleMap[0];
-                    playerRoleMap.RemoveAt(0);
-                    writer.WritePacked((uint)option.Item1);
-                    writer.WritePacked((uint)option.Item2);
-                }
-                AmongUsClient.Instance.FinishRpcImmediately(writer);
-            }
         }
 
         public class RoleAssignmentData {

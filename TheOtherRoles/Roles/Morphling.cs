@@ -36,12 +36,11 @@ namespace TheOtherRoles.Roles
             Morphling morphling = getRole(Helpers.playerById(message.morphlingId));
             if (morphling == null || target == null) return;
 
-            morphling.morphTimer = duration;
             morphling.morphTarget = target;
-            if (Camouflager.camouflageTimer <= 0f)
-                morphling.player.setLook(target.Data.PlayerName, target.Data.DefaultOutfit.ColorId, target.Data.DefaultOutfit.HatId, target.Data.DefaultOutfit.VisorId, target.Data.DefaultOutfit.SkinId, target.Data.DefaultOutfit.PetId);
+            morphling.player.GetOutfitInfo().AddOutfit(new("Morphling", 50, true, target.GetOutfitInfo()?.GetOutfit(75)));
+            morphling.morphTimer = duration;
         });
-    
+
         public static float cooldown = 30f;
         public static float duration = 10f;
 
@@ -56,7 +55,7 @@ namespace TheOtherRoles.Roles
             morphTarget = null;
             morphTimer = 0f;
             if (player == null) return;
-            player.setDefaultLook();
+            player.GetOutfitInfo().RemoveOutfit("Morphling");
         }
 
         public override void OnMeetingStart()
@@ -66,9 +65,23 @@ namespace TheOtherRoles.Roles
 
         public override void FixedUpdate()
         {
+            morphlingSetTarget();
+            morphlingUpdateTimer();
+        }
+
+        void morphlingSetTarget()
+        {
             if (player != PlayerControl.LocalPlayer) return;
             currentTarget = setTarget();
             setPlayerOutline(currentTarget, color);
+        }
+
+        void morphlingUpdateTimer()
+        {
+            float oldMorphlingTimer = morphTimer;
+            morphTimer = Mathf.Max(0f, morphTimer - Time.fixedDeltaTime);
+            if ((oldMorphlingTimer > 0f && morphTimer <= 0f) || player?.Data?.IsDead == true)
+                resetMorph();
         }
 
         public override void OnMeetingEnd(PlayerControl exiled = null)

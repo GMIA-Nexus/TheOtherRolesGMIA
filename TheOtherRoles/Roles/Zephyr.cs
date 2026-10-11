@@ -67,7 +67,7 @@ namespace TheOtherRoles.Roles
         public static void fireCannon(PlayerControl player, PlayerControl zephyr, Vector2 to)
         {
             if (player == null) return;
-            if (player == Mini.mini && !Mini.isGrownUp()) return;
+            if (player.hasModifier(RoleId.Mini) && !Mini.isGrownUp()) return;
             TORGameManager.Instance.GameStatistics.RecordEvent(new(GameStatistics.EventVariation.Kill, zephyr.PlayerId, 1 << player.PlayerId) { RelatedTag = EventDetail.Blown });
 
             TORGUIManager.Instance.StartCoroutine(CoPlayJumpAnimation(player, player?.transform.position ?? Vector2.zero, to, onLand : () =>

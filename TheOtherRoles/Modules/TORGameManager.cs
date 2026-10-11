@@ -5,6 +5,7 @@ using BepInEx.Unity.IL2CPP.Utils.Collections;
 using HarmonyLib;
 using Il2CppSystem;
 using TheOtherRoles.MetaContext;
+using TheOtherRoles.Players;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -19,6 +20,7 @@ public class TORGameManager
     static private TORGameManager instance;
     static public TORGameManager Instance { get => instance; }
     public List<AchievementTokenBase> AllAchievementTokens = [];
+    private Dictionary<byte, PlayerOutfit> allPlayerOutfits = [];
     public GameStatistics GameStatistics { get; set; } = new();
     public float CurrentTime { get; private set; }
     public RuntimeGameAsset RuntimeAsset { get; private init; }
@@ -27,15 +29,32 @@ public class TORGameManager
 
     public TORGameManager()
     {
+        allPlayerOutfits = [];
         instance = this;
         RuntimeAsset = new();
         SendHandshakeRequest();
     }
 
+    public IEnumerable<PlayerOutfit> AllPlayerOutfit() => allPlayerOutfits.Values;
+
     public void RecordRoleHistory(PlayerControl player)
     {
         var role = RoleInfo.getRoleInfoForPlayer(player, false, true).FirstOrDefault();
-        RoleHistory.Add(new(player.PlayerId, role, Madmate.madmate.Contains(player) || CreatedMadmate.createdMadmate.Contains(player), role.color));
+        RoleHistory.Add(new(player.PlayerId, role, player.hasModifier(RoleId.Madmate) || player.hasModifier(RoleId.CreatedMadmate), role.color));
+    }
+
+    public PlayerOutfit RegisterOutfit(PlayerControl player)
+    {
+        if (allPlayerOutfits.ContainsKey(player.PlayerId)) return allPlayerOutfits[player.PlayerId];
+
+        var info = new PlayerOutfit(player);
+        allPlayerOutfits.Add(player.PlayerId, info);
+        return info;
+    }
+
+    public PlayerOutfit GetPlayerOutfit(byte playerId)
+    {
+        return allPlayerOutfits.TryGetValue(playerId, out var v) ? v : null;
     }
 
     public void Abandon()

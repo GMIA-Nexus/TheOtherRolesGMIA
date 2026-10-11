@@ -57,12 +57,12 @@ namespace TheOtherRoles.Roles
                 target.cosmetics.colorBlindText.gameObject.SetActive(DataManager.Settings.Accessibility.ColorBlindMode);
                 target.cosmetics.colorBlindText.color = target.cosmetics.colorBlindText.color.SetAlpha(1f);
 
-                if (Camouflager.camouflageTimer <= 0) target.setDefaultLook();
+                target.GetOutfitInfo().RemoveOutfit("AssassinInvisible");
                 assassin.isInvisble = false;
                 return;
             }
 
-            target.setLook("", 6, "", "", "", "");
+            target.GetOutfitInfo().AddOutfit(new("AssassinInvisible", 175, true, new() { ColorId = 6, HatId = "", PetId = "", VisorId = "", SkinId = "", PlayerName = "" }));
             Color color = Color.clear;
             bool canSee = PlayerControl.LocalPlayer.Data.Role.IsImpostor || PlayerControl.LocalPlayer.Data.IsDead;
             if (canSee) color.a = 0.1f;
@@ -125,7 +125,7 @@ namespace TheOtherRoles.Roles
             if (player != PlayerControl.LocalPlayer) return;
             List<PlayerControl> untargetables = [];
             if (!Spy.impostorsCanKillAnyone) untargetables.AddRange(Spy.allPlayers);
-            if (Mini.mini != null && !Mini.isGrownUp()) untargetables.Add(Mini.mini);
+            if (Mini.exists && !Mini.isGrownUp()) untargetables.AddRange(Mini.allPlayers);
             foreach (var jackal in Jackal.players)
                 if (jackal.player != null && jackal.wasTeamRed) untargetables.Add(jackal.player);
             foreach (var sidekick in Sidekick.players)

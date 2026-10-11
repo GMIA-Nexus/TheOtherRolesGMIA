@@ -80,7 +80,7 @@ namespace TheOtherRoles.Roles
 
                     byte reporter = deadPlayer.killerIfExisting.PlayerId;
 
-                    if (Madmate.madmate.Any(x => x.PlayerId == player.PlayerId))
+                    if (player.hasModifier(RoleId.Madmate))
                     {
                         var candidates = PlayerControl.AllPlayerControls.GetFastEnumerator().ToArray().Where(x => !x.Data.IsDead && !x.Data.Role.IsImpostor).ToList();
                         int i = rnd.Next(0, candidates.Count);

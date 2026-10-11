@@ -30,14 +30,9 @@ namespace TheOtherRoles.Patches {
                 if (player)
                 {
                     var playerName = text;
-                    foreach (var morphling in Morphling.players) {
-                        if (morphling.morphTimer > 0f && morphling.morphTarget != null && morphling.player == player)
-                            playerName = morphling.morphTarget.Data.PlayerName;
-                    }
-                    if (MimicA.isMorph && player.isRole(RoleId.MimicA)) playerName = MimicK.allPlayers.FirstOrDefault().Data.PlayerName;
-                    if (MimicK.victim != null && player.isRole(RoleId.MimicK)) playerName = MimicK.victim.Data.PlayerName;
+                    var outfit = player.GetOutfitInfo();
+                    if (outfit != null) playerName = outfit.CurrentOutfit.PlayerName;
                     var nameText = player.cosmetics.nameText;
-                
                     nameText.text = Helpers.hidePlayerName(localPlayer, player) ? "" : playerName;
                     nameText.color = color = amImpostor && data.Role.IsImpostor ? Palette.ImpostorRed : Color.white;
                     nameText.color = nameText.color.SetAlpha(Chameleon.visibility(player.PlayerId));
@@ -273,7 +268,7 @@ namespace TheOtherRoles.Patches {
                 foreach (var fox in Fox.allPlayers)
                     setPlayerNameColor(fox, Immoralist.color);
             }
-            if (Madmate.madmate.Contains(localPlayer))
+            if (localPlayer.hasModifier(RoleId.Madmate))
             {
                 setPlayerNameColor(PlayerControl.LocalPlayer, Madmate.color);
                 if (Madmate.tasksComplete(localPlayer))
@@ -287,7 +282,7 @@ namespace TheOtherRoles.Patches {
                     }
                 }
             }
-            if (CreatedMadmate.createdMadmate.Contains(localPlayer))
+            if (localPlayer.hasModifier(RoleId.CreatedMadmate))
             {
                 setPlayerNameColor(PlayerControl.LocalPlayer, Madmate.color);
                 if (CreatedMadmate.tasksComplete(localPlayer))
@@ -469,31 +464,42 @@ namespace TheOtherRoles.Patches {
         public static void miniUpdate() {
             //  || Mini.mini == MimicK.mimicK && MimicK.victim != null
             // the above line deleted in 2024.3.9, specified the MimicK instead
-            if (Mini.mini == null || Camouflager.camouflageTimer > 0f || Helpers.MushroomSabotageActive() || (Mini.mini.isRole(RoleId.MimicA) && MimicA.isMorph) || Morphling.players.Any(x => x.player == Mini.mini && x.morphTimer > 0f) || Ninja.isStealthed(Mini.mini)
-                || (Mini.mini.isRole(RoleId.Fox) && Fox.stealthed) || Assassin.players.Any(x => x.player == Mini.mini && x.isInvisble) || Sprinter.isSprinting(Mini.mini) || (Mini.mini.isRole(RoleId.Kataomoi) && Kataomoi.isStalking()) || SurveillanceMinigamePatch.nightVisionIsActive) return;
-                
-            float growingProgress = Mini.growingProgress();
-            float scale = growingProgress * 0.35f + 0.35f;
-            string suffix = "";
-            if (growingProgress != 1f)
-                suffix = " <color=#FAD934FF>(" + Mathf.FloorToInt(growingProgress * 18) + ")</color>"; 
-            if (!Mini.isGrowingUpInMeeting && MeetingHud.Instance != null && Mini.ageOnMeetingStart != 0 && !(Mini.ageOnMeetingStart >= 18))
-                suffix = " <color=#FAD934FF>(" + Mini.ageOnMeetingStart + ")</color>";
+            if (!Mini.exists || Camouflager.camouflageTimer > 0f || Helpers.MushroomSabotageActive() || SurveillanceMinigamePatch.nightVisionIsActive) return;
 
-            if (!(Mini.mini.isRole(RoleId.MimicK) && MimicK.victim != null)) Mini.mini.cosmetics.nameText.text += suffix;
-            if (MeetingHud.Instance != null) {
-                foreach (PlayerVoteArea player in MeetingHud.Instance.playerStates)
-                    if (player.NameText != null && Mini.mini.PlayerId == player.PlayerId)
-                        player.NameText.text += suffix;
-            }
+            foreach (var mini in Mini.allPlayers)
+            {
+                if ((mini.isRole(RoleId.MimicA) && MimicA.isMorph) || (mini.isRole(RoleId.MimicK) && MimicK.victim != null) ||
+                    Morphling.players.Any(x => x.player == mini && x.morphTimer > 0f)) continue;
+                if (Ninja.isStealthed(mini) || (mini.isRole(RoleId.Fox) && Fox.stealthed) ||
+                    Assassin.players.Any(x => x.player == mini && x.isInvisble) || Sprinter.isSprinting(mini) || (mini.isRole(RoleId.Kataomoi) && Kataomoi.isStalking())) continue;
 
-            foreach (var morphling in Morphling.players) {
-                if (morphling.morphTarget == Mini.mini && morphling.morphTimer > 0f)
-                    morphling.player.cosmetics.nameText.text += suffix;
+                float growingProgress = Mini.growingProgress();
+                float scale = growingProgress * 0.35f + 0.35f;
+                string suffix = "";
+                if (growingProgress != 1f)
+                    suffix = " <color=#FAD934FF>(" + Mathf.FloorToInt(growingProgress * 18) + ")</color>";
+                if (!Mini.isGrowingUpInMeeting && MeetingHud.Instance != null && Mini.ageOnMeetingStart != 0 && !(Mini.ageOnMeetingStart >= 18))
+                    suffix = " <color=#FAD934FF>(" + Mini.ageOnMeetingStart + ")</color>";
+
+                mini.cosmetics.nameText.text += suffix;
+
+                if (MeetingHud.Instance != null)
+                {
+                    foreach (PlayerVoteArea player in MeetingHud.Instance.playerStates)
+                        if (player.NameText != null && mini.PlayerId == player.PlayerId)
+                            player.NameText.text += suffix;
+                }
+
+                foreach (var morphling in Morphling.players)
+                {
+                    if (morphling.morphTarget == mini && morphling.morphTimer > 0f)
+                        morphling.player.cosmetics.nameText.text += suffix;
+                }
+
+                if (MimicA.isMorph && mini.isRole(RoleId.MimicK))
+                    foreach (var mimicA in MimicA.allPlayers)
+                        mimicA.cosmetics.nameText.text += suffix;
             }
-            if (MimicA.isMorph && Mini.mini.isRole(RoleId.MimicK))
-                foreach (var mimicA in MimicA.allPlayers)
-                    mimicA.cosmetics.nameText.text += suffix;
         }
 
         static void updateImpostorKillButton(HudManager __instance) {
@@ -530,9 +536,9 @@ namespace TheOtherRoles.Patches {
             if ((Deputy.handcuffedKnows.ContainsKey(PlayerControl.LocalPlayer.PlayerId) && Deputy.handcuffedKnows[PlayerControl.LocalPlayer.PlayerId] > 0) || MeetingHud.Instance || PlayerControl.LocalPlayer.roleCanUseVents() == false) __instance.ImpostorVentButton.Hide();
             else if (PlayerControl.LocalPlayer.roleCanUseVents() && !__instance.ImpostorVentButton.isActiveAndEnabled) __instance.ImpostorVentButton.Show();
 
-            if (Madmate.madmate.Any(x => x.PlayerId == PlayerControl.LocalPlayer.PlayerId))
+            if (PlayerControl.LocalPlayer.hasModifier(RoleId.Madmate))
                 __instance.ImpostorVentButton.transform.localPosition = PlayerControl.LocalPlayer.isRole(RoleId.Engineer) ? CustomButton.ButtonPositions.lowerRowRight : CustomButton.ButtonPositions.upperRowLeft;
-            if (CreatedMadmate.createdMadmate.Any(x => x.PlayerId == PlayerControl.LocalPlayer.PlayerId) && CreatedMadmate.canEnterVents) __instance.ImpostorVentButton.transform.localPosition = CustomButton.ButtonPositions.lowerRowRight;
+            if (PlayerControl.LocalPlayer.hasModifier(RoleId.CreatedMadmate) && CreatedMadmate.canEnterVents) __instance.ImpostorVentButton.transform.localPosition = CustomButton.ButtonPositions.lowerRowRight;
 
             if (Rewired.ReInput.players.GetPlayer(0).GetButtonDown(RewiredConsts.Action.UseVent) && !PlayerControl.LocalPlayer.Data.Role.IsImpostor && PlayerControl.LocalPlayer.roleCanUseVents()) {
                 __instance.ImpostorVentButton.DoClick();
@@ -548,8 +554,8 @@ namespace TheOtherRoles.Patches {
             else if (PlayerControl.LocalPlayer.roleCanUseSabotage() && !__instance.SabotageButton.isActiveAndEnabled) __instance.SabotageButton.Show();
 
             if (Helpers.ShowButtons) {
-                if ((CreatedMadmate.createdMadmate.Any(x => x.PlayerId == PlayerControl.LocalPlayer.PlayerId) && CreatedMadmate.canSabotage)
-                    || (Madmate.madmate.Any(x => x.PlayerId == PlayerControl.LocalPlayer.PlayerId) && Madmate.canSabotage))
+                if ((PlayerControl.LocalPlayer.hasModifier(RoleId.CreatedMadmate) && CreatedMadmate.canSabotage)
+                    || (PlayerControl.LocalPlayer.hasModifier(RoleId.Madmate) && Madmate.canSabotage))
                     __instance.SabotageButton.transform.localPosition = CustomButton.ButtonPositions.upperRowCenter + __instance.UseButton.transform.localPosition;
             }
         }

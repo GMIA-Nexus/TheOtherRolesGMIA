@@ -196,7 +196,7 @@ namespace TheOtherRoles.Patches {
                 Lawyer.triggerProsecutorWin = true;*/
 
             // Mini exile lose condition
-            if (exiled != null && Mini.mini != null && Mini.mini.PlayerId == exiled.PlayerId && !Mini.isGrownUp() && !Mini.mini.Data.Role.IsImpostor && !RoleInfo.getRoleInfoForPlayer(Mini.mini).Any(x => x.isNeutral)) {
+            if (exiled != null && exiled.hasModifier(RoleId.Mini) && !Mini.isGrownUp() && !exiled.Data.Role.IsImpostor && !RoleInfo.getRoleInfoForPlayer(exiled).Any(x => x.isNeutral)) {
                 Mini.triggerMiniLose = true;
             }
             // Jester win condition
@@ -209,12 +209,7 @@ namespace TheOtherRoles.Patches {
             CustomButton.MeetingEndedUpdate();
 
             foreach (var role in new List<Role>(Role.allRoles)) role.OnMeetingEnd(exiled);
-
-            // Mini set adapted cooldown
-            if (Mini.mini != null && PlayerControl.LocalPlayer == Mini.mini && Mini.mini.Data.Role.IsImpostor) {
-                var multiplier = Mini.isGrownUp() ? 0.66f : 2f;
-                Mini.mini.SetKillTimer(PlayerControl.LocalPlayer.GetKillCooldown() * multiplier);
-            }
+            foreach (var mod in new List<Modifier>(Modifier.allModifiers)) mod.OnMeetingEnd();
 
             Diseased.active = [];
 
@@ -248,7 +243,7 @@ namespace TheOtherRoles.Patches {
 
             MapBehaviourPatch.resetRealTasks();
 
-            if (CustomOptionHolder.randomGameStartPosition.getBool() && (AntiTeleport.antiTeleport.FindAll(x => x.PlayerId == PlayerControl.LocalPlayer.PlayerId).Count == 0))
+            if (CustomOptionHolder.randomGameStartPosition.getBool() && !PlayerControl.LocalPlayer.hasModifier(RoleId.AntiTeleport))
             { //Random spawn on round start
                 var spawnLoc = MapData.GetCurrentMapData()?.SpawnPos ?? [];
                 if (spawnLoc.Length > 0) PlayerControl.LocalPlayer.NetTransform.RpcSnapTo(spawnLoc[rnd.Next(spawnLoc.Length)]);

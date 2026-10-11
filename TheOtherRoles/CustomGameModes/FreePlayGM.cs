@@ -97,7 +97,8 @@ namespace TheOtherRoles.CustomGameModes
                         new List<GUIContext>() { gui.LocalizedText(GUIAlignment.Center, roleMaskedTittleAttr, "freePlayModifiersEquipped"),
                         gui.Arrange(GUIAlignment.Center, RoleInfo.allRoleInfos.Where(r => r.isModifier && RoleInfo.getRoleInfoForPlayer(PlayerControl.LocalPlayer).Contains(r)).Select(r => gui.RawButton(GUIAlignment.Center, roleMaskedTittleAttr, Helpers.cs(r.color, r.name), () =>
                         {
-                            removeModifier(r.roleId);
+                            if (r.roleId == RoleId.Chameleon) Chameleon.removeChameleonFully(PlayerControl.LocalPlayer);
+                            PlayerControl.LocalPlayer.eraseModifier(r.roleId);
                             SetContext(1);
                         })), 4),
                         gui.LocalizedText(GUIAlignment.Center, roleMaskedTittleAttr, "freePlayModifiersUnequipped"),
@@ -124,49 +125,6 @@ namespace TheOtherRoles.CustomGameModes
             if (roleType is not RoleTypes.ImpostorGhost and not RoleTypes.CrewmateGhost)
                 targetPlayer.Data.RoleWhenAlive = new Il2CppSystem.Nullable<RoleTypes>(roleType);
             roleBehaviour.AdjustTasks(targetPlayer);
-        }
-
-        public static void removeModifier(RoleId modifierId)
-        {
-            var player = PlayerControl.LocalPlayer;
-            var playerId = player.PlayerId;
-            switch (modifierId)
-            {
-                case RoleId.AntiTeleport:
-                    AntiTeleport.antiTeleport.RemoveAll(x => x.PlayerId == playerId);
-                    break;
-                case RoleId.Chameleon:
-                    Chameleon.chameleon.RemoveAll(x => x.PlayerId == playerId);
-                    Chameleon.removeChameleonFully(player);
-                    break;
-                case RoleId.Invert:
-                    Invert.invert.RemoveAll(x => x.PlayerId == playerId);
-                    break;
-                case RoleId.Bloody:
-                    Bloody.bloody.RemoveAll(x => x.PlayerId == playerId);
-                    break;
-                case RoleId.Sunglasses:
-                    Sunglasses.sunglasses.RemoveAll(x => x.PlayerId == playerId);
-                    break;
-                case RoleId.Tiebreaker:
-                    Tiebreaker.tiebreaker = null;
-                    break;
-                case RoleId.Vip:
-                    Vip.vip.RemoveAll(x => x.PlayerId == playerId);
-                    break;
-                case RoleId.Armored:
-                    Armored.armored = null;
-                    break;
-                case RoleId.Radar:
-                    Radar.radar = null;
-                    break;
-                case RoleId.Multitasker:
-                    Multitasker.multitasker.RemoveAll(x => x.PlayerId == playerId);
-                    break;
-                case RoleId.Diseased:
-                    Diseased.diseased.RemoveAll(x => x.PlayerId == playerId);
-                    break;
-            }
         }
 
         public static PlayerControl SpawnDummy()

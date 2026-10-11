@@ -420,7 +420,7 @@ namespace TheOtherRoles
                 player.myTasks.Insert(0, task);
             }
 
-            if (Madmate.madmate.Any(x => x.PlayerId == player.PlayerId) || CreatedMadmate.createdMadmate.Any(x => x.PlayerId == player.PlayerId))
+            if (player.hasModifier(RoleId.Madmate) || player.hasModifier(RoleId.CreatedMadmate))
             {
                 var task = new GameObject("RoleTask").AddComponent<ImportantTextTask>();
                 task.transform.SetParent(player.transform, false);
@@ -517,6 +517,65 @@ namespace TheOtherRoles
                 if (player.isRole(t.Key))
                 {
                     t.Value.GetMethod("swapRole", BindingFlags.Public | BindingFlags.Static)?.Invoke(null, [player, target]);
+                }
+            }
+        }
+
+        public static bool hasModifier(this PlayerControl player, RoleId mod)
+        {
+            foreach (var t in ModifierData.allModTypes)
+            {
+                if (mod == t.Key)
+                {
+                    return (bool)t.Value.GetMethod("hasModifier", BindingFlags.Public | BindingFlags.Static)?.Invoke(null, new object[] { player });
+                }
+            }
+            return false;
+        }
+
+        public static void addModifier(this PlayerControl player, RoleId mod)
+        {
+            foreach (var t in ModifierData.allModTypes)
+            {
+                if (mod == t.Key)
+                {
+                    t.Value.GetMethod("addModifier", BindingFlags.Public | BindingFlags.Static)?.Invoke(null, new object[] { player });
+                    return;
+                }
+            }
+        }
+
+        public static void eraseModifier(this PlayerControl player, RoleId mod)
+        {
+            if (hasModifier(player, mod))
+            {
+                foreach (var t in ModifierData.allModTypes)
+                {
+                    if (mod == t.Key)
+                    {
+                        t.Value.GetMethod("eraseModifier", BindingFlags.Public | BindingFlags.Static)?.Invoke(null, new object[] { player });
+                        return;
+                    }
+                }
+                TheOtherRolesPlugin.Logger.LogMessage($"eraseRole: no method found for role type {mod}");
+            }
+        }
+
+        public static void eraseAllModifiers(this PlayerControl player)
+        {
+            foreach (var t in ModifierData.allModTypes)
+            {
+                t.Value.GetMethod("eraseModifier", BindingFlags.Public | BindingFlags.Static)?.Invoke(null, new object[] { player });
+            }
+        }
+
+        public static void swapModifiers(this PlayerControl player, PlayerControl target)
+        {
+            foreach (var t in ModifierData.allModTypes)
+            {
+                if (player.hasModifier(t.Key))
+                {
+                    t.Value.GetMethod("swapModifier", BindingFlags.Public | BindingFlags.Static)?.Invoke(null, new object[] { player, target });
                 }
             }
         }
@@ -651,8 +710,8 @@ namespace TheOtherRoles
 
         public static bool hasFakeTasks(this PlayerControl player) {
             return player.isRole(RoleId.Jester) || player.isRole(RoleId.Jackal) || player.isRole(RoleId.Sidekick) || player.isRole(RoleId.Arsonist) || player.isRole(RoleId.Vulture) || player.isRole(RoleId.Opportunist) || player.isRole(RoleId.Moriarty)
-                || (Madmate.madmate.Any(x => x.PlayerId == player.PlayerId) && !Madmate.hasTasks) ||
-                (CreatedMadmate.createdMadmate.Any(x => x.PlayerId == player.PlayerId) && !CreatedMadmate.hasTasks) || player.isRole(RoleId.Akujo) || player.isRole(RoleId.Kataomoi) || player.isRole(RoleId.PlagueDoctor) || player.isRole(RoleId.Cupid) || (player.isRole(RoleId.SchrodingersCat) && !SchrodingersCat.hideRole)
+                || (player.hasModifier(RoleId.Madmate) && !Madmate.hasTasks) ||
+                (player.hasModifier(RoleId.CreatedMadmate) && !CreatedMadmate.hasTasks) || player.isRole(RoleId.Akujo) || player.isRole(RoleId.Kataomoi) || player.isRole(RoleId.PlagueDoctor) || player.isRole(RoleId.Cupid) || (player.isRole(RoleId.SchrodingersCat) && !SchrodingersCat.hideRole)
                 || player.isRole(RoleId.Immoralist) || player.isRole(RoleId.Doomsayer) || player.isRole(RoleId.Pelican) || player.isRole(RoleId.Yandere);
         }
 
@@ -666,7 +725,7 @@ namespace TheOtherRoles
         }
 
         public static bool shouldClearTask(this PlayerControl target) => (target.hasFakeTasks() || target.isRole(RoleId.Thief) || (target.isRole(RoleId.Shifter) && Shifter.isNeutral) || (target.isRole(RoleId.TaskMaster) && target.PlayerId == PlayerControl.LocalPlayer.PlayerId && TaskMaster.isTaskComplete)
-                || Madmate.madmate.Any(x => x.PlayerId == target.PlayerId) || CreatedMadmate.createdMadmate.Any(x => x.PlayerId == target.PlayerId) || target.isRole(RoleId.JekyllAndHyde) || target.isRole(RoleId.Fox)) && !FreePlayGM.isFreePlayGM;
+                || target.hasModifier(RoleId.Madmate) || target.hasModifier(RoleId.CreatedMadmate) || target.isRole(RoleId.JekyllAndHyde) || target.isRole(RoleId.Fox)) && !FreePlayGM.isFreePlayGM;
 
         public static void clearAllTasks(this PlayerControl player) {
             if (player == null) return;
@@ -903,7 +962,7 @@ namespace TheOtherRoles
             if (Tracker.deadBodyPositions != null) Tracker.deadBodyPositions.Add(target.transform.position);
 
             // VIP Modifier
-            if (Vip.vip.FindAll(x => x.PlayerId == target.PlayerId).Count > 0)
+            if (target.hasModifier(RoleId.Vip))
             {
                 Color color = Color.yellow;
                 if (Vip.showColor)
@@ -1007,6 +1066,12 @@ namespace TheOtherRoles
         static public IEnumerator Sequence(params IEnumerator[] enumerator)
         {
             foreach (var e in enumerator) yield return e;
+        }
+
+        static public Players.PlayerOutfit GetOutfitInfo(this PlayerControl player)
+        {
+            if (!player) return null;
+            return TORGameManager.Instance?.GetPlayerOutfit(player!.PlayerId);
         }
 
         public static int ComputeConstantHash(this string str)
@@ -1534,13 +1599,10 @@ namespace TheOtherRoles
         static public float Distance(this Vector2 myVec, Vector2 vector) => (myVec - vector).magnitude;
 
         public static bool hidePlayerName(PlayerControl source, PlayerControl target) {
-            if (Camouflager.camouflageTimer > 0f || MushroomSabotageActive()) return true; // No names are visible
             if (!source.Data.Role.IsImpostor && Ninja.isStealthed(target)) return true; // Hide Ninja nametags from non-impostors
             if (Sprinter.isSprinting(target) && source != target) return true; // Hide Sprinter nametags
             if (Fox.stealthed && target.isRole(RoleId.Fox) && source != target) return true; // Hide Fox nametags
             if (source != target && Kataomoi.isStalking(target)) return true; // Hide Kataomoi nametags
-            if (Patches.SurveillanceMinigamePatch.nightVisionIsActive) return true;
-            else if (Assassin.players.Any(x => x.player == target && x.isInvisble)) return true;
             else if (!TORMapOptions.hidePlayerNames) return false; // All names are visible
             else if (source == null || target == null) return true;
             else if (source == target) return false; // Player sees his own name
@@ -1552,7 +1614,7 @@ namespace TheOtherRoles
             return true;
         }
 
-        public static void setDefaultLook(this PlayerControl target, bool enforceNightVisionUpdate = true) {
+        public static void setDefaultLook(this PlayerControl target) {
             if (MushroomSabotageActive())
             {
                 var instance = ShipStatus.Instance.CastFast<FungleShipStatus>().specialSabotage;
@@ -1561,10 +1623,10 @@ namespace TheOtherRoles
                 target.MixUpOutfit(playerOutfit);
             }
             else
-                target.setLook(target.Data.PlayerName, target.Data.DefaultOutfit.ColorId, target.Data.DefaultOutfit.HatId, target.Data.DefaultOutfit.VisorId, target.Data.DefaultOutfit.SkinId, target.Data.DefaultOutfit.PetId, enforceNightVisionUpdate);
+                target.setLook(target.Data.PlayerName, target.Data.DefaultOutfit.ColorId, target.Data.DefaultOutfit.HatId, target.Data.DefaultOutfit.VisorId, target.Data.DefaultOutfit.SkinId, target.Data.DefaultOutfit.PetId);
         }
 
-        public static void setLook(this PlayerControl target, String playerName, int colorId, string hatId, string visorId, string skinId, string petId, bool enforceNightVisionUpdate = true) {
+        public static void setLook(this PlayerControl target, String playerName, int colorId, string hatId, string visorId, string skinId, string petId) {
             target.RawSetColor(colorId);
             target.RawSetVisor(visorId, colorId);
             target.RawSetHat(hatId, colorId);
@@ -1596,7 +1658,6 @@ namespace TheOtherRoles
 
             target.RawSetPet(petId, colorId);
 
-            if (enforceNightVisionUpdate) Patches.SurveillanceMinigamePatch.enforceNightVision(target);
             Chameleon.update();  // so that morphling and camo wont make the chameleons visible
         }
 
@@ -1961,9 +2022,9 @@ namespace TheOtherRoles
 
         public static bool roleCanUseSabotage(this PlayerControl player) {
             bool roleCouldUse = false;
-            if (Madmate.madmate.Any(x => x.PlayerId == player?.PlayerId) && Madmate.canSabotage)
+            if (player.hasModifier(RoleId.Madmate) && Madmate.canSabotage)
                 roleCouldUse = true;
-            else if (CreatedMadmate.createdMadmate.Any(x => x.PlayerId == player?.PlayerId) && CreatedMadmate.canSabotage)
+            else if (player.hasModifier(RoleId.CreatedMadmate) && CreatedMadmate.canSabotage)
                 roleCouldUse = true;
             else if (player.isRole(RoleId.Janitor) && !Janitor.canSabotage)
                 roleCouldUse = false;
@@ -1986,9 +2047,9 @@ namespace TheOtherRoles
                 roleCouldUse = true;
             else if (Vulture.canUseVents && player.isRole(RoleId.Vulture))
                 roleCouldUse = true;
-            else if (Madmate.canVent && Madmate.madmate.Any(x => x.PlayerId == player.PlayerId))
+            else if (Madmate.canVent && player.hasModifier(RoleId.Madmate))
                 roleCouldUse = true;
-            else if (CreatedMadmate.canEnterVents && CreatedMadmate.createdMadmate.Any(x => x.PlayerId == player.PlayerId))
+            else if (CreatedMadmate.canEnterVents && player.hasModifier(RoleId.CreatedMadmate))
                 roleCouldUse = true;
             else if (player.isRole(RoleId.Moriarty))
                 roleCouldUse = true;
@@ -2019,7 +2080,7 @@ namespace TheOtherRoles
         }
         public static bool checkArmored(PlayerControl target, bool breakShield, bool showShield, bool additionalCondition = true)
         {
-            if (target != null && Armored.armored != null && Armored.armored == target && !Armored.isBrokenArmor && additionalCondition)
+            if (target != null && target.hasModifier(RoleId.Armored) && !Armored.isBrokenArmor && additionalCondition)
             {
                 if (breakShield)
                 {
@@ -2073,7 +2134,7 @@ namespace TheOtherRoles
             }
 
             // Block impostor not fully grown mini kill
-            else if (Mini.mini != null && target == Mini.mini && !Mini.isGrownUp()) {
+            else if (target.hasModifier(RoleId.Mini) && !Mini.isGrownUp()) {
                 return MurderAttemptResult.SuppressKill;
             }
 
@@ -2330,8 +2391,8 @@ namespace TheOtherRoles
                 || (player.Object.isRole(RoleId.Spy) && Spy.hasImpostorVision)
                 || (player.Object.isRole(RoleId.Jester) && Jester.hasImpostorVision)
                 || (player.Object.isRole(RoleId.Thief) && Thief.hasImpostorVision)
-                || (Madmate.madmate.Any(x => x.PlayerId == player.PlayerId) && Madmate.hasImpostorVision)
-                || (CreatedMadmate.createdMadmate.Any(x => x.PlayerId == player.PlayerId) && CreatedMadmate.hasImpostorVision)
+                || (player.Object.hasModifier(RoleId.Madmate) && Madmate.hasImpostorVision)
+                || (player.Object.hasModifier(RoleId.CreatedMadmate) && CreatedMadmate.hasImpostorVision)
                 || player.Object.isRole(RoleId.Moriarty)
                 || JekyllAndHyde.players.Any(x => x.player && x.player.PlayerId == player.PlayerId && !x.isJekyll())
                 || player.Object.isRole(RoleId.Fox)

@@ -150,7 +150,7 @@ namespace TheOtherRoles.Roles
             try
             {
                 // Block setting opacity if the Chameleon skill is active
-                if (Chameleon.chameleon.Any(x => x.PlayerId == player.PlayerId) && Chameleon.visibility(player.PlayerId) < 1f && !isStealthed(player)) return;
+                if (player.hasModifier(RoleId.Chameleon) && Chameleon.visibility(player.PlayerId) < 1f && !isStealthed(player)) return;
                 Helpers.setInvisible(player, color, opacity);
             }
             catch { }

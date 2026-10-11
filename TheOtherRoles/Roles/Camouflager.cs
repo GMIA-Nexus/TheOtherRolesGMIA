@@ -33,8 +33,9 @@ namespace TheOtherRoles.Roles
 
             camouflageTimer = duration;
             if (Helpers.MushroomSabotageActive()) return; // Dont overwrite the fungle "camo"
-            foreach (PlayerControl player in PlayerControl.AllPlayerControls)
-                player.setLook("", 6, "", "", "", "");
+            foreach (var player in TORGameManager.Instance.AllPlayerOutfit()) {
+                player.AddOutfit(new("Camo", 100, true, new() { PlayerName = "", ColorId = 6, HatId = "", VisorId = "", PetId = "", SkinId = "" }));
+            }
         });
 
         public override void PostInit()
@@ -50,6 +51,14 @@ namespace TheOtherRoles.Roles
             return buttonSprite;
         }
 
+        public override void FixedUpdate()
+        {
+            float oldCamouflageTimer = camouflageTimer;
+            camouflageTimer = Mathf.Max(0f, camouflageTimer - Time.fixedDeltaTime);
+            if (oldCamouflageTimer > 0f && camouflageTimer <= 0f)
+                resetCamouflage();
+        }
+
         public override void OnMeetingStart()
         {
             resetCamouflage();
@@ -63,12 +72,8 @@ namespace TheOtherRoles.Roles
 
         public static void resetCamouflage() {
             camouflageTimer = 0f;
-            foreach (PlayerControl p in PlayerControl.AllPlayerControls)
-            {
-                if (Assassin.players.Any(x => x.player == p && x.isInvisble))
-                    continue;
-                p.setDefaultLook();
-            }
+            foreach (var p in TORGameManager.Instance.AllPlayerOutfit())
+                p.RemoveOutfit("Camo");
             if (isRole(PlayerControl.LocalPlayer))
                 acTokenChallenge.Value.kills = 0;
         }

@@ -126,7 +126,7 @@ namespace TheOtherRoles.Roles
             var color = Color.Lerp(Palette.ClearWhite, Palette.White, opacity);
             try
             {
-                if (Chameleon.chameleon.Any(x => x.PlayerId == player.PlayerId) && Chameleon.visibility(player.PlayerId) < 1f && !stealthed) return;
+                if (player.hasModifier(RoleId.Chameleon) && Chameleon.visibility(player.PlayerId) < 1f && !stealthed) return;
                 Helpers.setInvisible(player, color, opacity);
             }
             catch { }

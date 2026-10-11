@@ -53,8 +53,8 @@ namespace TheOtherRoles {
                         || (playerInfo.Object.isRole(RoleId.Pursuer) && playerInfo.IsDead) // Tasks of the Pursuer only count, if he's alive
                         || (playerInfo.Object.isRole(RoleId.Shifter) && Shifter.isNeutral) // Chain-Shifter has tasks, but they don't count
                         || playerInfo.Object.isRole(RoleId.Thief) // Thief's tasks only count after joining crew team as sheriff (and then the thief is not the thief anymore)
-                        || (Madmate.hasTasks && Madmate.madmate.Any(x => x.PlayerId == playerInfo.PlayerId))
-                        || (CreatedMadmate.hasTasks && CreatedMadmate.createdMadmate.Any(x => x.PlayerId == playerInfo.PlayerId))
+                        || (Madmate.hasTasks && playerInfo.Object.hasModifier(RoleId.Madmate))
+                        || (CreatedMadmate.hasTasks && playerInfo.Object.hasModifier(RoleId.CreatedMadmate))
                         || (SchrodingersCat.hideRole && playerInfo.Object.isRole(RoleId.SchrodingersCat))
                         || playerInfo.Object.isRole(RoleId.JekyllAndHyde)
                         || playerInfo.Object.isRole(RoleId.Fox))

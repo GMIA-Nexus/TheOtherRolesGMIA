@@ -76,7 +76,7 @@ namespace TheOtherRoles.Roles
             if (player != PlayerControl.LocalPlayer) return;
             var untargetablePlayers = new List<PlayerControl>();
             if (jackal != null) untargetablePlayers.Add(jackal.player);
-            if (Mini.mini != null && !Mini.isGrownUp()) untargetablePlayers.Add(Mini.mini); // Exclude Sidekick from targeting the Mini unless it has grown up
+            if (Mini.exists && !Mini.isGrownUp()) untargetablePlayers.AddRange(Mini.allPlayers); // Exclude Sidekick from targeting the Mini unless it has grown up
             if (SchrodingersCat.exists && SchrodingersCat.team == SchrodingersCat.Team.Jackal) untargetablePlayers.AddRange(SchrodingersCat.allPlayers);
             currentTarget = setTarget(untargetablePlayers: untargetablePlayers);
             if (canKill) setPlayerOutline(currentTarget, Palette.ImpostorRed);
