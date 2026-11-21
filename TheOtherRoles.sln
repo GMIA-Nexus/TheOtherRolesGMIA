@@ -13,6 +13,8 @@ Global
 		Release|Windows = Release|Windows
 		Debug|Android = Debug|Android
 		Release|Android = Release|Android
+		Debug|iOS = Debug|iOS
+		Release|iOS = Release|iOS
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{11FBC798-BAF5-4EE5-9511-BE6DB0592F99}.Debug|Windows.ActiveCfg = Debug|Windows
@@ -23,12 +25,18 @@ Global
 		{11FBC798-BAF5-4EE5-9511-BE6DB0592F99}.Debug|Android.Build.0 = Debug|Android
 		{11FBC798-BAF5-4EE5-9511-BE6DB0592F99}.Release|Android.ActiveCfg = Release|Android
 		{11FBC798-BAF5-4EE5-9511-BE6DB0592F99}.Release|Android.Build.0 = Release|Android
+		{11FBC798-BAF5-4EE5-9511-BE6DB0592F99}.Debug|iOS.ActiveCfg = Debug|iOS
+		{11FBC798-BAF5-4EE5-9511-BE6DB0592F99}.Debug|iOS.Build.0 = Debug|iOS
+		{11FBC798-BAF5-4EE5-9511-BE6DB0592F99}.Release|iOS.ActiveCfg = Release|iOS
+		{11FBC798-BAF5-4EE5-9511-BE6DB0592F99}.Release|iOS.Build.0 = Release|iOS
 		{73A5662B-9C59-4C97-95C5-F5B2A8BBDDCA}.Debug|Windows.ActiveCfg = Debug|Win32
 		{73A5662B-9C59-4C97-95C5-F5B2A8BBDDCA}.Debug|Windows.Build.0 = Debug|Win32
 		{73A5662B-9C59-4C97-95C5-F5B2A8BBDDCA}.Release|Windows.ActiveCfg = Release|Win32
 		{73A5662B-9C59-4C97-95C5-F5B2A8BBDDCA}.Release|Windows.Build.0 = Release|Win32
 		{73A5662B-9C59-4C97-95C5-F5B2A8BBDDCA}.Debug|Android.ActiveCfg = Debug|Win32
 		{73A5662B-9C59-4C97-95C5-F5B2A8BBDDCA}.Release|Android.ActiveCfg = Release|Win32
+		{73A5662B-9C59-4C97-95C5-F5B2A8BBDDCA}.Debug|iOS.ActiveCfg = Debug|Win32
+		{73A5662B-9C59-4C97-95C5-F5B2A8BBDDCA}.Release|iOS.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

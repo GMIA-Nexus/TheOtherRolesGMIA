@@ -2,11 +2,14 @@
   "version": 1,
   "dependencies": {
     "net6.0": {
-      "AmongUs.GameLibs.Steam": {
+      "AmongUs.GameLibs.iOS": {
         "type": "Direct",
-        "requested": "[2026.9.29, )",
-        "resolved": "2026.9.29",
-        "contentHash": "LhZAevu5OV03KpFLjqXRb9RP2rrWbm8xemdIyNFQVPOVwV0etInH2BZFpDBBIrSnqGzCWa7qOHBhIaVDIfk/jA=="
+        "requested": "[2026.11.3, )",
+        "resolved": "2026.11.3",
+        "contentHash": "IS7K1f9uDTiSuePFfp/feU5we2LTpJxNPd7U9+GSULXPNnh0fTU4ADT66D779WDhZVLtGz20Bo1uALEBODgbAg==",
+        "dependencies": {
+          "Il2CppInterop.Runtime": "1.5.2"
+        }
       },
       "BepInEx.IL2CPP.MSBuild": {
         "type": "Direct",
@@ -127,8 +130,8 @@
       },
       "Il2CppInterop.Common": {
         "type": "Transitive",
-        "resolved": "1.4.6-ci.426",
-        "contentHash": "pI0kU0qqJKMP6z9eFz4+WJtGIwklfPxW2yWEY9vKnrN9bbYMusK3v5uFWV8al7S/HPSATV5jNWH1hyTvP7kglA==",
+        "resolved": "1.5.3",
+        "contentHash": "ziFbpzgXtqTvIwpfva9z3vlhjXrKYHfXDF5barssiFcc0YdFkQyT8FlIVQzDnycVdgPcKjzXD7goFaWddKg/KA==",
         "dependencies": {
           "Iced": "1.17.0",
           "Microsoft.Extensions.Logging.Abstractions": "6.0.1",
@@ -155,11 +158,11 @@
       },
       "Il2CppInterop.Runtime": {
         "type": "Transitive",
-        "resolved": "1.4.6-ci.426",
-        "contentHash": "0O0oI7gOqJixrsjvh1firhuGYK3Yr0uDLp6Q+t5CfcTMmeEX8Plk3pqAP9ZYyilBvh7uW0gv4Golqz08L1GXug==",
+        "resolved": "1.5.3",
+        "contentHash": "kV7UJ9Ra7kHAmFguM2DcD8CBiqM2PYSAUqb/0OajgrAw8yJKxSFmzOjcu653ZMLJ+kVi0XXEO/+uwEspKGCbLQ==",
         "dependencies": {
           "Iced": "1.17.0",
-          "Il2CppInterop.Common": "1.4.6-ci.426"
+          "Il2CppInterop.Common": "1.5.3"
         }
       },
       "Microsoft.Extensions.Logging.Abstractions": {

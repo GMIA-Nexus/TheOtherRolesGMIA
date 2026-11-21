@@ -381,7 +381,7 @@ namespace TheOtherRoles.Patches
             }
             ShipStatus.Instance.StartSFX();
             UnityEngine.Object.Destroy(__instance.gameObject);
-#if ANDROID
+#if ANDROID || iOS
             IntroCutsceneOnDestroyPatch.Prefix(__instance);
 #endif
             yield break;
