@@ -31,13 +31,13 @@
 	</PropertyGroup>
     
     <PropertyGroup Condition="'$(Platform)' == 'iOS'">
-        <RestoreAdditionalProjectSources>$(MSBuildThisFileDirectory)..\libs\iOS;$(RestoreAdditionalProjectSources)</RestoreAdditionalProjectSources>
+        <RestoreAdditionalProjectSources>$(MSBuildThisFileDirectory)../libs/iOS;$(RestoreAdditionalProjectSources)</RestoreAdditionalProjectSources>
     </PropertyGroup>
     
 	<ItemGroup>
-		<EmbeddedResource Include="Resources\**" Exclude="Resources\AssetsBundle\assetsbundle-Android" Condition="'$(Platform)' == 'Windows'" />
+		<EmbeddedResource Include="Resources\**" Exclude="Resources\AssetsBundle\assetsbundle-Android" Condition="'$(Platform)' == 'Android'" />
 
-		<EmbeddedResource Include="Resources\**" Exclude="Resources\AssetsBundle\assetsbundle-Windows" Condition="'$(Platform)' == 'Android'" />
+		<EmbeddedResource Include="Resources\**" Exclude="Resources\AssetsBundle\assetsbundle-Windows" Condition="'$(Platform)' == 'Windows'" />
 	</ItemGroup>
 
 	<ItemGroup>
