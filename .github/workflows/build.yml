@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        config: [Windows, Android]
+        platform: [Windows, Android]
     steps:
       - uses: actions/cache@v4
         with:
@@ -30,11 +30,11 @@ jobs:
         with:
           dotnet-version: 6.x
 
-      - name: Build ${{ matrix.config }}
-        run: dotnet build TheOtherRoles/TheOtherRoles.csproj --configuration ${{ matrix.config }}
+      - name: Build ${{ matrix.platform }}
+        run: dotnet build TheOtherRoles/TheOtherRoles.csproj --configuration Release --property:Platform=${{ matrix.platform }}
 
-      - name: Upload artifact for ${{ matrix.config }}
+      - name: Upload artifact for ${{ matrix.platform }}
         uses: actions/upload-artifact@v4
         with:
-          name: TheOtherRoles-${{ matrix.config }}
-          path: TheOtherRoles/bin/${{ matrix.config }}/net6.0/TheOtherRoles.dll
+          name: TheOtherRoles-${{ matrix.platform }}
+          path: TheOtherRoles/bin/${{ matrix.platform }}/Release/net6.0/TheOtherRoles.dll
