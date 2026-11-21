@@ -9,18 +9,26 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TheOtherUpdater", "TheOther
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
+		Debug|Windows = Debug|Windows
+		Release|Windows = Release|Windows
+		Debug|Android = Debug|Android
+		Release|Android = Release|Android
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{11FBC798-BAF5-4EE5-9511-BE6DB0592F99}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{11FBC798-BAF5-4EE5-9511-BE6DB0592F99}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{11FBC798-BAF5-4EE5-9511-BE6DB0592F99}.Release|Any CPU.ActiveCfg = Windows|Any CPU
-		{11FBC798-BAF5-4EE5-9511-BE6DB0592F99}.Release|Any CPU.Build.0 = Windows|Any CPU
-		{73A5662B-9C59-4C97-95C5-F5B2A8BBDDCA}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{73A5662B-9C59-4C97-95C5-F5B2A8BBDDCA}.Debug|Any CPU.Build.0 = Debug|Win32
-		{73A5662B-9C59-4C97-95C5-F5B2A8BBDDCA}.Release|Any CPU.ActiveCfg = Release|Win32
-		{73A5662B-9C59-4C97-95C5-F5B2A8BBDDCA}.Release|Any CPU.Build.0 = Release|Win32
+		{11FBC798-BAF5-4EE5-9511-BE6DB0592F99}.Debug|Windows.ActiveCfg = Debug|Windows
+		{11FBC798-BAF5-4EE5-9511-BE6DB0592F99}.Debug|Windows.Build.0 = Debug|Windows
+		{11FBC798-BAF5-4EE5-9511-BE6DB0592F99}.Release|Windows.ActiveCfg = Release|Windows
+		{11FBC798-BAF5-4EE5-9511-BE6DB0592F99}.Release|Windows.Build.0 = Release|Windows
+		{11FBC798-BAF5-4EE5-9511-BE6DB0592F99}.Debug|Android.ActiveCfg = Debug|Android
+		{11FBC798-BAF5-4EE5-9511-BE6DB0592F99}.Debug|Android.Build.0 = Debug|Android
+		{11FBC798-BAF5-4EE5-9511-BE6DB0592F99}.Release|Android.ActiveCfg = Release|Android
+		{11FBC798-BAF5-4EE5-9511-BE6DB0592F99}.Release|Android.Build.0 = Release|Android
+		{73A5662B-9C59-4C97-95C5-F5B2A8BBDDCA}.Debug|Windows.ActiveCfg = Debug|Win32
+		{73A5662B-9C59-4C97-95C5-F5B2A8BBDDCA}.Debug|Windows.Build.0 = Debug|Win32
+		{73A5662B-9C59-4C97-95C5-F5B2A8BBDDCA}.Release|Windows.ActiveCfg = Release|Win32
+		{73A5662B-9C59-4C97-95C5-F5B2A8BBDDCA}.Release|Windows.Build.0 = Release|Win32
+		{73A5662B-9C59-4C97-95C5-F5B2A8BBDDCA}.Debug|Android.ActiveCfg = Debug|Win32
+		{73A5662B-9C59-4C97-95C5-F5B2A8BBDDCA}.Release|Android.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

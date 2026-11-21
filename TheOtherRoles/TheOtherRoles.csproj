@@ -8,7 +8,7 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
         <PlatformTarget>AnyCPU</PlatformTarget>
-		<Configurations>Windows;Android;</Configurations>
+		<Platforms>Windows;Android</Platforms>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
       <LangVersion>preview</LangVersion>
@@ -22,14 +22,14 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="Resources\**" Exclude="Resources\AssetsBundle\assetsbundle-Android" Condition="'$(Configuration)' == 'Windows'" />
+		<EmbeddedResource Include="Resources\**" Exclude="Resources\AssetsBundle\assetsbundle-Android" Condition="'$(Platform)' == 'Windows'" />
 
-		<EmbeddedResource Include="Resources\**" Exclude="Resources\AssetsBundle\assetsbundle-Windows" Condition="'$(Configuration)' == 'Android'" />
+		<EmbeddedResource Include="Resources\**" Exclude="Resources\AssetsBundle\assetsbundle-Windows" Condition="'$(Platform)' == 'Android'" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AmongUs.GameLibs.Android" Version="2026.9.29" Condition="'$(Configuration)' == 'Android'" />
-		<PackageReference Include="AmongUs.GameLibs.Steam" Version="2026.9.29" Condition="'$(Configuration)' == 'Windows'" />
+		<PackageReference Include="AmongUs.GameLibs.Android" Version="2026.9.29" Condition="'$(Platform)' == 'Android'" />
+		<PackageReference Include="AmongUs.GameLibs.Steam" Version="2026.9.29" Condition="'$(Platform)' == 'Windows'" />
         <PackageReference Include="BepInEx.Unity.IL2CPP" Version="6.0.0-be.735" />
 		<PackageReference Include="BepInEx.IL2CPP.MSBuild" Version="2.1.0-rc.1" />
         <PackageReference Include="Reactor" Version="2.5.1-ci.400" />
