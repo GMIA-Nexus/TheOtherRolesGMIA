@@ -39,12 +39,12 @@ namespace TheOtherRoles.Patches {
                 if (SubmergedCompatibility.getInTransition()) {
                     __result = float.MaxValue;
                     return canUse = couldUse = false;
-                }                
+                }
                 switch (__instance.Id) {
                     case 9:  // Cannot enter vent 9 (Engine Room Exit Only Vent)!
                         if (PlayerControl.LocalPlayer.inVent) break;
                         __result = float.MaxValue;
-                        return canUse = couldUse = false;                    
+                        return canUse = couldUse = false;
                     case 14: // Lower Central
                         __result = float.MaxValue;
                         couldUse = roleCouldUse && !pc.IsDead && (@object.CanMove || @object.inVent);
@@ -61,15 +61,15 @@ namespace TheOtherRoles.Patches {
 
             var usableDistance = __instance.UsableDistance;
             if (__instance.name.StartsWith("JackInTheBoxVent_")) {
-                if(!PlayerControl.LocalPlayer.isRole(RoleId.Trickster)) {
+                if (!PlayerControl.LocalPlayer.isRole(RoleId.Trickster)) {
                     // Only the Trickster can use the Jack-In-The-Boxes!
                     canUse = false;
                     couldUse = false;
                     __result = num;
-                    return false; 
+                    return false;
                 } else {
                     // Reduce the usable distance to reduce the risk of gettings stuck while trying to jump into the box if it's placed near objects
-                    usableDistance = 0.4f; 
+                    usableDistance = 0.4f;
                 }
             }
 
@@ -89,9 +89,9 @@ namespace TheOtherRoles.Patches {
 
     [HarmonyPatch(typeof(VentButton), nameof(VentButton.DoClick))]
     class VentButtonDoClickPatch {
-        static  bool Prefix(VentButton __instance) {
+        static bool Prefix(VentButton __instance) {
             // Manually modifying the VentButton to use Vent.Use again in order to trigger the Vent.Use prefix patch
-		    if (__instance.currentTarget != null && !Deputy.handcuffedKnows.ContainsKey(PlayerControl.LocalPlayer.PlayerId)) __instance.currentTarget.Use();
+            if (__instance.currentTarget != null && !Deputy.handcuffedKnows.ContainsKey(PlayerControl.LocalPlayer.PlayerId)) __instance.currentTarget.Use();
             return false;
         }
     }
@@ -116,7 +116,7 @@ namespace TheOtherRoles.Patches {
             if (!canUse) return false; // No need to execute the native method as using is disallowed anyways
 
             bool isEnter = !PlayerControl.LocalPlayer.inVent;
-            
+
             if (__instance.name.StartsWith("JackInTheBoxVent_")) {
                 __instance.SetButtons(isEnter && canMoveInVents);
                 MessageWriter writer = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.UseUncheckedVent, Hazel.SendOption.Reliable);
@@ -129,7 +129,7 @@ namespace TheOtherRoles.Patches {
                 return false;
             }
 
-            if(isEnter) {
+            if (isEnter) {
                 PlayerControl.LocalPlayer.MyPhysics.RpcEnterVent(__instance.Id);
             } else {
                 PlayerControl.LocalPlayer.MyPhysics.RpcExitVent(__instance.Id);
@@ -171,7 +171,7 @@ namespace TheOtherRoles.Patches {
             if (PlayerControl.LocalPlayer.isRole(RoleId.Trickster)) {
                 if (defaultVentSprite == null) defaultVentSprite = __instance.graphic.sprite;
                 bool isSpecialVent = __instance.currentTarget != null && __instance.currentTarget.gameObject != null && __instance.currentTarget.gameObject.name.StartsWith("JackInTheBoxVent_");
-                __instance.graphic.sprite = isSpecialVent ?  Trickster.getTricksterVentButtonSprite() : defaultVentSprite;
+                __instance.graphic.sprite = isSpecialVent ? Trickster.getTricksterVentButtonSprite() : defaultVentSprite;
                 __instance.buttonLabelText.enabled = !isSpecialVent;
             }
         }
@@ -194,7 +194,7 @@ namespace TheOtherRoles.Patches {
                     Deputy.setHandcuffedKnows();
                     return false;
                 }
-                
+
                 // Use an unchecked kill command, to allow shorter kill cooldowns etc. without getting kicked
                 MurderAttemptResult res = Helpers.checkMurderAttemptAndKill(PlayerControl.LocalPlayer, __instance.currentTarget, showAnimation: showAnimation);
                 // Handle blank kill
@@ -301,8 +301,8 @@ namespace TheOtherRoles.Patches {
                 __instance.ButtonActive = remaining > 0;
                 __instance.ClosedLid.gameObject.SetActive(!__instance.ButtonActive);
                 __instance.OpenLid.gameObject.SetActive(__instance.ButtonActive);
-				return;
-			}
+                return;
+            }
         }
     }
 
@@ -344,7 +344,7 @@ namespace TheOtherRoles.Patches {
         static void Postfix(SwitchMinigame __instance) {
             // Block Swapper from fixing lights. One could also just delete the PlayerTask, but I wanted to do it the same way as with coms for now.
             if (PlayerControl.LocalPlayer.isRole(RoleId.Swapper) ||
-                PlayerControl.LocalPlayer.hasModifier(RoleId.Madmate) || 
+                PlayerControl.LocalPlayer.hasModifier(RoleId.Madmate) ||
                 PlayerControl.LocalPlayer.hasModifier(RoleId.CreatedMadmate)) {
                 __instance.Close();
             }
@@ -396,7 +396,7 @@ namespace TheOtherRoles.Patches {
                 //Fix Visor in Vitals
                 foreach (VitalsPanel panel in __instance.vitals) {
                     if (panel.PlayerIcon != null && panel.PlayerIcon.cosmetics.skin != null) {
-                         panel.PlayerIcon.cosmetics.skin.transform.position = new Vector3(0, 0, 0f);
+                        panel.PlayerIcon.cosmetics.skin.transform.position = new Vector3(0, 0, 0f);
                     }
                 }
             }
@@ -476,7 +476,7 @@ namespace TheOtherRoles.Patches {
                 }
 
                 // Hacker show time since death
-                
+
                 if (Hacker.players.Any(x => x.player == PlayerControl.LocalPlayer && x.hackerTimer > 0)) {
                     for (int k = 0; k < __instance.vitals.Length; k++) {
                         VitalsPanel vitalsPanel = __instance.vitals[k];
@@ -587,8 +587,8 @@ namespace TheOtherRoles.Patches {
                 __instance.timer = 0f;
                 players = [];
                 bool commsActive = false;
-                    foreach (PlayerTask task in PlayerControl.LocalPlayer.myTasks.GetFastEnumerator())
-                        if (task.TaskType == TaskTypes.FixComms) commsActive = true;
+                foreach (PlayerTask task in PlayerControl.LocalPlayer.myTasks.GetFastEnumerator())
+                    if (task.TaskType == TaskTypes.FixComms) commsActive = true;
 
 
                 // Restrict admin for Busker
@@ -1043,7 +1043,7 @@ namespace TheOtherRoles.Patches {
         public static void Postfix(PlayerControl __instance, SpriteRenderer rend) {
             if (!nightVisionIsActive) return;
             foreach (DeadBody deadBody in GameObject.FindObjectsOfType<DeadBody>()) {
-                foreach (SpriteRenderer component in new SpriteRenderer[2] { deadBody.bodyRenderers.FirstOrDefault(), deadBody.bloodSplatter }) { 
+                foreach (SpriteRenderer component in new SpriteRenderer[2] { deadBody.bodyRenderers.FirstOrDefault(), deadBody.bloodSplatter }) {
                     component.material.SetColor("_BackColor", Palette.ShadowColors[11]);
                     component.material.SetColor("_BodyColor", Palette.PlayerColors[11]);
                 }
@@ -1069,4 +1069,21 @@ namespace TheOtherRoles.Patches {
         }
     }
 
+    [HarmonyPatch(typeof(MatchInfoHudButton), nameof(MatchInfoHudButton.Update))]
+    internal class MatchInfoHudButtonPatch
+    {
+        public static bool Prefix(MatchInfoHudButton __instance)
+        {
+            __instance.gameObject.SetActive(false);
+            return false;
+        }
+    }
+    [HarmonyPatch(typeof(HudManager), nameof(HudManager.SetHudActive), typeof(PlayerControl), typeof(RoleBehaviour), typeof(bool))]
+    public static class HudManagerPatch
+    {
+        public static void Postfix(HudManager __instance, PlayerControl localPlayer, RoleBehaviour role, bool isActive)
+        {
+            if (__instance.MatchInfoButton) __instance.MatchInfoButton.gameObject.SetActive(false);
+        }
+    }
 }

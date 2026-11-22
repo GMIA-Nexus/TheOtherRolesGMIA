@@ -128,6 +128,7 @@ namespace TheOtherRoles
         Radar,
         Chameleon,
         Armored,
+        Incompetent,
         //Shifter
     }
 
@@ -1486,6 +1487,7 @@ namespace TheOtherRoles
             var armored = Armored.allPlayers.FirstOrDefault();
             if (armored == null || Armored.isBrokenArmor) return;
             Armored.isBrokenArmor = true;
+            if (PlayerControl.LocalPlayer == armored) new StaticAchievementToken("armored.challenge");
             if (PlayerControl.LocalPlayer.Data.IsDead)
             {
                 armored.ShowFailedMurder();
@@ -1840,7 +1842,11 @@ namespace TheOtherRoles
             firstKillPlayer = target;
         });
 
-        public static RemoteProcess SetTieBreak = new("SetTieBreak", (_) => Tiebreaker.isTiebreak = true);
+        public static RemoteProcess SetTieBreak = new("SetTieBreak", (_) => {
+            Tiebreaker.isTiebreak = true;
+            if (PlayerControl.LocalPlayer.hasModifier(RoleId.Tiebreaker))
+                new StaticAchievementToken("tiebreaker.challenge");
+        });
 
         public static void thiefStealsRole(byte playerId, byte thiefId) {
             // Notify that the Thief cannot steal the Mimic
@@ -2030,6 +2036,8 @@ namespace TheOtherRoles
                     float timer = reader.ReadSingle();
                     if (!AmongUsClient.Instance.AmHost && timer >= 0f) GameStartManagerPatch.timer = timer;
                     int versionOwnerId = reader.ReadPackedInt32();
+                    string subVer = reader.ReadString();
+                    bool isAndroid = reader.ReadBoolean();
                     byte revision = 0xFF;
                     Guid guid;
                     if (reader.Length - reader.Position >= 17) { // enough bytes left to read
@@ -2040,7 +2048,7 @@ namespace TheOtherRoles
                     } else {
                         guid = new Guid(new byte[16]);
                     }
-                    RPCProcedure.versionHandshake(major, minor, patch, revision == 0xFF ? -1 : revision, guid, versionOwnerId, reader.ReadString(), reader.ReadBoolean());
+                    RPCProcedure.versionHandshake(major, minor, patch, revision == 0xFF ? -1 : revision, guid, versionOwnerId, subVer, isAndroid);
                     break;
                 case (byte)CustomRPC.UseUncheckedVent:
                     int ventId = reader.ReadPackedInt32();

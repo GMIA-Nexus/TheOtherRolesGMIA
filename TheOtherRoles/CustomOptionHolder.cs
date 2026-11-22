@@ -194,12 +194,14 @@ namespace TheOtherRoles {
 
         public static CustomRoleOption engineerSpawnRate;
         public static CustomOption engineerNumberOfFixes;
+        public static CustomOption engineerResetFixesAfterMeeting;
         public static CustomOption engineerHighlightForImpostors;
         public static CustomOption engineerHighlightForTeamJackal;
 
         public static CustomRoleOption sheriffSpawnRate;
         public static CustomOption sheriffCooldown;
         public static CustomOption sheriffCanKillNeutrals;
+        public static CustomOption sheriffMisfireKills;
         public static CustomOption deputySpawnRate;
         public static CustomOption deputyRoleCount;
 
@@ -265,8 +267,7 @@ namespace TheOtherRoles {
         public static CustomRoleOption jailorSpawnRate;
         public static CustomOption jailorCooldown;
         public static CustomOption jailorNumberOfJails;
-        public static CustomOption jailorSuicidesIfFalseJail;
-        public static CustomOption jailorTargetDiesIfFalseJail;
+        public static CustomOption jailorFalseJailKills;
 
         public static CustomRoleOption noisemakerSpawnRate;
         public static CustomOption noisemakerCooldown;
@@ -556,53 +557,48 @@ namespace TheOtherRoles {
 
         public static CustomOption modifiersAreHidden;
 
-        public static CustomOption modifierLover;
+        public static CustomModifierOption modifierLover;
         public static CustomOption modifierLoverImpLoverRate;
-        public static CustomOption modifierLoverQuantity;
         public static CustomOption modifierLoverBothDie;
         public static CustomOption modifierLoverEnableChat;
 
-        public static CustomOption modifierBloody;
-        public static CustomOption modifierBloodyQuantity;
+        public static CustomModifierOption modifierBloody;
         public static CustomOption modifierBloodyDuration;
 
-        public static CustomOption modifierAntiTeleport;
-        public static CustomOption modifierAntiTeleportQuantity;
+        public static CustomModifierOption modifierAntiTeleport;
 
-        public static CustomOption modifierTieBreaker;
+        public static CustomModifierOption modifierTieBreaker;
 
-        public static CustomOption modifierRadar;
+        public static CustomModifierOption modifierRadar;
 
-        public static CustomOption modifierSunglasses;
-        public static CustomOption modifierSunglassesQuantity;
+        public static CustomModifierOption modifierSunglasses;
         public static CustomOption modifierSunglassesVision;
         
-        public static CustomOption modifierMini;
+        public static CustomModifierOption modifierMini;
         public static CustomOption modifierMiniGrowingUpDuration;
         public static CustomOption modifierMiniGrowingUpInMeeting;
 
-        public static CustomOption modifierVip;
-        public static CustomOption modifierVipQuantity;
+        public static CustomModifierOption modifierVip;
         public static CustomOption modifierVipShowColor;
 
-        public static CustomOption modifierInvert;
-        public static CustomOption modifierInvertQuantity;
+        public static CustomModifierOption modifierInvert;
         public static CustomOption modifierInvertDuration;
 
-        public static CustomOption modifierDiseased;
-        public static CustomOption modifierDiseasedQuantity;
+        public static CustomModifierOption modifierDiseased;
         public static CustomOption modifierDiseasedMultiplier;
 
-        public static CustomOption modifierChameleon;
-        public static CustomOption modifierChameleonQuantity;
+        public static CustomModifierOption modifierChameleon;
         public static CustomOption modifierChameleonHoldDuration;
         public static CustomOption modifierChameleonFadeDuration;
         public static CustomOption modifierChameleonMinVisibility;
 
-        public static CustomOption modifierMultitasker;
-        public static CustomOption modifierMultitaskerQuantity;
+        public static CustomModifierOption modifierMultitasker;
 
-        public static CustomOption modifierArmored;
+        public static CustomModifierOption modifierArmored;
+
+        public static CustomModifierOption modifierIncompetent;
+        public static CustomOption modifierIncompetentShuffleChance;
+        public static CustomOption modifierIncompetentMaxShufflePair;
 
         public static CustomOption madmateSpawnRate;
         public static CustomOption madmateQuantity;
@@ -1074,12 +1070,14 @@ namespace TheOtherRoles {
 
             engineerSpawnRate = new CustomRoleOption(90, Types.Crewmate, "engineer", Engineer.color);
             engineerNumberOfFixes = CustomOption.Create(91, Types.Crewmate, "engineerNumberOfFixes", 1f, 1f, 6f, 1f, engineerSpawnRate, false, "unitShots");
+            engineerResetFixesAfterMeeting = CustomOption.Create(94, Types.Crewmate, "engineerResetFixesAfterMeeting", true, engineerSpawnRate);
             engineerHighlightForImpostors = CustomOption.Create(92, Types.Crewmate, "engineerHighlightForImpostors", true, engineerSpawnRate);
             engineerHighlightForTeamJackal = CustomOption.Create(93, Types.Crewmate, "engineerHighlightForTeamJackal", true, engineerSpawnRate);
 
             sheriffSpawnRate = new CustomRoleOption(100, Types.Crewmate, "sheriff", Sheriff.color);
             sheriffCooldown = CustomOption.Create(101, Types.Crewmate, "sheriffCooldown", 30f, 10f, 60f, 2.5f, sheriffSpawnRate, false, "unitSeconds");
             sheriffCanKillNeutrals = CustomOption.Create(102, Types.Crewmate, "sheriffCanKillNeutrals", false, sheriffSpawnRate);
+            sheriffMisfireKills = CustomOption.Create(4018, Types.Crewmate, "sheriffMisfireKills", ["sheriffMisSelf", "sheriffMissTarget", "sheriffMisBoth"], sheriffSpawnRate);
             deputySpawnRate = CustomOption.Create(103, Types.Crewmate, "sheriffDeputy", rates, sheriffSpawnRate); 
             deputyRoleCount = CustomOption.Create(4017, Types.Crewmate, "deputyRoleCount", 1f, 1f, 24f, 1f, deputySpawnRate, format: "unitPlayers");
             deputyNumberOfHandcuffs = CustomOption.Create(104, Types.Crewmate, "deputyNumberOfHandcuffs", 3f, 1f, 10f, 1f, deputySpawnRate, false, "unitScrews");
@@ -1176,8 +1174,7 @@ namespace TheOtherRoles {
             jailorSpawnRate = new CustomRoleOption(4054, Types.Crewmate, "jailor", Jailor.color);
             jailorCooldown = CustomOption.Create(4055, Types.Crewmate, "jailorCooldown", 30f, 1f, 60f, 1f, jailorSpawnRate, false, "unitSeconds");
             jailorNumberOfJails = CustomOption.Create(4076, Types.Crewmate, "jailorNumberOfJails", 5f, 1f, 15f, 1f, jailorSpawnRate, false, "unitScrews");
-            jailorSuicidesIfFalseJail = CustomOption.Create(4077, Types.Crewmate, "jailorSuicidesIfFalseJail", true, jailorSpawnRate);
-            jailorTargetDiesIfFalseJail = CustomOption.Create(4078, Types.Crewmate, "jailorTargetDiesIfFalseJail", false, jailorSpawnRate);
+            jailorFalseJailKills = CustomOption.Create(4077, Types.Crewmate, "jailorFalseJailKills", ["jailorExeNone", "jailorExeSelf", "jailorExeTarget", "jailorExeBoth"], jailorSpawnRate);
 
             buskerSpawnRate = new CustomRoleOption(8040, Types.Crewmate, "busker", Busker.color);
             buskerCooldown = CustomOption.Create(8041, Types.Crewmate, "buskerCooldown", 20f, 5f, 60f, 2.5f, buskerSpawnRate, false, "unitSeconds");
@@ -1280,28 +1277,24 @@ namespace TheOtherRoles {
             // Modifier (1000 - 1999)
             modifiersAreHidden = CustomOption.Create(1009, Types.Modifier, cs(Color.yellow, "vipbloodyHidden"), true, null, true, heading: cs(Color.yellow, "modifiersAreHidden"));
 
-            modifierBloody = CustomOption.Create(1000, Types.Modifier, cs(Color.yellow, "bloody"), rates, null, true, color: Color.yellow);
-            modifierBloodyQuantity = CustomOption.Create(1001, Types.Modifier, cs(Color.yellow, "bloodyQuantity"), ratesModifier, modifierBloody);
+            modifierBloody = new CustomModifierOption(1000, Types.Modifier, "bloody", RoleId.Bloody);
             modifierBloodyDuration = CustomOption.Create(1002, Types.Modifier, "bloodDuration", 10f, 3f, 60f, 1f, modifierBloody, false, "unitSeconds");
 
-            modifierAntiTeleport = CustomOption.Create(1010, Types.Modifier, cs(Color.yellow, "antiTeleport"), rates, null, true, color: Color.yellow);
-            modifierAntiTeleportQuantity = CustomOption.Create(1011, Types.Modifier, cs(Color.yellow, "antiTeleportQuantity"), ratesModifier, modifierAntiTeleport);
+            modifierAntiTeleport = new CustomModifierOption(1010, Types.Modifier, "antiTeleport", RoleId.AntiTeleport);
 
-            modifierTieBreaker = CustomOption.Create(1020, Types.Modifier, cs(Color.yellow, "tiebreakerLongDesc"), rates, null, true, color: Color.yellow);
+            modifierTieBreaker = new CustomModifierOption(1020, Types.Modifier, "tiebreakerLongDesc", RoleId.Tiebreaker, 1);
 
-            modifierRadar = CustomOption.Create(1800, Types.Modifier, cs(Color.yellow, "radar"), rates, null, true, color: Color.yellow);
+            modifierRadar = new CustomModifierOption(1800, Types.Modifier, "radar", RoleId.Radar, 1);
 
-            modifierLover = CustomOption.Create(1040, Types.Modifier, cs(Color.yellow, "lovers"), rates, null, true, color: Color.yellow);
+            modifierLover = new CustomModifierOption(1040, Types.Modifier, "lovers", RoleId.Lover, 6, format: "unitCouples");
             modifierLoverImpLoverRate = CustomOption.Create(1041, Types.Modifier, "loversImpLoverRate", rates, modifierLover);
-            modifierLoverQuantity = CustomOption.Create(1044, Types.Modifier, "loversQuantity", 1f, 1f, 6f, 1f, modifierLover, format: "unitCouples");
             modifierLoverBothDie = CustomOption.Create(1042, Types.Modifier, "loversBothDie", true, modifierLover);
             modifierLoverEnableChat = CustomOption.Create(1043, Types.Modifier, "loversEnableChat", true, modifierLover);
 
-            modifierSunglasses = CustomOption.Create(1050, Types.Modifier, cs(Color.yellow, "sunglasses"), rates, null, true, color: Color.yellow);
-            modifierSunglassesQuantity = CustomOption.Create(1051, Types.Modifier, cs(Color.yellow, "sunglassesQuantity"), ratesModifier, modifierSunglasses);
+            modifierSunglasses = new CustomModifierOption(1050, Types.Modifier, "sunglasses", RoleId.Sunglasses, modifierFilter: TheOtherRoles.RoleHelpers.CrewmateRoles);
             modifierSunglassesVision = CustomOption.Create(1052, Types.Modifier, "sunglassesVision", ["-10%", "-20%", "-30%", "-40%", "-50%"], modifierSunglasses);
 
-            modifierMini = CustomOption.Create(1061, Types.Modifier, cs(Color.yellow, "mini"), rates, null, true, color: Color.yellow);
+            modifierMini = new CustomModifierOption(1061, Types.Modifier, "mini", RoleId.Mini, 1);
             modifierMiniGrowingUpDuration = CustomOption.Create(1062, Types.Modifier, "miniGrowingUpDuration", 400f, 100f, 1500f, 100f, modifierMini, false, "unitSeconds");
             modifierMiniGrowingUpInMeeting = CustomOption.Create(1063, Types.Modifier, "miniGrowingUpInMeeting", true, modifierMini);
             if (Utilities.EventUtility.canBeEnabled || Utilities.EventUtility.isEnabled)
@@ -1311,28 +1304,27 @@ namespace TheOtherRoles {
                 eventReallyNoMini = CustomOption.Create(10426, Types.Modifier, cs(Color.green, "eventReallyNoMini"), false, modifierMini, invertedParent: true);
             }
 
-            modifierVip = CustomOption.Create(1070, Types.Modifier, cs(Color.yellow, "vip"), rates, null, true, color: Color.yellow);
-            modifierVipQuantity = CustomOption.Create(1071, Types.Modifier, cs(Color.yellow, "vipQuantity"), ratesModifier, modifierVip);
+            modifierVip = new CustomModifierOption(1070, Types.Modifier, "vip", RoleId.Vip);
             modifierVipShowColor = CustomOption.Create(1072, Types.Modifier, "vipShowColor", true, modifierVip);
 
-            modifierInvert = CustomOption.Create(1080, Types.Modifier, cs(Color.yellow, "invert"), rates, null, true, color: Color.yellow);
-            modifierInvertQuantity = CustomOption.Create(1081, Types.Modifier, cs(Color.yellow, "invertQuantity"), ratesModifier, modifierInvert);
+            modifierInvert = new CustomModifierOption(1080, Types.Modifier, "invert", RoleId.Invert);
             modifierInvertDuration = CustomOption.Create(1082, Types.Modifier, "invertDuration", 3f, 1f, 15f, 1f, modifierInvert, false, "unitScrews");
 
-            modifierDiseased = CustomOption.Create(4990, Types.Modifier, cs(Color.yellow, "diseased"), rates, null, true, color: Color.yellow);
-            modifierDiseasedQuantity = CustomOption.Create(4991, Types.Modifier, cs(Color.yellow, "diseasedQuantity"), ratesModifier, modifierDiseased);
+            modifierDiseased = new CustomModifierOption(4990, Types.Modifier, "diseased", RoleId.Diseased, modifierFilter: TheOtherRoles.RoleHelpers.CrewmateRoles);
             modifierDiseasedMultiplier = CustomOption.Create(4992, Types.Modifier, "diseasedMultiplier", 3f, 1.25f, 5f, 0.25f, modifierDiseased, false, "unitTimes");
 
-            modifierChameleon = CustomOption.Create(1090, Types.Modifier, cs(Color.yellow, "chameleon"), rates, null, true, color: Color.yellow);
-            modifierChameleonQuantity = CustomOption.Create(1091, Types.Modifier, cs(Color.yellow, "chameleonQuantity"), ratesModifier, modifierChameleon);
+            modifierChameleon = new CustomModifierOption(1090, Types.Modifier, "chameleon", RoleId.Chameleon);
             modifierChameleonHoldDuration = CustomOption.Create(1092, Types.Modifier, "chameleonHoldDuration", 3f, 1f, 10f, 0.5f, modifierChameleon, false, "unitSeconds");
             modifierChameleonFadeDuration = CustomOption.Create(1093, Types.Modifier, "chameleonFadeDuration", 1f, 0.25f, 10f, 0.25f, modifierChameleon, false, "unitSeconds");
             modifierChameleonMinVisibility = CustomOption.Create(1094, Types.Modifier, "chameleonMinVisibility", ["0%", "10%", "20%", "30%", "40%", "50%"], modifierChameleon);
 
-            modifierMultitasker = CustomOption.Create(1996, Types.Modifier, cs(Color.yellow, "multitasker"), rates, null, true, color: Color.yellow);
-            modifierMultitaskerQuantity = CustomOption.Create(1997, Types.Modifier, cs(Color.yellow, "multitaskerQuantity"), ratesModifier, modifierMultitasker);
+            modifierMultitasker = new CustomModifierOption(1996, Types.Modifier, "multitasker", RoleId.Multitasker, modifierFilter: TheOtherRoles.RoleHelpers.CrewmateRoles);
 
-            modifierArmored = CustomOption.Create(9101, Types.Modifier, cs(Color.yellow, "armored"), rates, null, true, color: Color.yellow);
+            modifierArmored = new CustomModifierOption(9101, Types.Modifier, "armored", RoleId.Armored, 1);
+
+            modifierIncompetent = new CustomModifierOption(9012, Types.Modifier, "incompetent", RoleId.Incompetent);
+            modifierIncompetentShuffleChance = CustomOption.Create(9013, Types.Modifier, "incompetentShuffleChance", 50f, 0f, 100f, 5f, modifierIncompetent, false, "unitPercent");
+            modifierIncompetentMaxShufflePair = CustomOption.Create(9014, Types.Modifier, "incompetentMaxShufflePair", 3f, 1f, 10f, 1f, modifierIncompetent, false, "unitScrews");
 
             madmateSpawnRate = CustomOption.Create(4041, Types.Modifier, cs(Color.yellow, "madmate"), rates, null, true, color: Color.yellow);
             madmateQuantity = CustomOption.Create(7005, Types.Modifier, cs(Color.yellow, "madmateQuantity"), ratesModifier, madmateSpawnRate);

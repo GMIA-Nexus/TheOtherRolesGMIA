@@ -1,4 +1,5 @@
 using System.Linq;
+using Hazel;
 using TheOtherRoles.MetaContext;
 using TheOtherRoles.Modules;
 using UnityEngine;
@@ -9,6 +10,13 @@ namespace TheOtherRoles.Roles;
 
 public class Sheriff : RoleBase<Sheriff>
 {
+    public enum MisfireKills
+    {
+        Self,
+        Target,
+        Both
+    }
+
     public static Color color = new Color32(248, 205, 70, byte.MaxValue);
 
     public static float cooldown = 30f;
@@ -16,6 +24,7 @@ public class Sheriff : RoleBase<Sheriff>
     public static bool spyCanDieToSheriff = false;
     public bool isFormerDeputy = false;
     public float remainingHandcuffs = 0;
+    public static MisfireKills misfireKills = MisfireKills.Self;
 
     public Sheriff()
     {
@@ -42,6 +51,18 @@ public class Sheriff : RoleBase<Sheriff>
         setRole(deputy);
         getRole(deputy).currentTarget = null;
         cooldown = CustomOptionHolder.sheriffCooldown.getFloat();
+    }
+
+    public void sheriffKill(byte targetId)
+    {
+        if (targetId == player.PlayerId && Helpers.checkArmored(player, true, true))
+            return;
+        MessageWriter killWriter = AmongUsClient.Instance.StartRpcImmediately(player.NetId, (byte)CustomRPC.UncheckedMurderPlayer, Hazel.SendOption.Reliable, -1);
+        killWriter.Write(player.Data.PlayerId);
+        killWriter.Write(targetId);
+        killWriter.Write(byte.MaxValue);
+        AmongUsClient.Instance.FinishRpcImmediately(killWriter);
+        RPCProcedure.uncheckedMurderPlayer(player.Data.PlayerId, targetId, byte.MaxValue);
     }
 
     public override void OnKill(PlayerControl target)
@@ -101,6 +122,7 @@ public class Sheriff : RoleBase<Sheriff>
         cooldown = CustomOptionHolder.sheriffCooldown.getFloat();
         canKillNeutrals = CustomOptionHolder.sheriffCanKillNeutrals.getBool();
         spyCanDieToSheriff = CustomOptionHolder.spyCanDieToSheriff.getBool();
+        misfireKills = (MisfireKills)CustomOptionHolder.sheriffMisfireKills.getSelection();
         players = [];
     }
 }

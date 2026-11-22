@@ -144,6 +144,7 @@ namespace TheOtherRoles
         public static RoleInfo diseased = new("diseased", Color.yellow, RoleId.Diseased, false, true);
         public static RoleInfo radar = new("radar", Color.yellow, RoleId.Radar, false, true);
         public static RoleInfo armored = new("armored", Color.yellow, RoleId.Armored, false, true);
+        public static RoleInfo incompetent = new("incompetent", Color.yellow, RoleId.Incompetent, false, true);
         //public static RoleInfo shifter = new RoleInfo("Shifter", Color.yellow, "Shift your role", "Shift your role", RoleId.Shifter, false, true);
 
         public static List<RoleInfo> Killing = [
@@ -371,6 +372,7 @@ namespace TheOtherRoles
             diseased,
             radar,
             armored,
+            incompetent,
         };
 
         public static List<RoleInfo> getRoleInfoForPlayer(PlayerControl p, bool showModifier = true, bool includeHidden = false, RoleId[] excludeRoles = null) {
@@ -384,6 +386,7 @@ namespace TheOtherRoles
                 {
                     if (p.hasModifier(RoleId.Bloody)) infos.Add(bloody);
                     if (p.hasModifier(RoleId.Vip)) infos.Add(vip);
+                    if (p.hasModifier(RoleId.Incompetent)) infos.Add(incompetent);
                 }
                 if (p.isLovers()) infos.Add(lover);
                 if (p.hasModifier(RoleId.Tiebreaker)) infos.Add(tiebreaker);

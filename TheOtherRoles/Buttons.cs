@@ -552,17 +552,18 @@ namespace TheOtherRoles
                             _ = new StaticAchievementToken("sheriff.common1");
                             targetId = Sheriff.local.currentTarget.PlayerId;
                         }
-                        else {
+                        else if (Sheriff.misfireKills == Sheriff.MisfireKills.Self) {
                             _= new StaticAchievementToken("sheriff.another1");
                             targetId = PlayerControl.LocalPlayer.PlayerId;
                         }
+                        else if (Sheriff.misfireKills == Sheriff.MisfireKills.Target) {
+                            targetId = Sheriff.local.currentTarget.PlayerId;
+                        }
+                        else {
+                            Sheriff.local.sheriffKill(PlayerControl.LocalPlayer.PlayerId);
+                        }
 
-                        MessageWriter killWriter = AmongUsClient.Instance.StartRpcImmediately(PlayerControl.LocalPlayer.NetId, (byte)CustomRPC.UncheckedMurderPlayer, Hazel.SendOption.Reliable, -1);
-                        killWriter.Write(Sheriff.local.player.Data.PlayerId);
-                        killWriter.Write(targetId);
-                        killWriter.Write(byte.MaxValue);
-                        AmongUsClient.Instance.FinishRpcImmediately(killWriter);
-                        RPCProcedure.uncheckedMurderPlayer(Sheriff.local.player.Data.PlayerId, targetId, Byte.MaxValue);
+                        Sheriff.local.sheriffKill(targetId);
                     }
 
                     sheriffKillButton.Timer = sheriffKillButton.MaxTimer;

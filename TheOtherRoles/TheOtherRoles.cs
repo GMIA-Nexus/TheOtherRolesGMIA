@@ -123,6 +123,7 @@ namespace TheOtherRoles
             Multitasker.clearAndReload();
             Diseased.clearAndReload();
             Radar.clearAndReload();
+            Incompetent.clearAndReload();
             Modifier.ClearAll();
 
             // Gamemodes
@@ -257,7 +258,8 @@ namespace TheOtherRoles
                 { RoleId.Multitasker, typeof(ModifierBase<Multitasker>) },
                 { RoleId.Diseased, typeof(ModifierBase<Diseased>) },
                 { RoleId.Radar, typeof(ModifierBase<Radar>) },
-                { RoleId.Madmate, typeof(ModifierBase<Madmate>) }
+                { RoleId.Madmate, typeof(ModifierBase<Madmate>) },
+                { RoleId.Incompetent, typeof(ModifierBase<Incompetent>) }
             };
         }
 
@@ -290,6 +292,10 @@ namespace TheOtherRoles
                 text.AdjustNotification();
                 return text;
             }
+
+            static public List<RoleInfo> CrewmateRoles { get {
+                    return [.. RoleInfo.allRoleInfos.Where(x => !x.isOrgImpostor && !x.isModifier && !x.isOrgNeutral)];
+                } }
         }
 
         public static void OnDeath(this PlayerControl player, PlayerControl killer)
@@ -479,13 +485,15 @@ namespace TheOtherRoles
         public RoleId modId;
 
         public virtual void OnMeetingStart() { }
-        public virtual void OnMeetingEnd() { }
+        public virtual void OnMeetingEnd(PlayerControl exiled = null) { }
         public virtual void FixedUpdate() { }
         public virtual void OnKill(PlayerControl target) { }
         public virtual void OnDeath(PlayerControl killer = null) { }
         public virtual void OnFinishShipStatusBegin() { }
         public virtual void HandleDisconnect(PlayerControl player, DisconnectReasons reason) { }
         public virtual void ResetModifier() { }
+
+        public virtual void PostInit() { }
 
         public static void ClearAll()
         {
@@ -557,6 +565,7 @@ namespace TheOtherRoles
         {
             T mod = new();
             mod.Init(player);
+            mod.PostInit();
             return mod;
         }
 
@@ -583,6 +592,7 @@ namespace TheOtherRoles
             {
                 players.DoIf(x => x.player == p1, x => x.ResetModifier());
                 players[index].player = p2;
+                players.DoIf(x => x.player == p2, x => x.PostInit());
             }
         }
     }
@@ -945,6 +955,7 @@ namespace TheOtherRoles
 
     public class Bloody : ModifierBase<Bloody> {
         public static float duration = 5f;
+        public AchievementToken<(byte playerId, bool cleared)> acTokenChallenge = null;
 
         public override void OnDeath(PlayerControl killer = null)
         {
@@ -955,6 +966,20 @@ namespace TheOtherRoles
                 {
                     _ = new StaticAchievementToken("watermelon");
                 }
+                if (PlayerControl.LocalPlayer == player)
+                {
+                    _ = new StaticAchievementToken("bloody.common1");
+                    _ = new StaticAchievementToken("bloody.another1");
+                    acTokenChallenge.Value.playerId = killer.PlayerId;
+                }
+            }
+        }
+
+        public override void OnMeetingEnd(PlayerControl exiled = null)
+        {
+            if (PlayerControl.LocalPlayer == player && exiled != null)
+            {
+                acTokenChallenge.Value.cleared |= acTokenChallenge.Value.playerId == exiled.PlayerId;
             }
         }
 
@@ -963,9 +988,79 @@ namespace TheOtherRoles
             players = [];
         }
 
+        public override void PostInit()
+        {
+            if (PlayerControl.LocalPlayer != player) return;
+            acTokenChallenge ??= new("bloody.challenge", (byte.MaxValue, false), (val, _) => val.cleared);
+        }
+
         public Bloody()
         {
             ModType = modId = RoleId.Bloody;
+            acTokenChallenge = null;
+        }
+    }
+
+    public class Incompetent : ModifierBase<Incompetent>
+    {
+        public static float shuffleProb = 50f;
+        public static int maxPair = 3;
+
+        public static void clearAndReload()
+        {
+            shuffleProb = CustomOptionHolder.modifierIncompetentShuffleChance.getFloat();
+            maxPair = Mathf.RoundToInt(CustomOptionHolder.modifierIncompetentMaxShufflePair.getFloat());
+            players = [];
+        }
+
+        public Incompetent()
+        {
+            ModType = modId = RoleId.Incompetent;
+        }
+
+        public override void OnDeath(PlayerControl killer = null)
+        {
+            ResetColors();
+        }
+
+        public void ResetColors()
+        {
+            if (PlayerControl.LocalPlayer == player)
+            {
+                foreach (var p in TORGameManager.Instance?.AllPlayerOutfit())
+                    p.RemoveOutfit("Incompetent");
+            }
+        }
+
+        public override void ResetModifier()
+        {
+            ResetColors();
+        }
+
+        public override void OnMeetingEnd(PlayerControl exiled = null)
+        {
+            if (PlayerControl.LocalPlayer != player || PlayerControl.LocalPlayer.Data.IsDead) return;
+            var alives = PlayerControl.AllPlayerControls.GetFastEnumerator().Where(x => !x.Data.IsDead && x != player).ToArray();
+            var randomArray = Helpers.GetRandomArray(alives.Length);
+            int maxPairs = Mathf.Min(maxPair, alives.Length / 2);
+
+            float prob = shuffleProb;
+            
+            for (int i = 0; i < maxPairs; i++)
+            {
+                if (System.Random.Shared.NextSingle() * 100 > prob) continue;
+
+                var player1 = alives[randomArray[i * 2]];
+                var player2 = alives[randomArray[i * 2 + 1]];
+                var outfit1 = player1.GetOutfitInfo().GetOutfit(50);
+                var outfit2 = player2.GetOutfitInfo().GetOutfit(50);
+
+                player1.GetOutfitInfo().RemoveOutfit("Incompetent");
+                player2.GetOutfitInfo().RemoveOutfit("Incompetent");
+
+                player1.GetOutfitInfo().AddOutfit(new("Incompetent", 20, false, outfit2));
+                player2.GetOutfitInfo().AddOutfit(new("Incompetent", 20, false, outfit1));
+            }
         }
     }
 
@@ -1067,7 +1162,7 @@ namespace TheOtherRoles
             }
         }
 
-        public override void OnMeetingEnd()
+        public override void OnMeetingEnd(PlayerControl exiled = null)
         {
             if (PlayerControl.LocalPlayer == player && PlayerControl.LocalPlayer.Data.Role.IsImpostor)
             {
@@ -1133,6 +1228,12 @@ namespace TheOtherRoles
                 HudManagerStartPatch.pelicanKillButton.MaxTimer *= multiplier;
                 HudManagerStartPatch.yandereButton.MaxTimer *= multiplier;
                 HudManagerStartPatch.trackerKillButton.MaxTimer *= multiplier;
+
+                if (PlayerControl.LocalPlayer == player)
+                {
+                    _ = new StaticAchievementToken("diseased.common1");
+                    _ = new StaticAchievementToken("diseased.challenge");
+                }
             }
         }
 

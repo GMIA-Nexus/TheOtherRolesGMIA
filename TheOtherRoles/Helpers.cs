@@ -46,18 +46,6 @@ namespace TheOtherRoles
         FreePlay
     }
 
-    public static class Direction
-    {
-        public static Vector2 up = Vector2.up;
-        public static Vector2 down = Vector2.down;
-        public static Vector2 left = Vector2.left;
-        public static Vector2 right = Vector2.right;
-        public static Vector2 upleft = new(-0.70710677f, 0.70710677f);
-        public static Vector2 upright = new(0.70710677f, 0.70710677f);
-        public static Vector2 downleft = new(-0.70710677f, -0.70710677f);
-        public static Vector2 downright = new(0.70710677f, -0.70710677f);
-    }
-
     public class StackfullCoroutine
     {
         private List<IEnumerator> stack = new();
@@ -972,6 +960,11 @@ namespace TheOtherRoles
                     else if (isNeutral(target)) color = Color.blue;
                 }
                 showFlash(color, 1.5f);
+                if (PlayerControl.LocalPlayer == target)
+                {
+                    _ = new StaticAchievementToken("vip.common1");
+                    _ = new StaticAchievementToken("vip.challenge");
+                }
             }
         }
 
@@ -1203,6 +1196,13 @@ namespace TheOtherRoles
             layerMask ??= Constants.ShipAndAllObjectsMask;
             vector = pos2 - pos1;
             return PhysicsHelpers.AnyNonTriggersBetween(pos1, vector.normalized, vector.magnitude, layerMask!.Value);
+        }
+
+        public static int[] GetRandomArray(int length)
+        {
+            var array = new int[length];
+            for (int i = 0; i < length; i++) array[i] = i;
+            return array.OrderBy(i => Guid.NewGuid()).ToArray();
         }
 
         public static bool destroyGameObjects(GameObject root, DestroyInfo[] excludeInfos = null, GameObject obj = null)
@@ -2240,10 +2240,10 @@ namespace TheOtherRoles
             writer.Write((byte)TheOtherRolesPlugin.Version.Build);
             writer.Write(AmongUsClient.Instance.AmHost ? Patches.GameStartManagerPatch.timer : -1f);
             writer.WritePacked(AmongUsClient.Instance.ClientId);
-            writer.Write((byte)(TheOtherRolesPlugin.Version.Revision < 0 ? 0xFF : TheOtherRolesPlugin.Version.Revision));
-            writer.Write(Assembly.GetExecutingAssembly().ManifestModule.ModuleVersionId.ToByteArray());
             writer.Write(TheOtherRolesPlugin.SubVersionString);
             writer.Write(Constants.GetPlatformType() == Platforms.Android);
+            writer.Write((byte)(TheOtherRolesPlugin.Version.Revision < 0 ? 0xFF : TheOtherRolesPlugin.Version.Revision));
+            writer.Write(Assembly.GetExecutingAssembly().ManifestModule.ModuleVersionId.ToByteArray());
             AmongUsClient.Instance.FinishRpcImmediately(writer);
             RPCProcedure.versionHandshake(TheOtherRolesPlugin.Version.Major, TheOtherRolesPlugin.Version.Minor, TheOtherRolesPlugin.Version.Build, TheOtherRolesPlugin.Version.Revision,
                 Assembly.GetExecutingAssembly().ManifestModule.ModuleVersionId, AmongUsClient.Instance.ClientId, TheOtherRolesPlugin.SubVersionString, Constants.GetPlatformType() == Platforms.Android);

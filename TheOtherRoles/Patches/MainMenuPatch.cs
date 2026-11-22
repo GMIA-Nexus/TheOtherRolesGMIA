@@ -170,6 +170,7 @@ namespace TheOtherRoles.Modules {
             modScreen.transform.GetChild(0).GetChild(0).GetComponent<TextTranslatorTMP>().SetModText("GMIA");
             __instance.mainButtons.Add(modButton);
 
+            Object.Destroy(modScreen.transform.GetChild(5).gameObject);
             Object.Destroy(modScreen.transform.GetChild(4).gameObject);
 
             foreach (var button in __instance.mainButtons.GetFastEnumerator())

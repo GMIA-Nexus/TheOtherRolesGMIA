@@ -270,8 +270,18 @@ public static class HelpMenu
         var rawText = roleInfo.fullDescription;
         foreach (var r in RoleData.GetReplacementPart(roleInfo.roleId)) rawText = rawText.Replace(r.Key, r.Replacement);
 
-        return gui.VerticalHolder(GUIAlignment.TopLeft, gui.HorizontalHolder(GUIAlignment.Left, gui.VerticalHolder(GUIAlignment.Left, blurb, gui.VerticalMargin(-0.06f), title, gui.VerticalMargin(-0.05f)), gui.HorizontalMargin(0.25f)), gui.VerticalMargin(0.15f),
-            GetDocumentText(rawText), gui.VerticalMargin(0.15f));
+        return gui.VerticalHolder(GUIAlignment.TopLeft, gui.HorizontalHolder(GUIAlignment.Left, gui.VerticalHolder(GUIAlignment.Left, blurb, gui.VerticalMargin(-0.06f), title, gui.VerticalMargin(-0.05f)), gui.HorizontalMargin(0.25f)), 
+            GetFilterContext(roleInfo), gui.VerticalMargin(0.15f), GetDocumentText(rawText), gui.VerticalMargin(0.15f));
+    }
+
+    private static GUIContext GetFilterContext(RoleInfo roleInfo)
+    {
+        var gui = TORGUIContextEngine.API;
+        if (!roleInfo.isModifier) return GUIEmptyContext.Default;
+        var option = Patches.RoleManagerSelectRolesPatch.getCustomOptionForRoleId(roleInfo.roleId);
+        if (option == null) return GUIEmptyContext.Default;
+
+        return gui.VerticalHolder(GUIAlignment.TopLeft, gui.VerticalMargin(0.05f), GetDocumentText(ModTranslation.getString("canBeAssignedToCaption") + ": " + option.GetFilterDisplayString()));
     }
 
     private static GUIContext GetRoleHelpSprite(RoleInfo roleInfo)
@@ -367,7 +377,7 @@ public static class HelpMenu
 
     public static string optionToString(CustomOption option)
     {
-        if (option == null) return "";
+        if (option == null || option?.IsHiddenOnMenu == true) return "";
         return $"{option.getName().Replace("- ", "")}: {(option is CustomFilterOption filterOption ? filterOption.GetValueString(6, "\n        ") : option.getString())}";
     }
 
@@ -757,6 +767,7 @@ public static class HelpMenu
                 { RoleId.Invert, CustomOptionHolder.modifierInvert },
                 { RoleId.Multitasker, CustomOptionHolder.modifierMultitasker },
                 { RoleId.Diseased, CustomOptionHolder.modifierDiseased },
+                { RoleId.Incompetent, CustomOptionHolder.modifierIncompetent },
             };
 
         EndGameConditionTips = [
@@ -785,8 +796,6 @@ public static class HelpMenu
         // Deputy uses the independent spawn rate, but we also need to check the Sheriff's
         if (roleInfo.roleId == RoleId.Deputy)
             return CustomOptionHolder.sheriffSpawnRate.getSelection() > 0 && CustomOptionHolder.deputySpawnRate.getSelection() > 0;
-        if (Configurations.TryGetValue(roleInfo.roleId, out var option))
-            return option.getSelection() > 0;
         if (roleInfo.roleId is RoleId.NiceGuesser or RoleId.EvilGuesser)
         {
             if (TORMapOptions.gameMode == CustomGamemodes.Guesser)
@@ -826,6 +835,9 @@ public static class HelpMenu
             int neutralRate = CustomOptionHolder.shifterIsNeutralRate.getSelection();
             return !(roleInfo.isOrgNeutral ? neutralRate == 0 : neutralRate == 100);
         }
+
+        if (Configurations.TryGetValue(roleInfo.roleId, out var option))
+            return option.getSelection() > 0;
 
         return true;
     }

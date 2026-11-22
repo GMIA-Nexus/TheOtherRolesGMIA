@@ -209,7 +209,7 @@ namespace TheOtherRoles.Patches {
             CustomButton.MeetingEndedUpdate();
 
             foreach (var role in new List<Role>(Role.allRoles)) role.OnMeetingEnd(exiled);
-            foreach (var mod in new List<Modifier>(Modifier.allModifiers)) mod.OnMeetingEnd();
+            foreach (var mod in new List<Modifier>(Modifier.allModifiers)) mod.OnMeetingEnd(exiled);
 
             Diseased.active = [];
 

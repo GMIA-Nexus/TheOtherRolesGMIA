@@ -397,18 +397,14 @@ namespace TheOtherRoles.Modules
                                 actionButton.transform.localScale = new Vector3(2f, 2f);
                                 actionButton.SetCoolDown(0, 0);
 
-                                GameObject buttonSprite = new("buttonSprite");
-                                var sprite = buttonSprite.AddComponent<SpriteRenderer>();
+                                var sprite = Helpers.CreateObject<SpriteRenderer>("buttonSprite", actionButton.transform, new Vector3(0, 0.025f, -1f));
                                 sprite.sprite = cardSprite;
-                                buttonSprite.layer = actionButton.gameObject.layer;
-                                buttonSprite.transform.SetParent(actionButton.transform, false);
-                                buttonSprite.transform.localPosition = new Vector3(0, 0.025f, -1f);
+                                sprite.gameObject.AddComponent<UnityEngine.Rendering.SortingGroup>();
 
                                 if (illustration != null)
                                 {
                                     sprite.sprite = getBlankCard();
-                                    var illustrationButton = new GameObject("illustrationButton");
-                                    var illustrationSprite = illustrationButton.AddComponent<SpriteRenderer>();
+                                    var illustrationSprite = Helpers.CreateObject<SpriteRenderer>("illustrationSprite", sprite.transform, new Vector3(0, 0.2f, -2f));
                                     illustrationSprite.sprite = illustration;
 
                                     float originalWidth = illustrationSprite.sprite.bounds.size.x;
@@ -416,11 +412,7 @@ namespace TheOtherRoles.Modules
                                     float scaleX = 1.8f / originalWidth;
                                     float scaleY = 1.8f / originalHeight;
                                     illustrationSprite.transform.localScale = new Vector3(scaleX, scaleY, 1f);
-
-                                    illustrationButton.layer = actionButton.gameObject.layer;
-                                    illustrationButton.transform.SetParent(actionButton.transform, false);
-                                    illustrationButton.transform.localPosition = new Vector3(0, 0.2f, -3f);
-                                    illustrationButton.transform.SetAsLastSibling();
+                                    illustrationSprite.sortingOrder = 1;
                                 }
 
                                 GameObject textHolder = new("textHolder");
@@ -436,8 +428,8 @@ namespace TheOtherRoles.Modules
                                 text.rectTransform.pivot = new Vector2(0.5f, 0f);
                                 textHolder.layer = actionButton.gameObject.layer;
                                 text.color = color;
-                                textHolder.transform.SetParent(buttonSprite.transform, false);
-                                textHolder.transform.localPosition = new(0, -1.2f, -1f);
+                                textHolder.transform.SetParent(sprite.transform, false);
+                                textHolder.transform.localPosition = new(0, -1.2f, -3f);
 
                                 HudManager.Instance.StartCoroutine(Effects.Lerp(0.5f, new Action<float>((p) => {
                                     actionButton.OverrideText("");

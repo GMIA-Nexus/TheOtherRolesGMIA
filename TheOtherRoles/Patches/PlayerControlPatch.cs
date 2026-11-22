@@ -884,6 +884,7 @@ namespace TheOtherRoles.Patches {
             DeadPlayer deadPlayerEntry = deadPlayers.Where(x => x.player.PlayerId == __instance.PlayerId).FirstOrDefault();
             if (deadPlayerEntry != null) deadPlayers.Remove(deadPlayerEntry);
             TORGameManager.Instance?.GameStatistics.RecordEvent(new(GameStatistics.EventVariation.Revive, null, 1 << __instance.PlayerId) { RelatedTag = EventDetail.Revive });
+            SerialKiller.OnRevive(__instance);
             return false;
         }
     }

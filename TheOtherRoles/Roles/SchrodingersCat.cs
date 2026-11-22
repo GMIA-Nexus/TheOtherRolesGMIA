@@ -73,7 +73,7 @@ namespace TheOtherRoles.Roles
 
         public override void OnDeath(PlayerControl killer = null)
         {
-            if (killer != null)
+            if (killer != null && killer != player)
             {
                 if (PlayerControl.LocalPlayer == player) _ = new StaticAchievementToken("schrodingersCat.common1");
                 player.clearAllTasks();

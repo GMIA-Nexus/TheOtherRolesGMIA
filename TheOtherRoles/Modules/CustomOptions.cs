@@ -14,9 +14,9 @@ using TheOtherRoles.MetaContext;
 using TheOtherRoles.Modules;
 using TheOtherRoles.Patches;
 using TheOtherRoles.Roles;
-using TheOtherRoles.Utilities;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Rendering;
 using static TheOtherRoles.CustomOption;
 
 namespace TheOtherRoles {
@@ -60,6 +60,7 @@ namespace TheOtherRoles {
         public string heading = "";
         public bool invertedParent;
         public Color color;
+        public bool IsHiddenOnMenu { get; set; } = false;
         public List<CustomOption> children;
 
         // Option creation
@@ -375,6 +376,108 @@ namespace TheOtherRoles {
         }
     }
 
+    public class CustomModifierOption : CustomOption
+    {
+        public CustomOption countOption = null;
+        public CustomFilterOption filterOption = null;
+        public List<RoleInfo> defaultFilter = [.. RoleInfo.allRoleInfos.Where(x => !x.isModifier && x.roleId is not RoleId.BomberB and not RoleId.Sidekick and not RoleId.Immoralist)];
+        public List<RoleInfo> modifierFilter = [];
+        public RoleId roleId;
+        public bool enabled => selection > 0;
+        public int rate => enabled ? selection : 0;
+
+        public int count
+        {
+            get
+            {
+                if (!enabled) return 0;
+                return countOption != null ? Mathf.RoundToInt(countOption.getFloat()) : 1;
+            }
+        }
+
+        public string GetFilterDisplayString()
+        {
+            var impostorOn = new List<RoleInfo>();
+            var impostorOff = new List<RoleInfo>();
+            var crewmateOn = new List<RoleInfo>();
+            var crewmateOff = new List<RoleInfo>();
+            var neutralOn = new List<RoleInfo>();
+            var neutralOff = new List<RoleInfo>();
+
+            var filterSelection = filterOption.filterSelection;
+
+            foreach (var role in modifierFilter)
+            {
+                if (!HelpMenu.CheckSpawnable(role)) continue;
+
+                var contains = filterSelection.Contains(role);
+                if (role.isOrgNeutral)
+                    (contains ? neutralOn : neutralOff).Add(role);
+                else if (role.isOrgImpostor)
+                    (contains ? impostorOn : impostorOff).Add(role);
+                else
+                    (contains ? crewmateOn : crewmateOff).Add(role);
+            }
+
+            int onCount = impostorOn.Count + crewmateOn.Count + neutralOn.Count;
+            int offCount = impostorOff.Count + crewmateOff.Count + neutralOff.Count;
+            int minPerCategory = Math.Min(impostorOn.Count, impostorOff.Count) + Math.Min(crewmateOn.Count, crewmateOff.Count) + Math.Min(neutralOn.Count, neutralOff.Count);
+
+            if (onCount == 0) return ModTranslation.getString("roleFilterNone");
+            if (offCount == 0) return ModTranslation.getString("roleFilterAll");
+            if (onCount <= 8) return string.Join(", ", impostorOn.Concat(crewmateOn).Concat(neutralOn).Select(Colorized));
+            if (offCount <= 8) return string.Format(ModTranslation.getString("roleFilterExcludes"), string.Join(", ", impostorOff.Concat(crewmateOff).Concat(neutralOff).Select(Colorized)));
+
+            if (minPerCategory <= 6)
+            {
+                var parts = new[] {
+                GetCategoryString("Impostor", impostorOn, impostorOff),
+                GetCategoryString("Crewmate", crewmateOn, crewmateOff),
+                GetCategoryString("Neutral", neutralOn, neutralOff) };
+                return string.Join("; ", parts.Where(s => s.Length > 0));
+            }
+
+            var allOn = impostorOn.Concat(crewmateOn).Concat(neutralOn).ToList();
+            StringBuilder builder = new();
+            for (int i = 0; i < allOn.Count; i++)
+            {
+                if (i > 0)
+                {
+                    builder.Append(", ");
+                    if (i % 8 == 0)
+                        builder.Append('\n');
+                }
+                builder.Append(Colorized(allOn[i]));
+            }
+            return builder.ToString();
+
+            static string Colorized(RoleInfo role) => Helpers.cs(role.orgColor, role.name);
+
+            static string GetCategoryString(string category, List<RoleInfo> assignable, List<RoleInfo> nonAssignable)
+            {
+                if (assignable.Count == 0) return "";
+                if (nonAssignable.Count == 0) return ModTranslation.getString("roleFilterAll" + category);
+
+                if (assignable.Count <= nonAssignable.Count)
+                    return string.Join(", ", assignable.Select(Colorized));
+
+                return string.Format(ModTranslation.getString("roleFilterExcludes" + category),
+                    string.Join(", ", nonAssignable.Select(Colorized)));
+            }
+        }
+
+        public CustomModifierOption(int id, CustomOptionType type, string name, RoleId roleId, int max = 24, List<RoleInfo> modifierFilter = null, string format = "unitPlayers") : base(id, type, Helpers.cs(Color.yellow, name), CustomOptionHolder.rates, "", null, isHeader: true, "", Color.yellow)
+        {
+            this.roleId = roleId;
+
+            if (max > 1)
+                countOption = Create(id + 20000, type, "modifierQuantity", 1f, 1f, max, 1f, this, isHeader: false, format);
+
+            this.modifierFilter = modifierFilter ?? defaultFilter;
+            filterOption = new CustomFilterOption(id + 30000, type, "modifierFilter", isHeader: false, "", this, this.modifierFilter, this.modifierFilter, replaceNames: false) { GroupShare = true, IsHiddenOnMenu = true };
+        }
+    }
+
     public class CustomFilterOption : CustomOption
     {
         public CustomFilterOption(int id, CustomOptionType type, string name, bool isHeader = false, string heading = "", CustomOption parent = null, List<RoleInfo> categoryFilters = null,
@@ -436,7 +539,7 @@ namespace TheOtherRoles {
                     if (newLinesPer > 0 && n % newLinesPer == 0)
                         builder.Append(newLineStr);
                 }
-                builder.Append(Helpers.cs(categoryFilters[i].color, replaceNames ? AdjustFilterRole(categoryFilters[i]) : categoryFilters[i].name));
+                builder.Append(Helpers.cs(categoryFilters[i].orgColor, replaceNames ? AdjustFilterRole(categoryFilters[i]) : categoryFilters[i].name));
                 n++;
             }
             if (!showContainedRoles) return string.Format(ModTranslation.getString("roleFilterExcludes"), builder.ToString());
@@ -459,8 +562,6 @@ namespace TheOtherRoles {
             {
                 var list = RoleInfo.allRoleInfos.Where(x => !x.isModifier && (x.roleId is not RoleId.Sidekick and not RoleId.Immoralist and not RoleId.Impostor and not RoleId.Crewmate
                and not RoleId.Mafioso and not RoleId.Janitor and not RoleId.MimicA and not RoleId.Pursuer and not RoleId.BomberB));
-                if (TORMapOptions.gameMode == CustomGamemodes.Guesser)
-                    return [.. list.Where(x => x.roleId is not RoleId.NiceGuesser and not RoleId.EvilGuesser)];
                 return [.. list];
             } }
 
@@ -470,7 +571,6 @@ namespace TheOtherRoles {
         public bool replaceNames = true;
         public ConfigEntry<string> filterEntry;
         public MetaScreen filterScreen = null;
-        private MetaScreen editButtonScreen = null;
 
         public bool GroupShare { get; set; } = false;
 
@@ -487,8 +587,12 @@ namespace TheOtherRoles {
 
             var gui = TORGUIContextEngine.API;
             var roleMaskedTittleAttr = gui.GetAttribute(AttributeAsset.MetaRoleButton);
-            if (!editButtonScreen) editButtonScreen = MetaScreen.GenerateScreen(new(3f, 1f), optionBehaviour.transform, new(valueBox.transform.localPosition.x, valueBox.transform.localPosition.y, -200f), false, false, false);
-            editButtonScreen.SetContext(new GUIButton(GUIAlignment.Center, roleMaskedTittleAttr, new TranslateTextComponent("filterOptionEdit")) { OnClick = () => OpenFilterScreen() }, new Vector2(0.5f, 0.5f), out _);
+
+            optionBehaviour.gameObject.AddComponent<SortingGroup>();
+            var button = new GUIButton(GUIAlignment.Center, roleMaskedTittleAttr, new TranslateTextComponent("filterOptionEdit")) { OnClick = OpenFilterScreen, AsMaskedButton = true };
+            var editButton = button.Instantiate(new Anchor(new Vector2(0.5f, 0.5f), new Vector3(0f, 0f, 0f)), new Size(1.5f, 0.05f), out var _);
+            editButton.transform.SetParent(optionBehaviour.transform, false);
+            editButton.transform.localPosition += new Vector3(valueBox.transform.localPosition.x, valueBox.transform.localPosition.y, -0.1f);
         }
 
         private void OpenFilterScreen()
@@ -498,6 +602,7 @@ namespace TheOtherRoles {
             var filteredRole = categoryFilters.ToList();
             bool previewSpawnable = ClientOption.GetValue(ClientOption.ClientOptionType.ShowOnlySpawnableAssignableOnFilter) == 1;
             if (previewSpawnable) filteredRole = [.. filteredRole.Where(HelpMenu.CheckSpawnable)];
+            if (TORMapOptions.gameMode == CustomGamemodes.Guesser) filteredRole = [.. filteredRole.Where(x => x.roleId is not RoleId.NiceGuesser and not RoleId.EvilGuesser)];
 
             List<GUIContext> shortcutButtons = [];
             if (GroupShare)
@@ -1714,6 +1819,7 @@ namespace TheOtherRoles {
 
             foreach (CustomOption option in options) {
                 if (TORMapOptions.gameMode == CustomGamemodes.HideNSeek && option.type != CustomOptionType.HideNSeekMain && option.type != CustomOptionType.HideNSeekRoles) continue;
+                if (option.IsHiddenOnMenu) continue;
                 if (option.parent != null) {
                     bool isIrrelevant = !ShouldBeEnabled(option);
 

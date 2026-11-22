@@ -18,21 +18,6 @@ namespace TheOtherRoles.Patches {
         private static bool versionSent = false;
         private static string lobbyCodeText = "";
 
-        [HarmonyPatch(typeof(PlayerPhysics._CoSpawnPlayer_d__42), "MoveNext")]
-        public class PlayerPhysics_CoSpawnPlayer_d_Patch {
-            public static void Postfix() {
-                if (PlayerControl.LocalPlayer != null) {
-                    Helpers.shareGameVersion();
-                }
-                GameStartManagerUpdatePatch.sendGamemode = true;
-
-                if (PlayerControl.LocalPlayer != null && AmongUsClient.Instance.AmHost) {
-                    GameManager.Instance.LogicOptions.SyncOptions();
-                    CustomOption.ShareOptionSelections();
-                }
-            }
-        }
-
         [HarmonyPatch(typeof(AmongUsClient), nameof(AmongUsClient.CoFindGameInfoFromCodeAndJoin))]
         public class JoinGameLoadingPatch
         {

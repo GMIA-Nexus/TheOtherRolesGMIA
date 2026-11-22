@@ -14,12 +14,18 @@ namespace TheOtherRoles.Roles;
 [TORRPCHolder]
 public class Jailor : RoleBase<Jailor>
 {
+    public enum FalseJail
+    {
+        None,
+        Self,
+        Target,
+        Both
+    }
     public static Color32 color = new(166, 166, 166, 255);
+    public static FalseJail falseJailKill = FalseJail.Target;
 
     public static float cooldown = 30f;
     public int remainingUses = 3;
-    public static bool suicidesIfFalseJail = true;
-    public static bool targetDiesAsWell;
     public PlayerControl currentTarget = null;
     public PlayerControl jailTarget = null;
     public AchievementToken<int> acTokenChallenge = null;
@@ -77,7 +83,7 @@ public class Jailor : RoleBase<Jailor>
         string msg = "";
         if (message.suicide)
         {
-            if (suicidesIfFalseJail)
+            if (falseJailKill is FalseJail.Self or FalseJail.Both)
             {
                 if (PlayerControl.LocalPlayer == jailorPlayer)
                 {
@@ -105,7 +111,7 @@ public class Jailor : RoleBase<Jailor>
             msg = "jailorExecuteEvilNotification";
         }
 
-        if (!message.suicide || targetDiesAsWell)
+        if (!message.suicide || falseJailKill == FalseJail.Target || falseJailKill == FalseJail.Both)
         {
             if (PlayerControl.LocalPlayer == player && Helpers.ShowKillAnimation) FastDestroyableSingleton<HudManager>.Instance.KillOverlay.ShowKillAnimation(jailorPlayer.Data, PlayerControl.LocalPlayer.Data);
             player.Exiled();
@@ -133,8 +139,7 @@ public class Jailor : RoleBase<Jailor>
     public static void clearAndReload()
     {
         cooldown = CustomOptionHolder.jailorCooldown.getFloat();
-        suicidesIfFalseJail = CustomOptionHolder.jailorSuicidesIfFalseJail.getBool();
-        targetDiesAsWell = CustomOptionHolder.jailorTargetDiesIfFalseJail.getBool();
+        falseJailKill = (FalseJail)CustomOptionHolder.jailorFalseJailKills.getSelection();
         players = [];
     }
 }

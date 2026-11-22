@@ -582,7 +582,8 @@ namespace TheOtherRoles.Patches {
                 RoleId.Armored,
                 RoleId.Multitasker,
                 RoleId.Diseased,
-                RoleId.Radar
+                RoleId.Radar,
+                RoleId.Incompetent
                 //RoleId.Shifter
             });
 
@@ -614,15 +615,16 @@ namespace TheOtherRoles.Patches {
             // Assign Lovers
             if (CustomOptionHolder.modifierLover.getSelection() > 0)
             {
-                for (int i = 0; i < CustomOptionHolder.modifierLoverQuantity.getFloat(); i++)
+                for (int i = 0; i < CustomOptionHolder.modifierLover.count; i++)
                 {
                     List<PlayerControl> impPlayer = new(players);
                     List<PlayerControl> crewPlayer = new(players);
-                    impPlayer.RemoveAll(x => !x.Data.Role.IsImpostor || x.isRole(RoleId.NekoKabocha));
+                    impPlayer.RemoveAll(x => !x.Data.Role.IsImpostor || x.isRole(RoleId.NekoKabocha) || !isFilterRole(x, CustomOptionHolder.modifierLover));
                     if (MimicK.ifOneDiesBothDie) impPlayer.RemoveAll(y => y.isRole(RoleId.MimicK) || y.isRole(RoleId.MimicA));
                     if (BomberA.ifOneDiesBothDie) impPlayer.RemoveAll(z => z.isRole(RoleId.BomberA) || z.isRole(RoleId.BomberB));
-                    crewPlayer.RemoveAll(x => x.Data.Role.IsImpostor || x.isRole(RoleId.Lawyer) || x.isRole(RoleId.FortuneTeller) || x.isRole(RoleId.Akujo) || x.isRole(RoleId.Cupid) || x.isRole(RoleId.Fox)
-                    || x.isRole(RoleId.Kataomoi));
+                    crewPlayer.RemoveAll(x => x.Data.Role.IsImpostor || x.isRole(RoleId.Lawyer) ||
+                    x.isRole(RoleId.FortuneTeller) || x.isRole(RoleId.Akujo) || x.isRole(RoleId.Cupid) || x.isRole(RoleId.Fox)
+                    || x.isRole(RoleId.Kataomoi) || !isFilterRole(x, CustomOptionHolder.modifierLover));
                     var singleCrew = crewPlayer.FindAll(x => !x.isLovers());
                     var singleImps = impPlayer.FindAll(x => !x.isLovers());
 
@@ -763,126 +765,78 @@ namespace TheOtherRoles.Patches {
                 modifiers.RemoveAt(index);
             }
 
+            int assignedCount = 0;
             byte playerId;
 
             List<PlayerControl> crewPlayer = new(playerList);
             crewPlayer.RemoveAll(x => x.Data.Role.IsImpostor || RoleInfo.getRoleInfoForPlayer(x).Any(r => r.isNeutral));
-            /*if (modifiers.Contains(RoleId.Shifter)) {
-                var crewPlayerShifter = new List<PlayerControl>(crewPlayer);
-                crewPlayerShifter.RemoveAll(x => x == Spy.spy);
-                playerId = setModifierToRandomPlayer((byte)RoleId.Shifter, crewPlayerShifter);
+            foreach (RoleId modifier in modifiers)
+            {
+                if (assignedCount >= modifierCount)
+                    break;
+
+                List<PlayerControl> candidates;
+
+                switch (modifier)
+                {
+                    case RoleId.Sunglasses:
+                        candidates = [..crewPlayer.Where(x => isFilterRole(x, CustomOptionHolder.modifierSunglasses))];
+                        break;
+
+                    case RoleId.Multitasker:
+                        candidates = [..crewPlayer.Where(x => isFilterRole(x, CustomOptionHolder.modifierMultitasker))];
+                        break;
+
+                    case RoleId.Diseased:
+                        candidates = [..crewPlayer.Where(x => isFilterRole(x, CustomOptionHolder.modifierDiseased))];
+                        break;
+
+                    default:
+                        candidates = [..playerList.Where(x => isFilterRole(x, getCustomOptionForRoleId(modifier)))];
+                        break;
+                }
+
+                if (candidates.Count == 0)
+                    continue;
+
+                playerId = setModifierToRandomPlayer((byte)modifier, candidates);
+
                 crewPlayer.RemoveAll(x => x.PlayerId == playerId);
                 playerList.RemoveAll(x => x.PlayerId == playerId);
-                modifiers.RemoveAll(x => x == RoleId.Shifter);
-            }*/
-            if (modifiers.Contains(RoleId.Sunglasses)) {
-                int sunglassesCount = 0;
-                while (sunglassesCount < modifiers.FindAll(x => x == RoleId.Sunglasses).Count) {
-                    playerId = setModifierToRandomPlayer((byte)RoleId.Sunglasses, crewPlayer);
-                    crewPlayer.RemoveAll(x => x.PlayerId == playerId);
-                    playerList.RemoveAll(x => x.PlayerId == playerId);
-                    sunglassesCount++;
-                }
-                modifiers.RemoveAll(x => x == RoleId.Sunglasses);
-            }
 
-            if (modifiers.Contains(RoleId.Multitasker))
-            {
-                var multitaskerCount = 0;
-                while (multitaskerCount < modifiers.FindAll(x => x == RoleId.Multitasker).Count)
-                {
-                    playerId = setModifierToRandomPlayer((byte)RoleId.Multitasker, crewPlayer);
-                    crewPlayer.RemoveAll(x => x.PlayerId == playerId);
-                    playerList.RemoveAll(x => x.PlayerId == playerId);
-                    multitaskerCount++;
-                }
-                modifiers.RemoveAll(x => x == RoleId.Multitasker);
+                assignedCount++;
             }
+        }
 
-            if (modifiers.Contains(RoleId.Diseased))
-            {
-                var diseasedCount = 0;
-                while (diseasedCount < modifiers.FindAll(x => x == RoleId.Diseased).Count)
-                {
-                    playerId = setModifierToRandomPlayer((byte)RoleId.Diseased, crewPlayer);
-                    crewPlayer.RemoveAll(x => x.PlayerId == playerId);
-                    playerList.RemoveAll(x => x.PlayerId == playerId);
-                    diseasedCount++;
-                }
-                modifiers.RemoveAll(x => x == RoleId.Diseased);
-            }
+        public static CustomModifierOption getCustomOptionForRoleId(RoleId roleId)
+        {
+            return CustomOption.options.OfType<CustomModifierOption>().FirstOrDefault(x => x != null && x.roleId == roleId);
+        }
 
-            foreach (RoleId modifier in modifiers) {
-                if (playerList.Count == 0) break;
-                playerId = setModifierToRandomPlayer((byte)modifier, playerList);
-                playerList.RemoveAll(x => x.PlayerId == playerId);
-            }
+        private static bool isFilterRole(PlayerControl player, CustomModifierOption option)
+        {
+            if (option == null || option.filterOption == null) return false;
+            var role = RoleInfo.getRoleInfoForPlayer(player, false, true).FirstOrDefault();
+            return role != null && option.filterOption.filterSelection.Contains(role);
         }
 
         private static int getSelectionForRoleId(RoleId roleId, bool multiplyQuantity = false) {
             int selection = 0;
-            switch (roleId) {
-                case RoleId.Lover:
-                    selection = CustomOptionHolder.modifierLover.getSelection(); break;
-                case RoleId.Tiebreaker:
-                    selection = CustomOptionHolder.modifierTieBreaker.getSelection(); break;
-                case RoleId.Mini:
-                    selection = CustomOptionHolder.modifierMini.getSelection();
+            var option = getCustomOptionForRoleId(roleId);
+            if (option != null)
+            {
+                selection = option.rate;
+                if (multiplyQuantity) selection *= option.count;
+                if (roleId == RoleId.Mini)
+                {
                     if (EventUtility.isEnabled)
                     {
                         selection = 10;
                         if (CustomOptionHolder.modifierMini.getSelection() == 0 && CustomOptionHolder.eventReallyNoMini.getBool())
                             selection = 0;
                     }
-                    break;
-                //case RoleId.Bait:
-                //selection = CustomOptionHolder.modifierBait.getSelection();
-                //if (multiplyQuantity) selection *= CustomOptionHolder.modifierBaitQuantity.getQuantity();
-                //break;
-                case RoleId.Bloody:
-                    selection = CustomOptionHolder.modifierBloody.getSelection();
-                    if (multiplyQuantity) selection *= CustomOptionHolder.modifierBloodyQuantity.getQuantity();
-                    break;
-                case RoleId.AntiTeleport:
-                    selection = CustomOptionHolder.modifierAntiTeleport.getSelection();
-                    if (multiplyQuantity) selection *= CustomOptionHolder.modifierAntiTeleportQuantity.getQuantity();
-                    break;
-                case RoleId.Sunglasses:
-                    selection = CustomOptionHolder.modifierSunglasses.getSelection();
-                    if (multiplyQuantity) selection *= CustomOptionHolder.modifierSunglassesQuantity.getQuantity();
-                    break;
-                case RoleId.Madmate:
-                    selection = CustomOptionHolder.madmateSpawnRate.getSelection();
-                    if (multiplyQuantity) selection *= CustomOptionHolder.madmateQuantity.getQuantity();
-                    break;
-                case RoleId.Vip:
-                    selection = CustomOptionHolder.modifierVip.getSelection();
-                    if (multiplyQuantity) selection *= CustomOptionHolder.modifierVipQuantity.getQuantity();
-                    break;
-                case RoleId.Multitasker:
-                    selection = CustomOptionHolder.modifierMultitasker.getSelection();
-                    if (multiplyQuantity) selection *= CustomOptionHolder.modifierMultitaskerQuantity.getQuantity();
-                    break;
-                case RoleId.Diseased:
-                    selection = CustomOptionHolder.modifierDiseased.getSelection();
-                    if (multiplyQuantity) selection *= CustomOptionHolder.modifierDiseasedQuantity.getQuantity();
-                    break;
-                case RoleId.Invert:
-                    selection = CustomOptionHolder.modifierInvert.getSelection();
-                    if (multiplyQuantity) selection *= CustomOptionHolder.modifierInvertQuantity.getQuantity();
-                    break;
-                case RoleId.Chameleon:
-                    selection = CustomOptionHolder.modifierChameleon.getSelection();
-                    if (multiplyQuantity) selection *= CustomOptionHolder.modifierChameleonQuantity.getQuantity();
-                    break;
-                case RoleId.Armored:
-                    selection = CustomOptionHolder.modifierArmored.getSelection();
-                    break;
-                case RoleId.Radar:
-                    selection = CustomOptionHolder.modifierRadar.getSelection();
-                    break;
+                }
             }
-
             return selection;
         }
 

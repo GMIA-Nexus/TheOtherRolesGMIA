@@ -87,6 +87,7 @@ namespace TheOtherRoles.Roles
                         array[i].gameObject.active = false;
 
                 // Block Mimic(Killer) from morphing if camo or mushroom is active
+                player.GetOutfitInfo().RemoveOutfit("MimicKiller");
                 player.GetOutfitInfo().AddOutfit(new("MimicKiller", 40, true, target.GetOutfitInfo().DefaultOutfit));
                 victim = target;
 

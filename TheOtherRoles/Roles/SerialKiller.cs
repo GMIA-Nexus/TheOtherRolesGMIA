@@ -54,6 +54,14 @@ namespace TheOtherRoles.Roles
             }
         }
 
+        public static void OnRevive(PlayerControl playerControl)
+        {
+            if (!isRole(playerControl)) return;
+            var sk = getRole(playerControl);
+            if (sk.isCountDown && PlayerControl.LocalPlayer == playerControl)
+                HudManagerStartPatch.serialKillerButton.Timer = HudManagerStartPatch.serialKillerButton.EffectDuration;
+        }
+
         public static void clearAndReload()
         {
             killCooldown = CustomOptionHolder.serialKillerKillCooldown.getFloat();

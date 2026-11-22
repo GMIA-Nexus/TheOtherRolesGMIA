@@ -15,11 +15,13 @@ namespace TheOtherRoles.Roles
         public Engineer()
         {
             RoleId = roleId = RoleId.Engineer;
-            remainingFixes = Mathf.RoundToInt(CustomOptionHolder.engineerNumberOfFixes.getFloat());
+            remainingFixes = numberOfFixes;
             acTokenChallenge = null;
         }
 
         public override AudioClip IntroSound { get => MetaContext.VanillaAsset.EngineerIntroSound; }
+        public static bool resetFixesAfterMeeting = false;
+        public static int numberOfFixes = 1;
 
         public int remainingFixes = 1;
         public static bool highlightForImpostors = true;
@@ -32,6 +34,12 @@ namespace TheOtherRoles.Roles
             if (buttonSprite) return buttonSprite;
             buttonSprite = Helpers.loadSpriteFromResources("TheOtherRoles.Resources.RepairButton.png", 115f);
             return buttonSprite;
+        }
+
+        public override void OnMeetingEnd(PlayerControl exiled = null)
+        {
+            if (PlayerControl.LocalPlayer == player && resetFixesAfterMeeting)
+                remainingFixes = numberOfFixes;
         }
 
         public static RemoteProcess FixLights = new("EngineerFixLights",
@@ -96,6 +104,8 @@ namespace TheOtherRoles.Roles
         {
             highlightForImpostors = CustomOptionHolder.engineerHighlightForImpostors.getBool();
             highlightForTeamJackal = CustomOptionHolder.engineerHighlightForTeamJackal.getBool();
+            numberOfFixes = Mathf.RoundToInt(CustomOptionHolder.engineerNumberOfFixes.getFloat());
+            resetFixesAfterMeeting = CustomOptionHolder.engineerResetFixesAfterMeeting.getBool();
             players = [];
         }
     }

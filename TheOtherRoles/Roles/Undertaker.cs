@@ -85,41 +85,23 @@ namespace TheOtherRoles.Roles
 
             if (player == null || bodyComponent == null) return;
 
-            var undertakerPos = player.transform.position;
-            var bodyLastPos = bodyComponent.transform.position;
+            var targetPos = player.transform.position;
+            targetPos.z = targetPos.y / 1000f;
 
-            var direction = player.gameObject.GetComponent<Rigidbody2D>().velocity.normalized;
-
-            var newBodyPos = direction == Vector2.zero
-                ? bodyLastPos
-                : undertakerPos - (Vector3)(direction * (2f / 3f)) + (Vector3)bodyComponent.myCollider.offset;
-            newBodyPos.z = undertakerPos.z + 0.005f;
-
-            bodyComponent.transform.position.Set(newBodyPos.x, newBodyPos.y, newBodyPos.z);
-
-            if (direction == Direction.right) newBodyPos += new Vector3(0.3f, 0, 0);
-            if (direction == Direction.up) newBodyPos += new Vector3(0.15f, 0.2f, 0);
-            if (direction == Direction.down) newBodyPos += new Vector3(0.15f, -0.2f, 0);
-            if (direction == Direction.upleft) newBodyPos += new Vector3(0, 0.1f, 0);
-            if (direction == Direction.upright) newBodyPos += new Vector3(0.3f, 0.1f, 0);
-            if (direction == Direction.downright) newBodyPos += new Vector3(0.3f, -0.2f, 0);
-            if (direction == Direction.downleft) newBodyPos += new Vector3(0f, -0.2f, 0);
-
-            if (PhysicsHelpers.AnythingBetween(
-                    player.GetTruePosition(),
-                    newBodyPos,
-                    Constants.ShipAndObjectsMask,
-                    false
-                ))
-                newBodyPos = new Vector3(undertakerPos.x, undertakerPos.y, bodyLastPos.z);
+            if (player.inVent)
+            {
+                bodyComponent.transform.position = targetPos;
+            }
+            else
+            {
+                bodyComponent.transform.position = Vector3.Lerp(bodyComponent.transform.position, targetPos, 5f * Time.deltaTime);
+            }
 
             if (player.Data.IsDead) {
                 if (player.AmOwner)
-                    DropBody.Invoke(newBodyPos);
+                    DropBody.Invoke(bodyComponent.transform.position);
                 return;
             }
-
-            bodyComponent.transform.position = newBodyPos;
 
             if (!player.AmOwner) return;
 
@@ -160,7 +142,11 @@ namespace TheOtherRoles.Roles
 
         public override void ResetRole(bool isShifted)
         {
-            if (PlayerControl.LocalPlayer == player) EditVentInfo(false);
+            if (PlayerControl.LocalPlayer == player)
+            {
+                EditVentInfo(false);
+                DropBody.Invoke(DraggedBody?.transform.position ?? Vector3.zero);
+            }
         }
 
         private static Vent GetVent(string name)
